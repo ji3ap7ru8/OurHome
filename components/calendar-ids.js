@@ -60,7 +60,7 @@ function renderList() {
         ${x.name ? `<span class="text-xs font-bold text-slate-700 dark:text-slate-200 block truncate">${esc(x.name)}</span>` : ""}
         <span class="${x.name ? "text-[10px] text-slate-400" : "text-xs font-bold text-slate-700 dark:text-slate-200"} block truncate select-text">${esc(x.calId)}</span>
       </span>
-      <button type="button" data-action="calid-remove" data-id="${esc(x.id)}" aria-label="${armed ? "再按一次確定刪除" : "刪除這個日曆 ID"}" class="shrink-0 h-8 ${armed ? "px-3 bg-rose-500 text-white text-[11px] font-bold" : "w-8 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 hover:text-rose-500"} rounded-lg flex items-center justify-center active:scale-90 transition">${armed ? "再按一次刪除" : '<i class="fa-solid fa-trash-can text-xs"></i>'}</button>
+      <button type="button" data-tip="cal-id-del" data-action="calid-remove" data-id="${esc(x.id)}" aria-label="${armed ? "再按一次確定刪除" : "刪除這個日曆 ID"}" class="shrink-0 h-8 ${armed ? "px-3 bg-rose-500 text-white text-[11px] font-bold" : "w-8 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 hover:text-rose-500"} rounded-lg flex items-center justify-center active:scale-90 transition">${armed ? "再按一次刪除" : '<i class="fa-solid fa-trash-can text-xs"></i>'}</button>
     </div>`;
   }).join("");
 }

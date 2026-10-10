@@ -59,7 +59,7 @@ export const headerTemplate = `
                     </button>
 
                     <!-- 家庭日曆頁專用：︙ 日曆設定（顏色跟著主色調；其他頁隱藏） -->
-                    <button id="headerIdBtn" data-action="open-calendar-id" class="hidden w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center" title="日曆設定">
+                    <button id="headerIdBtn" data-action="open-calendar-id" data-tip="cal-set" class="hidden w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center" title="日曆設定">
                         <i class="fa-solid fa-ellipsis-vertical text-lg theme-text-primary"></i>
                     </button>
 

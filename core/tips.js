@@ -206,6 +206,21 @@ const calPageScene = (back) => `<div class="sc">
   ${finger("left:calc(50% - 6px);top:20px")}
 </div>`;
 
+// ---------- 日曆設定（︙）的示範場景 ----------
+const calSetScene = `<div class="sc">
+  <span class="scm-btn" style="right:14px;top:4px;width:30px;height:30px;font-size:14px"><b>︙</b></span>
+  <div class="pnl pnl-in"><b style="font-size:11px">日曆設定</b><i class="sb"></i><i class="sb" style="width:60%"></i><i class="sb"></i></div>
+  ${finger("right:10px;top:12px")}
+</div>`;
+const tpi = (txt) => `<div class="tpi"><span class="tpi-t">${txt}</span><span class="tpi-c"></span></div>`;
+const calIdNameScene = `<div class="sc"><b style="position:absolute;left:30px;top:6px;font-size:11px">名稱（可不填）</b>${tpi("全家行程")}</div>`;
+const calIdValueScene = `<div class="sc"><b style="position:absolute;left:30px;top:6px;font-size:11px">日曆 ID</b>${tpi("xxxx@group.calendar…")}</div>`;
+const calIdAddScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-62px;top:2px;font-size:12px;padding:6px 14px;background:#0284c7;border-color:#0284c7;color:#fff">＋ 新增日曆 ID</span>
+  <div class="gtl" style="top:44px"><div class="gt gl" style="animation-delay:.3s"><span class="scc-ic" style="width:16px;height:16px"></span><i class="sb" style="flex:1;margin:0"></i></div></div>
+  ${finger("left:calc(50% - 6px);top:12px")}
+</div>`;
+
 const TIPS = {
   "cards-gear": { scene: panelScene(true), text: "按這裡打開系統設定。" },
   "cards-close": { scene: panelScene(false), text: "按這裡關閉設定視窗。" },
@@ -259,6 +274,11 @@ const TIPS = {
   "cal-close": { scene: calCloseScene, text: "按這裡，關閉視窗。" },
   "cal-step-next": { scene: calPageScene(false), text: "填完這一頁，按這裡到下一頁；最後一頁按「儲存」。" },
   "cal-step-prev": { scene: calPageScene(true), text: "回到上一頁修改；第一頁按「取消」會直接關閉。" },
+  "cal-set": { scene: calSetScene, text: "按這裡，打開日曆設定。" },
+  "cal-id-name": { scene: calIdNameScene, text: "幫這本日曆取個好認的名字，不填也可以。" },
+  "cal-id-value": { scene: calIdValueScene, text: "貼上 Google 日曆 ID。到 Google 日曆 → 該日曆的設定 → 整合日曆，就能找到。" },
+  "cal-id-add": { scene: calIdAddScene, text: "按這裡新增，清單會多一筆，數量不限。" },
+  "cal-id-del": { scene: calDelScene, text: "按垃圾桶，再按一次「再按一次刪除」才會真的移除。" },
   "notes-sort-pinned": { scene: reorder('<i class="fa-solid fa-thumbtack"></i>'), text: "這是釘選，會自動往前排放。" },
   "notes-sort-date": { scene: reorder('<span class="sm-txt">最新</span>'), text: "最新發布的公告，會排在最前面。" },
   "notes-sort-expire": { scene: reorder('<span class="sm-txt">剩1天</span>'), text: "快到期的公告，會自動往前排放。" },
@@ -387,6 +407,11 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 .cmo { position: absolute; left: 50%; top: 4px; width: 170px; margin-left: -85px; display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 14px; background: #0284c7; color: #fff; box-shadow: 0 3px 6px rgba(0,0,0,.18); }
 .cmo-b { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; }
 .cmo-t { position: relative; width: 56px; height: 24px; text-align: center; font-size: 18px; line-height: 24px; } .cmo-t span { position: absolute; inset: 0; }
+.tpi { position: absolute; left: 30px; right: 30px; top: 30px; height: 34px; border-radius: 10px; background: #fff; border: 2px solid #94a3b8; display: flex; align-items: center; padding: 0 10px; font-size: 13px; font-weight: 900; color: #1e293b; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+.tpi-t { display: inline-block; overflow: hidden; white-space: nowrap; width: 0; animation: tpiType 3.6s steps(14, end) infinite; }
+.tpi-c { width: 2px; height: 16px; background: #0284c7; margin-left: 1px; animation: tpiBlink .7s steps(2) infinite; }
+@keyframes tpiType { 0% { width: 0; } 65%,92% { width: 100%; } 100% { width: 0; } }
+@keyframes tpiBlink { 50% { opacity: 0; } }
 @keyframes tipPress { 0%,12%,24%,100% { transform: scale(1); } 18% { transform: scale(.92); } }
 `;
   document.head.appendChild(st);

@@ -9,10 +9,10 @@ export const calendarIdsTemplate = `
                     <h1 class="text-base font-black text-slate-800 dark:text-slate-100 tracking-wider">日曆設定</h1>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button data-action="open-settings" data-mode="all" title="系統設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-slate-300/70 theme-text-primary flex items-center justify-center transition-all active:scale-90">
+                    <button data-tip="cards-gear" data-action="open-settings" data-mode="all" title="系統設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-slate-300/70 theme-text-primary flex items-center justify-center transition-all active:scale-90">
                         <i class="fa-solid fa-gear text-base"></i>
                     </button>
-                    <button data-action="close-apps-options" title="關閉設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90">
+                    <button data-tip="cards-close" data-action="close-apps-options" title="關閉設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
@@ -32,11 +32,11 @@ export const calendarIdsTemplate = `
                     </div>
                     <div class="px-4 pb-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-3">
                         <div class="space-y-2">
-                            <label for="calIdName" class="text-xs font-bold text-slate-700 dark:text-slate-200 block">名稱<span class="text-[10px] font-medium text-slate-400 ml-1">（可不填，最多 20 字）</span></label>
+                            <label for="calIdName" data-tip="cal-id-name" class="text-xs font-bold text-slate-700 dark:text-slate-200 block">名稱<span class="text-[10px] font-medium text-slate-400 ml-1">（可不填，最多 20 字）</span></label>
                             <input id="calIdName" type="text" maxlength="20" autocomplete="off" enterkeyhint="next" placeholder="例如：全家行程" class="select-text w-full px-3 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 focus:outline-none theme-focus-border">
-                            <label for="calIdValue" class="text-xs font-bold text-slate-700 dark:text-slate-200 block pt-1">日曆 ID</label>
+                            <label for="calIdValue" data-tip="cal-id-value" class="text-xs font-bold text-slate-700 dark:text-slate-200 block pt-1">日曆 ID</label>
                             <input id="calIdValue" type="text" enterkeyhint="done" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="例如：xxxx@group.calendar.google.com" class="select-text w-full px-3 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 focus:outline-none theme-focus-border">
-                            <button type="button" data-action="calid-add" class="w-full py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold text-center flex items-center justify-center gap-1.5 active:scale-95 transition">
+                            <button type="button" data-tip="cal-id-add" data-action="calid-add" class="w-full py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold text-center flex items-center justify-center gap-1.5 active:scale-95 transition">
                                 <i class="fa-solid fa-plus"></i> 新增日曆 ID
                             </button>
                         </div>
@@ -47,7 +47,7 @@ export const calendarIdsTemplate = `
                 <!-- 最底下：Google 帳號。未登入 → 顯示登入（叫出登入頁）；已登入 → 顯示儲存狀態 -->
                 <div class="pt-2 space-y-2">
                     <p id="calIdDriveHint" class="text-[10px] text-slate-400 leading-relaxed text-center px-2"></p>
-                    <button id="calIdLoginBtn" type="button" data-action="open-login-from-settings" class="w-full py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-700 dark:text-slate-100 font-bold text-xs flex items-center justify-center gap-2.5 soft-shadow-sm active:scale-95 transition-all">
+                    <button id="calIdLoginBtn" data-tip="cards-login" type="button" data-action="open-login-from-settings" class="w-full py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-700 dark:text-slate-100 font-bold text-xs flex items-center justify-center gap-2.5 soft-shadow-sm active:scale-95 transition-all">
                         <i class="fa-brands fa-google text-sm"></i>
                         <span>使用 Google 帳號登入</span>
                     </button>
