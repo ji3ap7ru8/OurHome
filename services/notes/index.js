@@ -98,8 +98,8 @@ function openDetail(id) {
   const m = modal(`
     <div style="${style(n)};transform:rotate(-1deg)" class="relative rounded-b-xl border-t-8 px-6 pt-9 pb-6 shadow-2xl">
       ${TAPE}
-      <button data-send aria-label="發送到 LINE" class="absolute top-3 right-16 w-10 h-10 rounded-full bg-white/70 text-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-paper-plane"></i></button>
-      <button data-close aria-label="關閉" class="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/70 text-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-xmark"></i></button>
+      <button data-send data-tip="notes-send" aria-label="發送到 LINE" class="absolute top-3 right-16 w-10 h-10 rounded-full bg-white/70 text-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-paper-plane"></i></button>
+      <button data-close data-tip="notes-close" aria-label="關閉" class="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/70 text-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-xmark"></i></button>
       <div class="flex items-center gap-2 pr-24 flex-wrap">
         <span class="text-sm px-3 py-0.5 rounded border-2 border-current font-extrabold">${esc(n.tag)}</span>
         ${expired(n) ? '<span class="text-xs bg-gray-500 text-white px-2 py-0.5 rounded font-bold">已過期</span>' : n.isPinned ? '<span class="font-extrabold text-red-600 text-sm"><i class="fa-solid fa-thumbtack"></i> 已置頂</span>' : ""}
@@ -185,7 +185,7 @@ function openManage() {
       ${TAPE}
       <div class="flex items-center justify-between mb-3">
         <h3 class="text-xl font-black"><i class="fa-solid fa-thumbtack text-amber-600"></i> 管理公告 <span class="text-sm font-extrabold bg-amber-200 px-2 py-0.5 rounded-full align-middle">${notes.length} / ${MAX_NOTES}</span></h3>
-        <button data-close aria-label="關閉" class="w-9 h-9 rounded-full bg-white/80 text-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-xmark"></i></button>
+        <button data-close data-tip="notes-close" aria-label="關閉" class="w-9 h-9 rounded-full bg-white/80 text-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <button data-new class="w-full py-3 rounded-xl border-2 border-dashed border-amber-500 bg-amber-100/60 text-amber-800 font-black text-base mb-4 active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增便利貼</button>
       <div class="space-y-4">
@@ -282,7 +282,7 @@ function openForm(n = null) {
           <i class="fa-solid ${n ? "fa-pen-to-square" : "fa-note-sticky"} text-xl"></i>
           <h2 class="text-xl font-black truncate">${n ? "編輯" : "新增"}便利貼</h2>
         </div>
-        <button type="button" data-x aria-label="關閉" class="shrink-0 w-10 h-10 rounded-full bg-white/70 hover:bg-white text-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" data-x data-tip="notes-close" aria-label="關閉" class="shrink-0 w-10 h-10 rounded-full bg-white/70 hover:bg-white text-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
       <form novalidate class="flex-1 min-h-0 flex flex-col text-slate-800 dark:text-slate-100">

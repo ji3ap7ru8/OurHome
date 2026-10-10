@@ -90,7 +90,7 @@ export function openLineSendDialog({ title = "發送訊息", subtitle = "", buil
   wrap.id = ID;
   wrap.className = `${dark ? "dark " : ""}fixed inset-0 z-[70] flex items-center justify-center bg-black/45 p-4`;
 
-  const rows = list.map((x) => `<label class="lsd-item flex items-center gap-2 px-2.5 py-2.5 rounded-2xl cursor-pointer select-none min-w-0"><input type="checkbox" data-uid="${esc(x.userId)}" data-name="${esc(x.name || x.userId)}" class="w-5 h-5 accent-emerald-600 shrink-0"><span class="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">${esc(x.name || x.userId)}</span></label>`).join("");
+  const rows = list.map((x) => `<label data-tip="line-pick" class="lsd-item flex items-center gap-2 px-2.5 py-2.5 rounded-2xl cursor-pointer select-none min-w-0"><input type="checkbox" data-uid="${esc(x.userId)}" data-name="${esc(x.name || x.userId)}" class="w-5 h-5 accent-emerald-600 shrink-0"><span class="text-sm font-bold text-slate-800 dark:text-slate-100 truncate">${esc(x.name || x.userId)}</span></label>`).join("");
   const empty = `<p class="text-sm font-medium text-slate-500 dark:text-slate-400 text-center py-4">還沒有 LINE 接收對象，請先到「系統設定 > LINE Bot」新增。</p>`;
 
   wrap.innerHTML = `
@@ -108,11 +108,11 @@ export function openLineSendDialog({ title = "發送訊息", subtitle = "", buil
         </div>
         <div class="flex items-center justify-between mb-2">
           <span class="text-xs font-black text-slate-500 dark:text-slate-400">發送給（LINE 名稱，可複選）</span>
-          ${list.length ? `<button type="button" data-m="all" class="text-xs font-black theme-text-primary">全選 / 取消</button>` : ""}
+          ${list.length ? `<button type="button" data-m="all" data-tip="line-all" class="text-xs font-black theme-text-primary">全選 / 取消</button>` : ""}
         </div>
         <div class="grid grid-cols-2 gap-2 max-h-[34vh] overflow-y-auto pr-0.5">${list.length ? rows : empty}</div>
         <p data-m="msg" class="text-xs font-bold text-red-600 min-h-[1rem] mt-2"></p>
-        <button type="button" data-m="next" ${list.length ? "" : "disabled"} class="lsd-btn w-full mt-1 py-3 rounded-2xl theme-bg-primary text-white text-base font-black"><i class="fa-solid fa-paper-plane"></i> 發送</button>
+        <button type="button" data-m="next" data-tip="line-send" ${list.length ? "" : "disabled"} class="lsd-btn w-full mt-1 py-3 rounded-2xl theme-bg-primary text-white text-base font-black"><i class="fa-solid fa-paper-plane"></i> 發送</button>
       </div>
       <div data-view-confirm class="hidden">
         <div class="text-center mb-3">
@@ -123,12 +123,12 @@ export function openLineSendDialog({ title = "發送訊息", subtitle = "", buil
         <div data-m="names" class="flex flex-wrap justify-center gap-1.5 max-h-[22vh] overflow-y-auto mb-2"></div>
         <p data-m="msg2" class="text-xs font-bold text-red-600 min-h-[1rem] text-center"></p>
         <div class="grid grid-cols-2 gap-2.5 mt-1">
-          <button type="button" data-m="back" class="lsd-btn py-3 rounded-2xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-100 text-sm font-black">返回修改</button>
-          <button type="button" data-m="go" class="lsd-btn py-3 rounded-2xl theme-bg-primary text-white text-sm font-black"><i class="fa-solid fa-paper-plane"></i> 確定發送</button>
+          <button type="button" data-m="back" data-tip="line-back" class="lsd-btn py-3 rounded-2xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-100 text-sm font-black">返回修改</button>
+          <button type="button" data-m="go" data-tip="line-go" class="lsd-btn py-3 rounded-2xl theme-bg-primary text-white text-sm font-black"><i class="fa-solid fa-paper-plane"></i> 確定發送</button>
         </div>
       </div>
     </div>
-    <button type="button" data-m="close" aria-label="關閉" class="absolute w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center active:scale-90 transition" style="top:${INSET + 10}px;right:${INSET + 10}px"><i class="fa-solid fa-xmark text-sm"></i></button>
+    <button type="button" data-m="close" data-tip="line-close" aria-label="關閉" class="absolute w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center active:scale-90 transition" style="top:${INSET + 10}px;right:${INSET + 10}px"><i class="fa-solid fa-xmark text-sm"></i></button>
   </div>`;
   document.body.appendChild(wrap);
 

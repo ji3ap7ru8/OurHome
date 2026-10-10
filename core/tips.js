@@ -221,6 +221,40 @@ const calIdAddScene = `<div class="sc">
   ${finger("left:calc(50% - 6px);top:12px")}
 </div>`;
 
+// ---------- 家庭公告：發送到 LINE ----------
+const lchip = (name, tick) => `<span class="lc"><span class="lc-b${tick === 1 ? " lc-on" : tick === 2 ? " lc-late" : ""}">✓</span>${name}</span>`;
+const lineDlg = (inner, st = "") => `<div class="so-big" style="left:calc(50% - 80px);width:160px;top:2px;height:86px;background:#fff;border-color:#111827;color:#1e293b;border-top-width:2px;border-radius:14px;padding:8px;${st}">${inner}</div>`;
+const noteSendScene = `<div class="sc">
+  <span class="scm-btn" style="right:26px;top:4px;width:32px;height:32px;font-size:14px"><i class="fa-solid fa-paper-plane"></i></span>
+  ${lineDlg('<b style="font-size:11px">✈ 發送到 LINE</b><i class="sb"></i><i class="sb" style="width:60%"></i>')}
+  ${finger("right:22px;top:14px")}
+</div>`;
+const noteCloseScene = `<div class="sc">
+  <div style="position:absolute;left:calc(50% - 70px);top:6px;width:140px;height:76px;border-radius:0 0 10px 10px;border-top:6px solid #fcd34d;background:#fef3c7;box-shadow:0 4px 8px rgba(0,0,0,.2);padding:8px;animation:dlgGone 3.6s ease-in-out infinite"><b style="font-size:11px;color:#78350f">苗栗冰箱</b><i class="sb"></i><i class="sb" style="width:70%"></i><span class="scm-btn" style="right:4px;top:4px;width:22px;height:22px;font-size:11px;animation:none">✕</span></div>
+  ${finger("left:calc(50% + 50px);top:6px")}
+</div>`;
+const linePickScene = `<div class="sc"><div style="position:absolute;left:24px;right:24px;top:10px;display:flex;flex-wrap:wrap;gap:6px">${lchip("爸爸", 0)}${lchip("媽媽", 2)}${lchip("牛牛", 1)}${lchip("小妹", 0)}</div>${finger("left:calc(50% - 56px);top:44px")}</div>`;
+const lineAllScene = `<div class="sc"><b style="position:absolute;right:26px;top:4px;font-size:11px;color:#0369a1">全選 / 取消</b><div style="position:absolute;left:24px;right:24px;top:28px;display:flex;flex-wrap:wrap;gap:6px">${["爸爸", "媽媽", "牛牛", "小妹"].map((n) => lchip(n, 2)).join("")}</div>${finger("right:34px;top:2px")}</div>`;
+const lineSendScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-40px;top:6px;font-size:13px;padding:7px 22px;background:#0284c7;border-color:#0284c7;color:#fff">✈ 發送</span>
+  ${lineDlg('<div style="text-align:center;font-size:20px">❓</div><b style="display:block;text-align:center;font-size:11px">確定要發送嗎？</b>', "top:34px;height:54px")}
+  ${finger("left:calc(50% - 6px);top:16px")}
+</div>`;
+const lineGoScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-48px;top:40px;font-size:12px;padding:6px 14px;background:#0284c7;border-color:#0284c7;color:#fff">✈ 確定發送</span>
+  <span class="fly">✈️</span><span class="rc-toast" style="top:8px">已發送到 LINE</span>
+  ${finger("left:calc(50% - 6px);top:50px")}
+</div>`;
+const lineBackScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-44px;top:8px;font-size:12px;padding:6px 14px;background:#f1f5f9;border-color:#cbd5e1;color:#334155">返回修改</span>
+  <div style="position:absolute;left:24px;right:24px;top:48px;display:flex;gap:6px;justify-content:center;animation:fmtB 3.6s ease-in-out infinite">${lchip("爸爸", 0)}${lchip("牛牛", 1)}</div>
+  ${finger("left:calc(50% - 6px);top:20px")}
+</div>`;
+const lineCloseScene = `<div class="sc">
+  <div style="position:absolute;left:calc(50% - 70px);top:6px;width:140px;height:76px;border-radius:14px;background:#fff;border:2px solid #111827;padding:8px;animation:dlgGone 3.6s ease-in-out infinite"><b style="font-size:11px">✈ 發送到 LINE</b><i class="sb"></i><i class="sb" style="width:60%"></i><span class="scm-btn" style="right:4px;top:4px;width:22px;height:22px;font-size:11px;animation:none;color:#64748b">✕</span></div>
+  ${finger("left:calc(50% + 50px);top:6px")}
+</div>`;
+
 const TIPS = {
   "cards-gear": { scene: panelScene(true), text: "按這裡打開系統設定。" },
   "cards-close": { scene: panelScene(false), text: "按這裡關閉設定視窗。" },
@@ -279,6 +313,14 @@ const TIPS = {
   "cal-id-value": { scene: calIdValueScene, text: "貼上 Google 日曆 ID。到 Google 日曆 → 該日曆的設定 → 整合日曆，就能找到。" },
   "cal-id-add": { scene: calIdAddScene, text: "按這裡新增，清單會多一筆，數量不限。" },
   "cal-id-del": { scene: calDelScene, text: "按垃圾桶，再按一次「再按一次刪除」才會真的移除。" },
+  "notes-send": { scene: noteSendScene, text: "按紙飛機，把這則公告發送到 LINE。" },
+  "notes-close": { scene: noteCloseScene, text: "按 ✕，關閉這則公告。" },
+  "line-pick": { scene: linePickScene, text: "點名字打勾，可以選好幾個人。" },
+  "line-all": { scene: lineAllScene, text: "一次全部打勾；再按一次全部取消。" },
+  "line-send": { scene: lineSendScene, text: "選好人後按發送，還會再問你一次，不會直接送出。" },
+  "line-go": { scene: lineGoScene, text: "確定要送，就按這裡，訊息會立刻發到 LINE。" },
+  "line-back": { scene: lineBackScene, text: "還沒送出，回到上一步重新選人。" },
+  "line-close": { scene: lineCloseScene, text: "按 ✕，取消發送並關閉視窗。" },
   "notes-sort-pinned": { scene: reorder('<i class="fa-solid fa-thumbtack"></i>'), text: "這是釘選，會自動往前排放。" },
   "notes-sort-date": { scene: reorder('<span class="sm-txt">最新</span>'), text: "最新發布的公告，會排在最前面。" },
   "notes-sort-expire": { scene: reorder('<span class="sm-txt">剩1天</span>'), text: "快到期的公告，會自動往前排放。" },
@@ -412,6 +454,13 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 .tpi-c { width: 2px; height: 16px; background: #0284c7; margin-left: 1px; animation: tpiBlink .7s steps(2) infinite; }
 @keyframes tpiType { 0% { width: 0; } 65%,92% { width: 100%; } 100% { width: 0; } }
 @keyframes tpiBlink { 50% { opacity: 0; } }
+.lc { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 10px; background: #f8fafc; border: 2px solid #e2e8f0; font-size: 11px; font-weight: 900; color: #1e293b; }
+.lc-b { width: 14px; height: 14px; border-radius: 4px; border: 2px solid #94a3b8; background: #fff; color: transparent; font-size: 10px; line-height: 10px; text-align: center; }
+.lc-on { background: #10b981; border-color: #10b981; color: #fff; }
+.lc-late { animation: lcTick 3.6s ease-in-out infinite; }
+@keyframes lcTick { 0%,30% { background: #fff; border-color: #94a3b8; color: transparent; } 40%,90% { background: #10b981; border-color: #10b981; color: #fff; } 100% { background: #fff; border-color: #94a3b8; color: transparent; } }
+.fly { position: absolute; left: 20px; top: 8px; font-size: 22px; animation: flyAway 3.6s ease-in-out infinite; }
+@keyframes flyAway { 0%,30% { opacity: 0; transform: translate(0, 10px); } 40% { opacity: 1; } 80%,100% { opacity: 0; transform: translate(190px, -14px) rotate(-10deg); } }
 @keyframes tipPress { 0%,12%,24%,100% { transform: scale(1); } 18% { transform: scale(.92); } }
 `;
   document.head.appendChild(st);
