@@ -538,7 +538,7 @@ export default {
       <div class="pt-4 pb-1 px-1">
         <span data-count class="text-sm font-black bg-amber-200 text-amber-900 px-2.5 py-0.5 rounded-full"></span>
         <div class="flex gap-2 overflow-x-auto no-scrollbar mt-3 -mx-1 px-1 pb-1" role="group" aria-label="排序方式">
-          ${SORTS.map(([v, t]) => `<button data-sortbtn="${v}" data-tip="notes-sort" class="shrink-0 px-3.5 py-1.5 rounded-full border text-sm font-extrabold active:scale-95 transition">${t}</button>`).join("")}
+          ${SORTS.map(([v, t]) => `<button data-sortbtn="${v}" data-tip="notes-sort-${v}" class="shrink-0 px-3.5 py-1.5 rounded-full border text-sm font-extrabold active:scale-95 transition">${t}</button>`).join("")}
         </div>
       </div>
       <div data-grid class="grid grid-cols-2 gap-4 pt-3"></div>`;

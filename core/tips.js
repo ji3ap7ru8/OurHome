@@ -6,10 +6,38 @@
 //   2. 服務 mount 時呼叫 showTipHint("notes")、unmount 時呼叫 closeTips()
 import { state, emit, on } from "./store.js";
 
+// ---------- 示範場景（純 HTML + CSS 動畫）----------
+const NOTE = { y: ["#fef3c7", "#fcd34d", "#78350f"], g: ["#dcfce7", "#86efac", "#14532d"] }; // 便利貼配色：黃（重要）、綠（一般）
+const note = (cls, c, inner) => `<div class="sn ${cls}" style="background:${c[0]};border-color:${c[1]};color:${c[2]}"><span class="sn-tape"></span>${inner}<i class="sb"></i><i class="sb" style="width:60%"></i></div>`;
+const finger = (style = "") => `<span class="tip-finger" style="${style}">👆</span>`;
+
+// 三張便利貼，最後一張（帶圈起來的記號）自己滑到最前面
+function reorder(markHtml) {
+  return `<div class="sc">
+    ${note("sn-a", NOTE.g, '<b class="sl">一般</b>')}
+    ${note("sn-b", NOTE.g, '<b class="sl">一般</b>')}
+    ${note("sn-c", NOTE.y, `<b class="sl">重要</b><span class="sm">${markHtml}<span class="sm-ring"></span></span>`)}
+  </div>`;
+}
+// 點便利貼 → 打開完整內容
+const openScene = `<div class="sc">
+  ${note("so-small", NOTE.y, '<b class="sl">重要</b>')}
+  <div class="so-big" style="background:${NOTE.y[0]};border-color:${NOTE.y[1]};color:${NOTE.y[2]}"><b class="sl">重要</b><i class="sb"></i><i class="sb"></i><i class="sb" style="width:70%"></i></div>
+  ${finger("left:calc(50% - 6px);top:36px")}
+</div>`;
+// 點「管理」→ 新增一張便利貼
+const manageScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:30px;top:26px;background:#d97706;border-color:#d97706;color:#fff">⚙ 管理</span>
+  <div class="sp-new" style="background:${NOTE.g[0]};border-color:${NOTE.g[1]};color:${NOTE.g[2]}"><span class="sn-tape"></span><b class="sl" style="font-size:18px">＋</b><i class="sb"></i></div>
+  ${finger("left:62px;top:36px")}
+</div>`;
+
 const TIPS = {
-  "notes-sort": { title: "切換排序", text: "點選想要的順序，公告會立刻重新排列。", demo: "tap" },
-  "notes-open": { title: "看完整公告", text: "點一下便利貼，打開完整內容。", demo: "tap" },
-  "notes-manage": { title: "新增與編輯公告", text: "登入後才會出現。可新增、編輯、刪除；期限可選「綁定期限」到期自動變灰，或「永久顯示」。", demo: "tap" },
+  "notes-sort-pinned": { scene: reorder('<i class="fa-solid fa-thumbtack"></i>'), text: "這是釘選，會自動往前排放。" },
+  "notes-sort-date": { scene: reorder('<span class="sm-txt">最新</span>'), text: "最新發布的公告，會排在最前面。" },
+  "notes-sort-expire": { scene: reorder('<span class="sm-txt">剩1天</span>'), text: "快到期的公告，會自動往前排放。" },
+  "notes-open": { scene: openScene, text: "點一下便利貼，打開完整內容。" },
+  "notes-manage": { scene: manageScene, text: "登入後可新增、編輯公告；期限可選「綁定期限」或「永久顯示」。" },
 };
 
 const HOLD_MS = 500;
@@ -42,13 +70,32 @@ function injectStyle() {
 body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 .tip-pop { animation: tipIn .2s ease-out; }
 @keyframes tipIn { from { opacity: 0; transform: translateY(6px) scale(.96); } to { opacity: 1; transform: none; } }
-.tip-demo { position: relative; height: 84px; display: flex; align-items: center; justify-content: center; }
-.tip-pill { padding: 8px 18px; border-radius: 999px; background: #fff; border: 2px solid #f59e0b; color: #78350f; font-weight: 900; font-size: 14px; animation: tipPress 1.6s ease-in-out infinite; }
-.tip-ring { position: absolute; width: 28px; height: 28px; border-radius: 50%; border: 3px solid #f59e0b; opacity: 0; animation: tipRing 1.6s ease-out infinite; }
-.tip-finger { position: absolute; font-size: 34px; line-height: 1; transform-origin: 50% 0; animation: tipFinger 1.6s ease-in-out infinite; }
-@keyframes tipFinger { 0%,100% { transform: translate(14px, 30px); } 35%,55% { transform: translate(14px, 12px); } }
-@keyframes tipPress { 0%,100% { transform: scale(1); } 40%,55% { transform: scale(.94); } }
-@keyframes tipRing { 0%,30% { opacity: 0; transform: scale(.4); } 40% { opacity: .9; transform: scale(.8); } 100% { opacity: 0; transform: scale(2.2); } }
+.sc { position: relative; height: 92px; margin: 2px 0 6px; }
+.sn { position: absolute; top: 18px; width: 52px; height: 62px; border-top: 5px solid; border-radius: 0 0 7px 7px; padding: 6px 5px; box-shadow: 0 3px 6px rgba(0,0,0,.18); }
+.sn-tape { position: absolute; top: -10px; left: 50%; width: 22px; height: 8px; margin-left: -11px; background: rgba(255,255,255,.75); border: 1px dashed rgba(0,0,0,.2); }
+.sl { display: block; font-size: 9px; font-weight: 900; line-height: 1; border: 1.5px solid currentColor; border-radius: 4px; padding: 2px 3px; width: max-content; margin-bottom: 5px; }
+.sb { display: block; height: 5px; border-radius: 3px; background: currentColor; opacity: .45; margin-top: 4px; }
+.sn-a { left: 24px; animation: sA 4s ease-in-out infinite; }
+.sn-b { left: 90px; animation: sB 4s ease-in-out infinite; }
+.sn-c { left: 156px; animation: sC 4s ease-in-out infinite; }
+@keyframes sA { 0%,22% { transform: translateX(0); } 42%,90% { transform: translateX(66px); } 100% { transform: translateX(0); } }
+@keyframes sB { 0%,22% { transform: translateX(0); } 42%,90% { transform: translateX(66px); } 100% { transform: translateX(0); } }
+@keyframes sC { 0%,22% { transform: translateX(0); } 42%,90% { transform: translateX(-132px); } 100% { transform: translateX(0); } }
+.sm { position: absolute; top: -12px; right: -9px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #dc2626; }
+.sm-txt { font-size: 9px; font-weight: 900; white-space: nowrap; color: #b91c1c; }
+.sm-ring { position: absolute; inset: -4px; border: 2.5px solid #ef4444; border-radius: 50%; animation: smRing 1.4s ease-in-out infinite; }
+@keyframes smRing { 0%,100% { transform: scale(.9); opacity: .6; } 50% { transform: scale(1.12); opacity: 1; } }
+.so-small { left: calc(50% - 26px); animation: soSmall 3.6s ease-in-out infinite; }
+.so-big { position: absolute; left: calc(50% - 62px); top: 6px; width: 124px; height: 80px; border: 2px solid; border-top-width: 6px; border-radius: 0 0 8px 8px; padding: 8px; box-shadow: 0 5px 10px rgba(0,0,0,.2); opacity: 0; animation: soBig 3.6s ease-in-out infinite; }
+@keyframes soSmall { 0%,38% { opacity: 1; } 46%,92% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes soBig { 0%,40% { opacity: 0; transform: scale(.5); } 52%,90% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(.5); } }
+.sp-btn { animation: tipPress 3.6s ease-in-out infinite; }
+.sp-new { position: absolute; right: 30px; top: 20px; width: 52px; height: 58px; border: 2px solid; border-top-width: 5px; border-radius: 0 0 7px 7px; padding: 6px 5px; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,.18); opacity: 0; animation: spNew 3.6s ease-in-out infinite; }
+@keyframes spNew { 0%,40% { opacity: 0; transform: scale(.4) rotate(-8deg); } 55%,90% { opacity: 1; transform: scale(1) rotate(2deg); } 100% { opacity: 0; transform: scale(.4); } }
+.tip-pill { display: inline-block; padding: 8px 16px; border-radius: 999px; background: #fff; border: 2px solid #f59e0b; font-weight: 900; font-size: 14px; }
+.tip-finger { position: absolute; font-size: 30px; line-height: 1; animation: tipFinger 3.6s ease-in-out infinite; pointer-events: none; }
+@keyframes tipFinger { 0%,25%,100% { transform: translate(8px, 22px); opacity: 0; } 8% { opacity: 1; } 15%,30% { transform: translate(8px, 2px); opacity: 1; } 38% { transform: translate(8px, 22px); opacity: 0; } }
+@keyframes tipPress { 0%,12%,24%,100% { transform: scale(1); } 18% { transform: scale(.92); } }
 `;
   document.head.appendChild(st);
 }
@@ -68,11 +115,10 @@ function openPop(target) {
   closePop();
   const wrap = document.createElement("div");
   wrap.className = "fixed inset-0 z-[80]";
-  wrap.innerHTML = `<div class="tip-pop absolute w-[260px] rounded-2xl border-2 border-amber-400 bg-amber-50 text-amber-950 shadow-2xl px-4 pt-2 pb-3">
-    <div class="tip-demo" aria-hidden="true"><span class="tip-pill">${esc(t.title)}</span><span class="tip-ring"></span><span class="tip-finger">👆</span></div>
-    <p class="text-base font-black leading-snug">${esc(t.title)}</p>
-    <p class="text-sm font-bold leading-snug mt-1">${esc(t.text)}</p>
-    <p class="text-[11px] font-bold text-amber-700/70 mt-2">點空白處關閉</p>
+  wrap.innerHTML = `<div class="tip-pop absolute w-[260px] rounded-2xl border-2 border-amber-400 bg-amber-50 text-amber-950 shadow-2xl px-4 pt-3 pb-3">
+    <div aria-hidden="true">${t.scene}</div>
+    <p class="text-base font-black leading-snug text-center">${esc(t.text)}</p>
+    <p class="text-[11px] font-bold text-amber-700/70 mt-2 text-center">點空白處關閉</p>
   </div>`;
   document.body.appendChild(wrap);
   const box = wrap.firstElementChild, r = target.getBoundingClientRect();
