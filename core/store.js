@@ -8,6 +8,7 @@ export const state = {
   isLoggedIn: false,
   account: null, // { name, email, picture }
   autoLogin: false, // 自動登入（不登出）開關：預設關閉；開啟時瀏覽器記住帳號，下次進入自動登入。隨系統設定存 Google 雲端硬碟
+  tips: true, // 操作提示說明開關（預設開）：開著時每次登入 / 進入網頁，第一次進入各畫面會顯示提示卡（見 core/tips.js）；隨系統設定存 Google 雲端硬碟
   nickname: "", // 暱稱：空字串＝使用 Google 帳號名稱；登入後隨系統設定存 Google 雲端硬碟
   // 雲端連線狀態：off 未連線 / unset 尚未設定 / loading 連線中 / ok 已連線 / error 失敗
   cloud: { mode: "demo", drive: "off", server: "off", private: "off", detail: {}, ready: false, syncing: false, busy: [] },

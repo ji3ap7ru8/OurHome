@@ -15,6 +15,7 @@ import { lockAdmin } from "../core/admin.js";
 import { showToast } from "../core/toast.js";
 import { mountLineBotIds } from "./line-bot-ids.js";
 import { setAutoLogin } from "../core/autologin.js";
+import { setTips } from "../core/tips.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -42,6 +43,7 @@ export function mountSettingsPanel(mountEl) {
   });
   registerChangeActions({
     "dock-visible": (el) => setDockVisible(el.checked),
+    tips: (el) => { setTips(el.checked); showToast(el.checked ? "已開啟操作提示說明" : "已關閉操作提示說明"); },
     "auto-login": (el) => {
       if (!state.isLoggedIn) { el.checked = false; return showToast("請先登入 Google 帳號才能開啟自動登入"); }
       setAutoLogin(el.checked);
@@ -59,6 +61,7 @@ export function mountSettingsPanel(mountEl) {
   on("auth:change", renderAuth);
   on("auth:change", renderAutoLogin);
   on("autologin:change", renderAutoLogin);
+  on("tips:change", renderTips);
   on("auth:change", paintAdmin);
   on("admin:change", paintAdmin);
   on("nickname:change", () => renderNickname(false));
@@ -225,6 +228,11 @@ function renderTheme(theme) {
   else if (val <= 85) label += " (精簡)";
   $("fontScaleLabel").innerText = label;
   $("fontSizeRange").value = val;
+}
+
+function renderTips() {
+  const t = $("tipsToggle");
+  if (t) t.checked = state.tips !== false;
 }
 
 function renderAutoLogin() {

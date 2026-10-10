@@ -144,7 +144,7 @@ export const settingsPanelTemplate = `
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-200">操作提示說明</span>
                             </div>
                             <label class="relative inline-flex items-center gap-1.5 cursor-pointer">
-                                <input type="checkbox" checked class="sr-only peer">
+                                <input type="checkbox" id="tipsToggle" data-change="tips" checked class="sr-only peer">
                                 <div class="oh-switch"></div><span class="oh-switch-text" aria-hidden="true"></span>
                             </label>
                         </div>

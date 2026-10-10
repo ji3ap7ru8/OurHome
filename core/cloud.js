@@ -34,6 +34,7 @@ import { snapshotLineBotIds, snapshotLineBotToken, snapshotLineRelayUrl, applyLi
 import { bindBowlEmails, cleanBowlEmails } from "./bowl-emails.js";
 import { showToast } from "./toast.js";
 import { bindReads, unbindReads } from "./reminder-reads.js";
+import { snapshotTips, applyTips } from "./tips.js";
 import { snapshotAutoLogin, applyAutoLogin, resetAutoLogin } from "./autologin.js";
 import { privateKey } from "./nickname.js";
 
@@ -91,7 +92,7 @@ export function friendlyError(e, scope = "") {
 }
 
 /* ---------- 設定快照 / 套用 ---------- */
-const snapshotSettings = () => ({ theme: snapshotTheme(), shortcuts: [...state.shortcuts], dockVisible: state.dockVisible !== false, apps: snapshotApps(), lobby: snapshotLobby(), cards: snapshotCards(), nickname: state.nickname || "", storage: { ...state.storage }, calendarIds: snapshotCalendarIds(), lineBotToken: snapshotLineBotToken(), lineRelayUrl: snapshotLineRelayUrl(), lineBotIds: snapshotLineBotIds(), autoLogin: snapshotAutoLogin() });
+const snapshotSettings = () => ({ theme: snapshotTheme(), shortcuts: [...state.shortcuts], dockVisible: state.dockVisible !== false, apps: snapshotApps(), lobby: snapshotLobby(), cards: snapshotCards(), nickname: state.nickname || "", storage: { ...state.storage }, calendarIds: snapshotCalendarIds(), lineBotToken: snapshotLineBotToken(), lineRelayUrl: snapshotLineRelayUrl(), lineBotIds: snapshotLineBotIds(), autoLogin: snapshotAutoLogin(), tips: snapshotTips() });
 
 function applySettings(s) {
   if (!s) return;
@@ -119,6 +120,7 @@ function applySettings(s) {
       for (const [k, v] of Object.entries(s.readReminders)) if (typeof v === "number" && !(k in m)) m[k] = v;
       state.readReminders = m;
     }
+    applyTips(s.tips); // 操作提示說明開關（舊設定檔沒有這欄 = 開啟）
     applyAutoLogin(s.autoLogin); // 自動登入開關（舊設定檔沒有這欄 = 關閉）
     applyCards(s.cards); // 生活圖卡設定：格式大小、排序方式、自訂編號（舊設定檔沒有 cards 時不動）
     applyApps(s.apps); // 所有應用頁：排序方式、自訂編號、擴充插件（舊設定檔沒有 apps 時不動）
@@ -458,7 +460,8 @@ on("cards:change", scheduleSettingsSave); // 生活圖卡排序
 on("cards:view", scheduleSettingsSave); // 生活圖卡格式大小
 on("apps:view", scheduleSettingsSave); // 格式大小（圖卡/清單、大小、每行數量）
 on("storage:change", scheduleSettingsSave);
-on("autologin:change", scheduleSettingsSave); // 自動登入開關
+on("autologin:change", scheduleSettingsSave);
+on("tips:change", scheduleSettingsSave); // 操作提示說明開關 // 自動登入開關
 on("linebotids:change", scheduleSettingsSave); // LINE Bot（Token、接收對象）
 on("calendarids:change", scheduleSettingsSave); // 家庭日曆 ID設定 // 儲存位置（我的筆記 / 記帳本）
 

@@ -4,6 +4,7 @@ import { MAX_NOTES, AUTHORS, TAGS, TAG_COLOR, PALETTE, notesApi } from "./data.j
 import { state } from "../../core/store.js";
 import { effectiveNickname } from "../../core/nickname.js";
 import { openLineSendDialog, closeLineSendDialog } from "../../core/line-send.js";
+import { showTips, closeTips } from "../../core/tips.js";
 
 let notes = [];               // 目前畫面上的資料（由 refresh() 從 notesApi 取得）
 let loaded = false;
@@ -550,7 +551,12 @@ export default {
     loaded = false; notes = [];
     render();
     refresh();
+    showTips("notes", { title: "家庭公告小提示", items: [
+      "點便利貼可以看完整內容",
+      "上方可切換「置頂優先 / 最新發布 / 即將截止」排序",
+      "登入後按右上角「管理」新增、編輯公告；「綁定期限」到期後會自動變灰，「永久顯示」不會過期",
+    ] });
     off = notesApi.onChange(() => { if (root) refresh(); }); // 家人新增/修改時即時更新
   },
-  unmount() { closeLineSendDialog(); formClose?.(true); off?.(); off = null; root?.remove(); root = null; },
+  unmount() { closeTips(); closeLineSendDialog(); formClose?.(true); off?.(); off = null; root?.remove(); root = null; },
 };
