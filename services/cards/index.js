@@ -2,6 +2,7 @@
 import { KINDS, MAX_CODES, cardsApi } from "./data.js";
 import { code39Svg, isCode39 } from "./code39.js";
 import { state, on } from "../../core/store.js";
+import { showTipHint, closeTips } from "../../core/tips.js";
 import { orderedCards, setCardItems, takeOpenCard } from "../../core/cards-model.js";
 
 let cards = [];
@@ -74,7 +75,7 @@ function face(c, big = false, only = null, detail = false) {
   const img = c.kind === "車牌號碼" ? "" : safeImg(c.imageUrl); // 舊資料的內容圖片
   const pic = img ? `<img src="${esc(img)}" alt="${esc(c.name)}" class="max-w-full rounded-lg" style="max-height:${big ? "50vh" : "14rem"}">` : "";
   const multi = codes.length + (img ? 1 : 0) > 1;
-  const wrap = (key, html) => detail ? `<button type="button" data-full="${key}" class="w-full flex justify-center active:scale-[0.98] transition">${html}</button>` : html;
+  const wrap = (key, html) => detail ? `<button type="button" data-full="${key}" data-tip="cards-zoom" class="w-full flex justify-center active:scale-[0.98] transition">${html}</button>` : html;
   const parts = [];
   if (pic && (only === null || only === "pic")) parts.push(wrap("pic", pic));
   codes.forEach((x, i) => { if (only === null || only === i) parts.push(wrap(i, codeBlock(c, x, big, codes.length > 1 && only === null, !!img))); });
@@ -106,7 +107,7 @@ function render() {
   const gap = list ? "gap-3" : cols === 3 ? "gap-3" : "gap-4";
   const items = orderedCards(cards, state.cardsSort.sort); // 預設 / 名稱 / 自訂
   const html = items.map((k) => list
-    ? `<button data-open="${k.id}" class="flat-card w-full rounded-2xl ${c.pad} flex items-center gap-4 active:scale-[.98] transition text-left">
+    ? `<button data-open="${k.id}" data-tip="cards-open" class="flat-card w-full rounded-2xl ${c.pad} flex items-center gap-4 active:scale-[.98] transition text-left">
         <span class="flat-ibox ${c.box} rounded-2xl overflow-hidden flex items-center justify-center shrink-0">${iconHtml(k, c.icon)}</span>
         <span class="flex-1 min-w-0">
           <span class="${c.name} font-bold text-slate-800 dark:text-slate-100 block truncate">${esc(k.name)}</span>
@@ -114,7 +115,7 @@ function render() {
         </span>
         <i class="fa-solid fa-chevron-right text-xs text-slate-400 dark:text-slate-500 shrink-0"></i>
       </button>`
-    : `<button data-open="${k.id}" class="flat-card min-w-0 rounded-3xl ${c.pad} flex flex-col items-center active:scale-95 transition">
+    : `<button data-open="${k.id}" data-tip="cards-open" class="flat-card min-w-0 rounded-3xl ${c.pad} flex flex-col items-center active:scale-95 transition">
         <span class="flat-ibox ${c.box} rounded-2xl overflow-hidden flex items-center justify-center shrink-0 mb-3">${iconHtml(k, c.icon)}</span>
         <span class="${c.name} font-bold text-slate-800 dark:text-slate-100 text-center break-words w-full">${esc(k.name)}</span>
         <span class="${c.kind} font-semibold text-slate-500 dark:text-slate-400 mt-0.5">${esc(k.kind)}</span>
@@ -172,6 +173,7 @@ function renderDetail() {
       <p class="text-center text-sm font-bold text-slate-600 dark:text-slate-300 mt-4"><i class="fa-solid fa-magnifying-glass-plus"></i> 點擊任一內容可單獨放大</p>
     </div>`;
   fixPics(root);
+  showTipHint("cards-detail");
 }
 
 function openFullscreen(c, only = null) {
@@ -305,6 +307,7 @@ export default {
     loaded = false; cards = [];
     render();
     refresh();
+    showTipHint("cards");
     off = cardsApi.onChange(() => { if (root) refresh(); });
     // ︙ 生活圖卡設定改了格式 / 排序 → 清單頁立刻重畫（詳細頁不動）
     const redraw = () => { if (root && view.page === "list") render(); };
@@ -316,5 +319,5 @@ export default {
         run(() => cardsApi.remove(id));
       })];
   },
-  unmount() { hdrTitle()?.removeEventListener("click", onHeaderClick); headerList(); setPage(null); document.querySelectorAll("#appContainer > [data-card-fs]").forEach((n) => n.remove()); off?.(); off = null; offView.forEach((f) => f()); offView = []; setCardItems([]); root?.remove(); root = null; },
+  unmount() { closeTips(); hdrTitle()?.removeEventListener("click", onHeaderClick); headerList(); setPage(null); document.querySelectorAll("#appContainer > [data-card-fs]").forEach((n) => n.remove()); off?.(); off = null; offView.forEach((f) => f()); offView = []; setCardItems([]); root?.remove(); root = null; },
 };

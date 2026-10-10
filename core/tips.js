@@ -32,12 +32,36 @@ const manageScene = `<div class="sc">
   ${finger("left:62px;top:36px")}
 </div>`;
 
+// ---------- 生活圖卡的示範場景 ----------
+const BAR = "background:repeating-linear-gradient(90deg,#111827 0 2px,transparent 2px 4px,#111827 4px 5px,transparent 5px 8px,#111827 8px 11px,transparent 11px 12px)";
+// 點圖卡 → 顯示條碼
+const cardOpenScene = `<div class="sc">
+  <div class="scc"><span class="scc-ic"></span><i class="sb" style="width:34px"></i></div>
+  <div class="so-big" style="background:#fff;border-color:#cbd5e1;color:#111827;border-top-width:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px"><div style="${BAR};width:96px;height:38px"></div><b style="font-size:10px;letter-spacing:2px">0912345678</b></div>
+  ${finger("left:calc(50% - 6px);top:36px")}
+</div>`;
+// 點條碼 → 放大（再點一下轉橫向）
+const cardZoomScene = `<div class="sc">
+  <div class="scc" style="width:84px;height:44px;top:24px;left:calc(50% - 42px)"><div style="${BAR};width:60px;height:24px"></div></div>
+  <div class="so-big" style="background:#fff;border-color:#cbd5e1;color:#111827;border-top-width:2px;left:calc(50% - 90px);width:180px;display:flex;align-items:center;justify-content:center"><div style="${BAR};width:150px;height:56px"></div></div>
+  ${finger("left:calc(50% - 6px);top:40px")}
+</div>`;
+// 點 ︙ → 跳出選單（新增圖卡、排序）
+const cardMenuScene = `<div class="sc">
+  <span class="scm-btn"><b>︙</b></span>
+  <div class="scm-menu"><span>＋ 新增圖卡</span><span>⇅ 排序方式</span><span>▦ 大小</span></div>
+  ${finger("right:20px;top:16px")}
+</div>`;
+
 const TIPS = {
+  "cards-open": { scene: cardOpenScene, text: "點一下圖卡，顯示條碼。" },
+  "cards-zoom": { scene: cardZoomScene, text: "點一下條碼會放大，再點一下轉成橫向，方便掃描。" },
+  "cards-menu": { scene: cardMenuScene, text: "按這裡新增圖卡，或調整排序與大小。" },
   "notes-sort-pinned": { scene: reorder('<i class="fa-solid fa-thumbtack"></i>'), text: "這是釘選，會自動往前排放。" },
   "notes-sort-date": { scene: reorder('<span class="sm-txt">最新</span>'), text: "最新發布的公告，會排在最前面。" },
   "notes-sort-expire": { scene: reorder('<span class="sm-txt">剩1天</span>'), text: "快到期的公告，會自動往前排放。" },
   "notes-open": { scene: openScene, text: "點一下便利貼，打開完整內容。" },
-  "notes-manage": { scene: manageScene, text: "登入後可新增、編輯公告；期限可選「綁定期限」或「永久顯示」。" },
+  "notes-manage": { scene: manageScene, text: "登入後，按這裡新增或編輯公告。" },
 };
 
 const HOLD_MS = 500;
@@ -92,6 +116,11 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 .sp-btn { animation: tipPress 3.6s ease-in-out infinite; }
 .sp-new { position: absolute; right: 30px; top: 20px; width: 52px; height: 58px; border: 2px solid; border-top-width: 5px; border-radius: 0 0 7px 7px; padding: 6px 5px; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,.18); opacity: 0; animation: spNew 3.6s ease-in-out infinite; }
 @keyframes spNew { 0%,40% { opacity: 0; transform: scale(.4) rotate(-8deg); } 55%,90% { opacity: 1; transform: scale(1) rotate(2deg); } 100% { opacity: 0; transform: scale(.4); } }
+.scc { position: absolute; top: 16px; left: calc(50% - 35px); width: 70px; height: 62px; border-radius: 14px; background: #fff; border: 2px solid #e2e8f0; box-shadow: 0 3px 6px rgba(0,0,0,.15); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; animation: soSmall 3.6s ease-in-out infinite; }
+.scc-ic { width: 24px; height: 24px; border-radius: 8px; background: #bae6fd; }
+.scm-btn { position: absolute; right: 26px; top: 10px; width: 36px; height: 36px; border-radius: 12px; background: #fff; border: 2px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,.12); display: flex; align-items: center; justify-content: center; color: #0284c7; font-size: 16px; animation: tipPress 3.6s ease-in-out infinite; }
+.scm-menu { position: absolute; right: 26px; top: 50px; width: 118px; border-radius: 12px; background: #fff; border: 2px solid #e2e8f0; box-shadow: 0 5px 10px rgba(0,0,0,.18); padding: 4px 8px; font-size: 12px; font-weight: 900; color: #1e293b; opacity: 0; transform-origin: 100% 0; animation: spNew 3.6s ease-in-out infinite; }
+.scm-menu span { display: block; padding: 4px 0; }
 .tip-pill { display: inline-block; padding: 8px 16px; border-radius: 999px; background: #fff; border: 2px solid #f59e0b; font-weight: 900; font-size: 14px; }
 .tip-finger { position: absolute; font-size: 30px; line-height: 1; animation: tipFinger 3.6s ease-in-out infinite; pointer-events: none; }
 @keyframes tipFinger { 0%,25%,100% { transform: translate(8px, 22px); opacity: 0; } 8% { opacity: 1; } 15%,30% { transform: translate(8px, 2px); opacity: 1; } 38% { transform: translate(8px, 22px); opacity: 0; } }

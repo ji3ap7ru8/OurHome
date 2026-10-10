@@ -64,7 +64,7 @@ export const headerTemplate = `
                     </button>
 
                     <!-- 生活圖卡頁專用：︙ 生活圖卡設定（格式大小、排序方式；顏色跟著主色調；其他頁隱藏） -->
-                    <button id="headerCardsBtn" data-action="open-cards-options" class="hidden w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center" title="生活圖卡設定" aria-label="生活圖卡設定">
+                    <button id="headerCardsBtn" data-action="open-cards-options" data-tip="cards-menu" class="hidden w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center" title="生活圖卡設定" aria-label="生活圖卡設定">
                         <i class="fa-solid fa-ellipsis-vertical text-lg theme-text-primary"></i>
                     </button>
 
