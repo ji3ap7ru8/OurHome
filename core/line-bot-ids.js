@@ -29,7 +29,8 @@ export function setLineBotToken(v) {
   return { token: t };
 }
 const cleanName = (v) => String(v ?? "").trim().slice(0, MAX_NAME);
-const cleanUserId = (v) => String(v ?? "").trim();
+// 去掉頭尾空白與引號（從 JSON / 文件複製時常會多帶 " 或 '）
+const cleanUserId = (v) => String(v ?? "").trim().replace(/^[\s"'“”‘’]+|[\s"'“”‘’]+$/g, "");
 const cleanToken = (v) => String(v ?? "").trim();
 
 // 回傳 { item } 或 { error }
