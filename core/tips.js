@@ -119,6 +119,47 @@ const loginScene = (out) => `<div class="sc">
   ${out ? `<span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-60px;top:54px;background:#fff1f2;border-color:#fda4af;color:#e11d48;font-size:12px;padding:6px 18px">登出帳號</span>${finger("left:calc(50% + 10px);top:62px")}` : finger("left:100px;top:34px")}
 </div>`;
 
+// ---------- 最新提醒的示範場景 ----------
+const remCard = (dot, btn, style = "", cls = "") => `<div class="rc ${cls}" style="${style}"><div class="rc-top"><span class="rc-pill">一般</span>${dot ? '<span class="rc-dot"></span>' : ""}<i class="sb" style="margin:0 0 0 auto;width:24px"></i></div><i class="sb" style="width:80%"></i>${btn ? '<span class="rc-btn">設為未讀</span>' : '<i class="sb" style="width:55%"></i>'}</div>`;
+const remDialog = (inner) => `<div class="so-big" style="background:#f1f5f9;border-color:#cbd5e1;color:#1e293b;border-top-width:2px;border-radius:14px;left:calc(50% - 76px);width:152px;top:2px;height:86px;padding:8px">${inner}</div>`;
+const remCardScene = `<div class="sc">
+  ${remCard(true, false, "top:20px", "scc-fade")}
+  ${remDialog('<div class="rc-pill" style="display:inline-block">一般</div><i class="sb"></i><i class="sb" style="width:70%"></i><span class="rc-ok">知道了</span>')}
+  ${finger("left:calc(50% - 6px);top:40px")}
+</div>`;
+const remFilterScene = `<div class="sc">
+  <span class="rc-sel"><span class="num-a">未讀 ▾</span><span class="num-b">已讀 ▾</span></span>
+  <div class="fmt fmt-a" style="top:34px;display:block">${remCard(true, false, "position:relative;margin:0 auto;left:0")}</div>
+  <div class="fmt fmt-b" style="top:34px;display:block">${remCard(false, true, "position:relative;margin:0 auto;left:0")}</div>
+  ${finger("left:30px;top:10px")}
+</div>`;
+const remUnreadScene = `<div class="sc">
+  ${remCard(false, true, "top:8px").replace('class="rc-btn"', 'class="rc-btn" style="animation:fmtA 3.6s ease-in-out infinite"')}
+  <div class="rc" style="top:8px;background:transparent;border:0;box-shadow:none;pointer-events:none"><div class="rc-top"><span class="rc-pill" style="opacity:0">一般</span><span class="rc-dot num-b" style="opacity:0"></span></div></div>
+  ${finger("left:calc(50% + 20px);top:44px")}
+</div>`;
+const remSheet = (cls, label) => `<div class="rsh ${cls}"><div class="rsh-top"><b style="font-size:11px">🔔 ${label}</b><span class="rsh-x">✕</span></div>${remCard(true, false, "position:relative;margin:4px auto 0;left:0;width:130px")}</div>`;
+const remCloseScene = `<div class="sc">${remSheet("rsh-down", "最新提醒")}${finger("right:30px;top:2px")}</div>`;
+const remBellScene = `<div class="sc">
+  <span class="scm-btn" style="right:22px;top:2px;width:30px;height:30px;font-size:14px;animation:tipPress 3.6s ease-in-out infinite">🔔<span class="rc-dot" style="position:absolute;right:-2px;top:-2px;width:9px;height:9px"></span></span>
+  ${remSheet("rsh-up", "最新提醒").replace("rsh ", "rsh rsh-low ")}
+  ${finger("right:20px;top:12px")}
+</div>`;
+const remBadgeScene = `<div class="sc">
+  <span class="rc-badge"><span class="num-a">3 則未讀</span><span class="num-b">2 則未讀</span></span>
+  ${remCard(true, false, "top:34px;width:130px;margin-left:-65px", "")}
+  ${finger("left:calc(50% + 24px);top:60px")}
+</div>`;
+const remDlgUnreadScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-62px;top:14px;font-size:12px;padding:8px 14px;background:#e2e8f0;border-color:#94a3b8;color:#334155">✉ 恢復為未讀</span>
+  <span class="rc-toast">已恢復為未讀</span>
+  ${finger("left:calc(50% + 6px);top:26px")}
+</div>`;
+const remDlgCloseScene = `<div class="sc">
+  <div style="position:absolute;left:calc(50% - 70px);top:6px;width:140px;height:76px;border-radius:14px;background:#f1f5f9;border:2px solid #cbd5e1;padding:8px;animation:dlgGone 3.6s ease-in-out infinite"><i class="sb"></i><i class="sb" style="width:70%"></i><span class="rc-ok" style="position:absolute;left:12px;right:12px;bottom:6px">知道了</span></div>
+  ${finger("left:calc(50% - 6px);top:58px")}
+</div>`;
+
 const TIPS = {
   "cards-gear": { scene: panelScene(true), text: "按這裡打開系統設定。" },
   "cards-close": { scene: panelScene(false), text: "按這裡關閉設定視窗。" },
@@ -140,6 +181,14 @@ const TIPS = {
   "cards-del": { scene: delScene, text: "按垃圾桶，再按一次「確定刪除」才會真的刪除。" },
   "cards-login": { scene: loginScene(false), text: "登入後，設定會自動存到你的 Google 雲端硬碟，換手機也帶著走。" },
   "cards-logout": { scene: loginScene(true), text: "登出帳號。在公共場所用完，記得登出。" },
+  "rem-card": { scene: remCardScene, text: "點一下提醒，打開完整內容；看過後紅點會自動消失。" },
+  "rem-filter": { scene: remFilterScene, text: "切換看「未讀」或「已讀」的提醒。" },
+  "rem-unread": { scene: remUnreadScene, text: "看過的提醒，按這顆可以恢復成未讀，紅點會再出現。" },
+  "rem-close": { scene: remCloseScene, text: "按這裡關閉提醒視窗。" },
+  "rem-bell": { scene: remBellScene, text: "有新提醒時鈴鐺會出現紅點，點一下打開最新提醒。" },
+  "rem-badge": { scene: remBadgeScene, text: "這裡顯示還有幾則提醒沒有看。" },
+  "rem-dlg-unread": { scene: remDlgUnreadScene, text: "按這裡，這則提醒會恢復成未讀。" },
+  "rem-dlg-close": { scene: remDlgCloseScene, text: "看完了，按「知道了」關閉。" },
   "cards-kind-bar": { scene: kindScene("fa-barcode", `<div style="${BAR};width:96px;height:36px"></div><b style="font-size:10px;letter-spacing:2px">/ABC1234</b>`), text: "會員、載具、條碼類，會畫成條碼，點開就能直接掃描。" },
   "cards-kind-phone": { scene: kindScene("fa-phone", '<b style="font-size:22px;letter-spacing:1px">02-1234-5678</b>'), text: "電話號碼用大字顯示，方便念給對方聽。" },
   "cards-kind-mail": { scene: kindScene("fa-envelope", '<b style="font-size:15px">name@example.com</b>'), text: "電子郵件用大字顯示，清楚好唸。" },
@@ -247,6 +296,27 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 @keyframes arrGrow { 0% { width: 0; } 60%,90% { width: 100%; } 100% { width: 0; } }
 .acct { display: flex; align-items: center; gap: 8px; margin: 18px 30px 0; padding: 8px 10px; border-radius: 12px; background: #ecfdf5; border: 2px solid #a7f3d0; }
 .acct-av { width: 22px; height: 22px; border-radius: 50%; background: #10b981; flex-shrink: 0; }
+.rc { position: absolute; left: 50%; margin-left: -75px; width: 150px; padding: 6px 8px; border-radius: 12px 12px 12px 4px; background: #fff; border: 2px solid #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,.12); }
+.rc-top { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+.rc-pill { font-size: 9px; font-weight: 900; padding: 1px 7px; border-radius: 999px; background: #e0f2fe; color: #0369a1; }
+.rc-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block; animation: fmtA 3.6s ease-in-out infinite; }
+.rc-dot.num-b { animation: fmtB 3.6s ease-in-out infinite; }
+.rc-btn { display: inline-block; margin-top: 4px; font-size: 9px; font-weight: 900; padding: 2px 7px; border-radius: 999px; background: #f1f5f9; color: #475569; }
+.rc-ok { display: block; margin-top: 8px; text-align: center; font-size: 11px; font-weight: 900; color: #fff; background: #0284c7; border-radius: 8px; padding: 4px 0; }
+.scc-fade { animation: soSmall 3.6s ease-in-out infinite; }
+.rc-sel { position: absolute; left: 14px; top: 6px; width: 56px; height: 22px; border-radius: 999px; background: #fff; border: 2px solid #e2e8f0; font-size: 11px; font-weight: 900; text-align: center; line-height: 18px; color: #0369a1; }
+.rc-sel span { position: absolute; inset: 0; }
+.rc-badge { position: absolute; left: 50%; top: 4px; margin-left: -34px; width: 68px; text-align: center; font-size: 10px; font-weight: 900; color: #fff; background: #0284c7; border-radius: 999px; padding: 2px 0; height: 18px; line-height: 14px; }
+.rc-badge span { position: absolute; inset: 0; }
+.rc-toast { position: absolute; left: 50%; margin-left: -50px; width: 100px; top: 60px; text-align: center; font-size: 11px; font-weight: 900; color: #fff; background: #334155; border-radius: 999px; padding: 4px 0; opacity: 0; animation: spNew 3.6s ease-in-out infinite; }
+.rsh { position: absolute; left: 30px; right: 30px; bottom: -6px; height: 78px; padding: 6px 8px; border-radius: 16px 16px 0 0; background: #fcfbf9; border: 2px solid #e2e8f0; box-shadow: 0 -3px 8px rgba(0,0,0,.12); }
+.rsh-low { height: 56px; bottom: -6px; }
+.rsh-top { display: flex; justify-content: space-between; align-items: center; }
+.rsh-x { width: 18px; height: 18px; border-radius: 50%; background: #e2e8f0; font-size: 9px; display: flex; align-items: center; justify-content: center; }
+.rsh-down { animation: rshDown 3.6s ease-in-out infinite; } .rsh-up { animation: rshUp 3.6s ease-in-out infinite; }
+@keyframes rshDown { 0%,36% { transform: none; opacity: 1; } 55%,90% { transform: translateY(60px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@keyframes rshUp { 0%,36% { transform: translateY(60px); opacity: 0; } 55%,90% { transform: none; opacity: 1; } 100% { transform: translateY(60px); opacity: 0; } }
+@keyframes dlgGone { 0%,36% { opacity: 1; transform: none; } 55%,90% { opacity: 0; transform: scale(.7); } 100% { opacity: 1; transform: none; } }
 .tip-pill { display: inline-block; padding: 8px 16px; border-radius: 999px; background: #fff; border: 2px solid #f59e0b; font-weight: 900; font-size: 14px; }
 .tip-finger { position: absolute; font-size: 30px; line-height: 1; animation: tipFinger 3.6s ease-in-out infinite; pointer-events: none; }
 @keyframes tipFinger { 0%,25%,100% { transform: translate(8px, 22px); opacity: 0; } 8% { opacity: 1; } 15%,30% { transform: translate(8px, 2px); opacity: 1; } 38% { transform: translate(8px, 22px); opacity: 0; } }
@@ -327,7 +397,7 @@ export function showTipHint(id) {
   el.setAttribute("role", "note");
   el.className = "fixed left-1/2 z-[60] -translate-x-1/2 rounded-full bg-amber-500 text-white shadow-lg px-4 py-2 text-sm font-black whitespace-nowrap transition-opacity duration-300 pointer-events-none";
   el.style.bottom = "calc(env(safe-area-inset-bottom, 0px) + 96px)";
-  el.innerHTML = '<i class="fa-regular fa-lightbulb mr-1.5"></i>長按按鈕或便利貼，可看操作說明';
+  el.innerHTML = '<i class="fa-regular fa-lightbulb mr-1.5"></i>長按按鈕或卡片，可看操作說明';
   hintEl?.remove(); document.body.appendChild(el); hintEl = el;
   clearTimeout(hintTimer); hintTimer = setTimeout(() => { el.style.opacity = "0"; setTimeout(() => el.remove(), 300); if (hintEl === el) hintEl = null; }, 3500);
 }

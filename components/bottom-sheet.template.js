@@ -8,7 +8,7 @@ export const bottomSheetTemplate = `
                 </div>
                 <div class="w-full flex items-center justify-between mt-1">
                     <div class="w-10 h-10 relative shrink-0">
-                        <select id="reminderFilter" aria-label="篩選提醒" class="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-[3.75rem] pl-2 pr-0 rounded-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 theme-text-primary cursor-pointer">
+                        <select data-tip="rem-filter" id="reminderFilter" aria-label="篩選提醒" class="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-[3.75rem] pl-2 pr-0 rounded-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 theme-text-primary cursor-pointer">
                             <option value="unread">未讀</option>
                             <option value="read">已讀</option>
                         </select>
@@ -17,9 +17,9 @@ export const bottomSheetTemplate = `
                     <div id="sheetHeaderTitle" class="flex items-center gap-2">
                         <i class="fa-solid fa-bell text-base theme-text-primary"></i>
                         <span class="text-lg font-black text-slate-800 dark:text-slate-100 tracking-wider">最新提醒</span>
-                        <span id="unreadHeaderBadge" class="hidden px-2 py-0.5 rounded-full theme-bg-primary text-white text-[10px] font-bold">0 則未讀</span>
+                        <span id="unreadHeaderBadge" data-tip="rem-badge" class="hidden px-2 py-0.5 rounded-full theme-bg-primary text-white text-[10px] font-bold">0 則未讀</span>
                     </div>
-                    <button data-action="close-sheet" title="關閉視窗" class="w-10 h-10 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90">
+                    <button data-tip="rem-close" data-action="close-sheet" title="關閉視窗" class="w-10 h-10 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>

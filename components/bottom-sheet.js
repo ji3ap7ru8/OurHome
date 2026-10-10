@@ -1,4 +1,5 @@
 // 共用 Bottom Sheet：最新提醒 / 帳號登入
+import { showTipHint, closeTips } from "../core/tips.js";
 import { bottomSheetTemplate } from "./bottom-sheet.template.js";
 import { on, emit, state } from "../core/store.js";
 import { registerActions } from "../core/actions.js";
@@ -53,7 +54,7 @@ const TITLE_ADMIN = `
 const titleNotification = () => `
   <i class="fa-solid fa-bell text-base theme-text-primary"></i>
   <span class="text-lg font-black text-slate-800 dark:text-slate-100 tracking-wider">最新提醒</span>
-  <span id="unreadHeaderBadge" class="px-2 py-0.5 rounded-full theme-bg-primary text-white text-[10px] font-bold ${unreadCount() ? "" : "hidden"}">${unreadCount()} 則未讀</span>`;
+  <span id="unreadHeaderBadge" data-tip="rem-badge" class="px-2 py-0.5 rounded-full theme-bg-primary text-white text-[10px] font-bold ${unreadCount() ? "" : "hidden"}">${unreadCount()} 則未讀</span>`;
 
 export function mountBottomSheet(mountEl) {
   mountEl.innerHTML = bottomSheetTemplate;
@@ -64,7 +65,7 @@ export function mountBottomSheet(mountEl) {
   document.getElementById("adminPasswordInput")?.addEventListener("keydown", (e) => { if (e.key === "Enter") submitAdminPassword(); });
 
   document.getElementById("reminderFilter")?.addEventListener("change", (e) => { filter = e.target.value === "read" ? "read" : "unread"; renderNotifications(); });
-  on("overlay:change", ({ sheet }) => render(sheet));
+  on("overlay:change", ({ sheet }) => { render(sheet); if (sheet === "notification") showTipHint("reminders"); else closeTips(); });
   initResize();
   initReminderDialog();
   on("data:change", ({ name }) => { if (name === "reminders") reloadNotifications(); });
@@ -95,7 +96,7 @@ function renderNotifications() {
         const lv = levelOf(r.level);
         const unread = !isRead(r);
         return `
-          <div class="notification-card cursor-pointer active:scale-[0.98] transition-transform" data-id="${esc(r.id)}" role="button" tabindex="0">
+          <div data-tip="rem-card" class="notification-card cursor-pointer active:scale-[0.98] transition-transform" data-id="${esc(r.id)}" role="button" tabindex="0">
             <div class="bg-white dark:bg-slate-800 rounded-3xl rounded-tl-md p-4 soft-shadow-sm border border-slate-200/70 dark:border-slate-700 flex flex-col gap-2">
               <div class="flex items-center gap-2">
                 <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-base font-bold ${lv.iconBox}"><i class="fa-solid ${lv.icon}"></i><span>${lv.label}</span></span>
@@ -104,7 +105,7 @@ function renderNotifications() {
               </div>
               <h4 class="text-lg font-black text-slate-800 dark:text-slate-100 break-words leading-snug">${esc(r.title)}</h4>
               ${r.content ? `<p class="text-base text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line break-words line-clamp-3">${esc(r.content)}</p>` : ""}
-              ${unread ? "" : `<button type="button" data-unread="${esc(r.id)}" class="self-end mt-1 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-sm font-bold text-slate-600 dark:text-slate-200 active:scale-95 transition-transform"><i class="fa-regular fa-envelope"></i><span>標示為未讀</span></button>`}
+              ${unread ? "" : `<button type="button" data-tip="rem-unread" data-unread="${esc(r.id)}" class="self-end mt-1 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-sm font-bold text-slate-600 dark:text-slate-200 active:scale-95 transition-transform"><i class="fa-regular fa-envelope"></i><span>標示為未讀</span></button>`}
             </div>
           </div>`;
       }).join("");
@@ -235,8 +236,8 @@ function initReminderDialog() {
         </div>
       </div>
       <div class="p-4 shrink-0 flex flex-col gap-2">
-        <button type="button" id="reminderDialogUnread" class="w-full py-3 rounded-2xl bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-base font-bold active:scale-95 transition-transform"><i class="fa-regular fa-envelope mr-1.5"></i>標示為未讀</button>
-        <button type="button" id="reminderDialogClose" class="w-full py-3.5 rounded-2xl theme-bg-primary text-white text-lg font-bold active:scale-95 transition-transform">知道了</button>
+        <button type="button" data-tip="rem-dlg-unread" id="reminderDialogUnread" class="w-full py-3 rounded-2xl bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-base font-bold active:scale-95 transition-transform"><i class="fa-regular fa-envelope mr-1.5"></i>標示為未讀</button>
+        <button type="button" data-tip="rem-dlg-close" id="reminderDialogClose" class="w-full py-3.5 rounded-2xl theme-bg-primary text-white text-lg font-bold active:scale-95 transition-transform">知道了</button>
       </div>
     </div>`;
   document.body.appendChild(dlg);
