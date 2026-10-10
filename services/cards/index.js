@@ -24,6 +24,8 @@ const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<
 const safeImg = (u) => (/^https:\/\//i.test(u || "") ? u : "");
 // 一張圖卡可有多筆內容 codes:[{label,value}]；舊資料只有 code 字串，也當成一筆
 const getCodes = (c) => (Array.isArray(c.codes) && c.codes.length ? c.codes : c.code ? [{ label: "", value: c.code }] : []);
+// 長按說明：依圖卡類型顯示不同的示範（條碼 / 大字電話 / 大字信箱 / 大字車牌 / 文字）
+const kindTip = (k) => ({ 電話號碼: "cards-kind-phone", 電子郵件: "cards-kind-mail", 車牌號碼: "cards-kind-plate", 其他: "cards-kind-other" }[k] || "cards-kind-bar");
 const kindIcon = (k) => KINDS[k.kind]?.icon || "fa-image";
 // 圖卡圖示：有貼圖示連結就用圖片（載入失敗自動換回預設小圖示），否則用類型圖示
 function iconHtml(k, size) {
@@ -107,7 +109,7 @@ function render() {
   const gap = list ? "gap-3" : cols === 3 ? "gap-3" : "gap-4";
   const items = orderedCards(cards, state.cardsSort.sort); // 預設 / 名稱 / 自訂
   const html = items.map((k) => list
-    ? `<button data-open="${k.id}" data-tip="cards-open" class="flat-card w-full rounded-2xl ${c.pad} flex items-center gap-4 active:scale-[.98] transition text-left">
+    ? `<button data-open="${k.id}" data-tip="${kindTip(k.kind)}" class="flat-card w-full rounded-2xl ${c.pad} flex items-center gap-4 active:scale-[.98] transition text-left">
         <span class="flat-ibox ${c.box} rounded-2xl overflow-hidden flex items-center justify-center shrink-0">${iconHtml(k, c.icon)}</span>
         <span class="flex-1 min-w-0">
           <span class="${c.name} font-bold text-slate-800 dark:text-slate-100 block truncate">${esc(k.name)}</span>
@@ -115,7 +117,7 @@ function render() {
         </span>
         <i class="fa-solid fa-chevron-right text-xs text-slate-400 dark:text-slate-500 shrink-0"></i>
       </button>`
-    : `<button data-open="${k.id}" data-tip="cards-open" class="flat-card min-w-0 rounded-3xl ${c.pad} flex flex-col items-center active:scale-95 transition">
+    : `<button data-open="${k.id}" data-tip="${kindTip(k.kind)}" class="flat-card min-w-0 rounded-3xl ${c.pad} flex flex-col items-center active:scale-95 transition">
         <span class="flat-ibox ${c.box} rounded-2xl overflow-hidden flex items-center justify-center shrink-0 mb-3">${iconHtml(k, c.icon)}</span>
         <span class="${c.name} font-bold text-slate-800 dark:text-slate-100 text-center break-words w-full">${esc(k.name)}</span>
         <span class="${c.kind} font-semibold text-slate-500 dark:text-slate-400 mt-0.5">${esc(k.kind)}</span>

@@ -22,7 +22,7 @@ export const cardsOptionsTemplate = `
             <div class="flex-1 overflow-y-auto px-4 py-4 space-y-4 no-scrollbar pb-12">
 
                 <div id="cardsCardFormat" class="setting-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 soft-shadow-sm overflow-hidden transition-all">
-                    <button data-accordion-trigger="cformat" aria-expanded="false" aria-controls="contentCFormat" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                    <button data-tip="cards-format" data-accordion-trigger="cformat" aria-expanded="false" aria-controls="contentCFormat" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl theme-bg-light theme-text-primary flex items-center justify-center text-base font-bold shrink-0">
                                 <i class="fa-solid fa-text-height"></i>
@@ -64,7 +64,7 @@ export const cardsOptionsTemplate = `
                 </div>
 
                 <div id="cardsCardSort" class="setting-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 soft-shadow-sm overflow-hidden transition-all">
-                    <button data-accordion-trigger="csort" aria-expanded="false" aria-controls="contentCSort" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                    <button data-tip="cards-sort" data-accordion-trigger="csort" aria-expanded="false" aria-controls="contentCSort" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl theme-bg-light theme-text-primary flex items-center justify-center text-base font-bold shrink-0">
                                 <i class="fa-solid fa-arrow-down-wide-short"></i>
@@ -84,7 +84,7 @@ export const cardsOptionsTemplate = `
                 </div>
 
                 <div id="cardsCardManage" class="setting-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 soft-shadow-sm overflow-hidden transition-all">
-                    <button data-accordion-trigger="cmanage" aria-expanded="false" aria-controls="contentCManage" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                    <button data-tip="cards-manage" data-accordion-trigger="cmanage" aria-expanded="false" aria-controls="contentCManage" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl theme-bg-light theme-text-primary flex items-center justify-center text-base font-bold shrink-0">
                                 <i class="fa-solid fa-plus"></i>

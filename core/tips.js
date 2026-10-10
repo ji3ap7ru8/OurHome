@@ -53,7 +53,34 @@ const cardMenuScene = `<div class="sc">
   ${finger("right:20px;top:16px")}
 </div>`;
 
+// 依圖卡類型：小圖卡 → 點開後的大字 / 條碼
+const kindScene = (icon, face) => `<div class="sc">
+  <div class="scc"><span class="scc-ic"><i class="fa-solid ${icon}" style="font-size:12px;color:#0369a1"></i></span><i class="sb" style="width:34px"></i></div>
+  <div class="so-big" style="background:#fff;border-color:#cbd5e1;color:#111827;border-top-width:2px;left:calc(50% - 90px);width:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">${face}</div>
+  ${finger("left:calc(50% - 6px);top:36px")}
+</div>`;
+const WHITE = ["#ffffff", "#cbd5e1", "#1e293b"];
+const cardsSortScene = `<div class="sc">
+  ${["sn-a", "sn-b", "sn-c"].map((c, i) => note(c, WHITE, `<span class="scc-ic" style="width:20px;height:20px;margin-bottom:5px"></span>${i === 2 ? '<span class="sm"><b style="font-size:13px">1</b><span class="sm-ring"></span></span>' : ""}`)).join("")}
+</div>`;
+const cardsAddScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:16px;top:26px;background:#fff;border:2px dashed #0284c7;color:#0284c7">＋ 新增圖卡</span>
+  <div class="sp-new" style="background:#fff;border-color:#cbd5e1;color:#1e293b;border-top-width:2px;border-radius:12px;display:flex;align-items:center;justify-content:center"><span class="scc-ic"></span></div>
+  ${finger("left:56px;top:36px")}
+</div>`;
+const cardsFormatScene = `<div class="sc">
+  <div class="fmt fmt-a">${[0,1,2,3].map(() => '<div class="fmt-t"><span class="scc-ic" style="width:18px;height:18px"></span></div>').join("")}</div>
+  <div class="fmt fmt-b">${[0,1,2].map(() => '<div class="fmt-r"><span class="scc-ic" style="width:18px;height:18px"></span><i class="sb" style="flex:1;margin:0"></i></div>').join("")}</div>
+</div>`;
 const TIPS = {
+  "cards-kind-bar": { scene: kindScene("fa-barcode", `<div style="${BAR};width:96px;height:36px"></div><b style="font-size:10px;letter-spacing:2px">/ABC1234</b>`), text: "會員、載具、條碼類，會畫成條碼，點開就能直接掃描。" },
+  "cards-kind-phone": { scene: kindScene("fa-phone", '<b style="font-size:22px;letter-spacing:1px">02-1234-5678</b>'), text: "電話號碼用大字顯示，方便念給對方聽。" },
+  "cards-kind-mail": { scene: kindScene("fa-envelope", '<b style="font-size:15px">name@example.com</b>'), text: "電子郵件用大字顯示，清楚好唸。" },
+  "cards-kind-plate": { scene: kindScene("fa-car", '<b style="font-size:24px;letter-spacing:2px;border:3px solid #1e293b;border-radius:8px;padding:2px 12px">ABC-1234</b>'), text: "車牌號碼用大字顯示，停車登記一目了然。" },
+  "cards-kind-other": { scene: kindScene("fa-tag", '<b style="font-size:14px">想放的文字內容</b>'), text: "其他類型，內容以文字顯示。" },
+  "cards-format": { scene: cardsFormatScene, text: "切換圖卡或清單，也能調整大小與每行數量。" },
+  "cards-sort": { scene: cardsSortScene, text: "排序可選預設、名稱，或自訂編號，編號小的排前面。" },
+  "cards-manage": { scene: cardsAddScene, text: "按這裡新增圖卡，也能編輯或刪除。" },
   "cards-open": { scene: cardOpenScene, text: "點一下圖卡，顯示條碼。" },
   "cards-zoom": { scene: cardZoomScene, text: "點一下條碼會放大，再點一下轉成橫向，方便掃描。" },
   "cards-menu": { scene: cardMenuScene, text: "按這裡新增圖卡，或調整排序與大小。" },
@@ -117,10 +144,17 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 .sp-new { position: absolute; right: 30px; top: 20px; width: 52px; height: 58px; border: 2px solid; border-top-width: 5px; border-radius: 0 0 7px 7px; padding: 6px 5px; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,.18); opacity: 0; animation: spNew 3.6s ease-in-out infinite; }
 @keyframes spNew { 0%,40% { opacity: 0; transform: scale(.4) rotate(-8deg); } 55%,90% { opacity: 1; transform: scale(1) rotate(2deg); } 100% { opacity: 0; transform: scale(.4); } }
 .scc { position: absolute; top: 16px; left: calc(50% - 35px); width: 70px; height: 62px; border-radius: 14px; background: #fff; border: 2px solid #e2e8f0; box-shadow: 0 3px 6px rgba(0,0,0,.15); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; animation: soSmall 3.6s ease-in-out infinite; }
-.scc-ic { width: 24px; height: 24px; border-radius: 8px; background: #bae6fd; }
+.scc-ic { width: 24px; height: 24px; border-radius: 8px; background: #bae6fd; display: flex; align-items: center; justify-content: center; }
 .scm-btn { position: absolute; right: 26px; top: 10px; width: 36px; height: 36px; border-radius: 12px; background: #fff; border: 2px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,.12); display: flex; align-items: center; justify-content: center; color: #0284c7; font-size: 16px; animation: tipPress 3.6s ease-in-out infinite; }
 .scm-menu { position: absolute; right: 26px; top: 50px; width: 118px; border-radius: 12px; background: #fff; border: 2px solid #e2e8f0; box-shadow: 0 5px 10px rgba(0,0,0,.18); padding: 4px 8px; font-size: 12px; font-weight: 900; color: #1e293b; opacity: 0; transform-origin: 100% 0; animation: spNew 3.6s ease-in-out infinite; }
 .scm-menu span { display: block; padding: 4px 0; }
+.fmt { position: absolute; left: 50%; top: 8px; width: 150px; margin-left: -75px; }
+.fmt-a { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; animation: fmtA 4s ease-in-out infinite; }
+.fmt-b { display: flex; flex-direction: column; gap: 5px; top: 10px; opacity: 0; animation: fmtB 4s ease-in-out infinite; }
+.fmt-t { height: 34px; border-radius: 10px; background: #fff; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+.fmt-r { height: 22px; border-radius: 8px; background: #fff; border: 2px solid #e2e8f0; display: flex; align-items: center; gap: 6px; padding: 0 6px; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+@keyframes fmtA { 0%,40% { opacity: 1; } 50%,90% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes fmtB { 0%,40% { opacity: 0; } 50%,90% { opacity: 1; } 100% { opacity: 0; } }
 .tip-pill { display: inline-block; padding: 8px 16px; border-radius: 999px; background: #fff; border: 2px solid #f59e0b; font-weight: 900; font-size: 14px; }
 .tip-finger { position: absolute; font-size: 30px; line-height: 1; animation: tipFinger 3.6s ease-in-out infinite; pointer-events: none; }
 @keyframes tipFinger { 0%,25%,100% { transform: translate(8px, 22px); opacity: 0; } 8% { opacity: 1; } 15%,30% { transform: translate(8px, 2px); opacity: 1; } 38% { transform: translate(8px, 22px); opacity: 0; } }
@@ -143,7 +177,8 @@ function openPop(target) {
   injectStyle();
   closePop();
   const wrap = document.createElement("div");
-  wrap.className = "fixed inset-0 z-[80]";
+  wrap.className = "fixed inset-0";
+  wrap.style.zIndex = "2147483000"; // 蓋過所有設定視窗
   wrap.innerHTML = `<div class="tip-pop absolute w-[260px] rounded-2xl border-2 border-amber-400 bg-amber-50 text-amber-950 shadow-2xl px-4 pt-3 pb-3">
     <div aria-hidden="true">${t.scene}</div>
     <p class="text-base font-black leading-snug text-center">${esc(t.text)}</p>
