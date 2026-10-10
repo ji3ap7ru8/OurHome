@@ -3,6 +3,7 @@
 import { state } from "../core/store.js";
 import { orderedApps } from "../core/apps-model.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
+import { showTipHint } from "../core/tips.js";
 
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
@@ -34,8 +35,8 @@ export function renderApps(el, services) {
     const dim = svc || f.plugin ? "" : "opacity-60";
     // 插件：直接開新分頁（noopener，不讓對方網頁控制本頁）；內建服務：走路由
     const open = f.plugin
-      ? (cls, inner) => `<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer" title="${esc(f.url)}" class="${cls}">${inner}</a>`
-      : (cls, inner) => `<button data-action="nav" data-feature="${esc(f.id)}" class="${cls}">${inner}</button>`;
+      ? (cls, inner) => `<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer" title="${esc(f.url)}" data-tip="apps-plugin" class="${cls}">${inner}</a>`
+      : (cls, inner) => `<button data-action="nav" data-feature="${esc(f.id)}" data-tip="apps-open" class="${cls}">${inner}</button>`;
     const name = esc(f.name);
     const icon = `<span class="${c.box} rounded-2xl theme-bg-light overflow-hidden flex items-center justify-center shrink-0 ${list ? "" : c.gap}">${appIcon(f, c.icon)}</span>`;
     if (list) {
@@ -56,4 +57,5 @@ export function renderApps(el, services) {
       <div class="${list ? "flex flex-col" : "grid " + (GRID_COLS[cols] || GRID_COLS[2])} ${gap}">${html}</div>
     </div>`;
   fixAppIcons(el); // 插件圖示連不上 → 換回預設圖示
+  showTipHint("apps");
 }

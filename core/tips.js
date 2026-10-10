@@ -308,6 +308,28 @@ const memoNoteOkScene = `<div class="sc">
   ${finger("right:46px;top:18px")}
 </div>`;
 
+// ---------- 所有應用 / 所有應用設定 ----------
+const appTile = (cls = "", st = "") => `<div class="scc ${cls}" style="${st}"><span class="scc-ic"><i class="fa-solid fa-calendar-days" style="font-size:12px;color:#0369a1"></i></span><i class="sb" style="width:34px"></i></div>`;
+const appOpenScene = `<div class="sc">
+  ${appTile()}
+  <div class="so-big" style="background:#fff;border-color:#cbd5e1;color:#1e293b;border-top-width:2px;border-radius:12px;left:calc(50% - 76px);width:152px;height:84px;top:4px;padding:8px"><b style="font-size:11px">📅 家庭日曆</b><i class="sb"></i><i class="sb" style="width:70%"></i></div>
+  ${finger("left:calc(50% - 6px);top:36px")}
+</div>`;
+const appPluginScene = `<div class="sc">
+  ${appTile("", "left:calc(50% - 90px)")}
+  <span class="so-big" style="left:calc(50% - 10px);width:100px;height:62px;top:10px;background:#fff;border-color:#94a3b8;color:#1e293b;border-top-width:8px;border-radius:8px;padding:6px"><b style="font-size:10px">↗ 新分頁</b><i class="sb"></i><i class="sb" style="width:60%"></i></span>
+  ${finger("left:calc(50% - 76px);top:36px")}
+</div>`;
+const appToggleScene = `<div class="sc"><div class="rw" style="top:20px;animation:none"><span class="scc-ic" style="width:16px;height:16px"></span><b style="flex:1;font-size:11px;font-weight:900">家人相簿</b><span class="swm"><i></i></span></div><b style="position:absolute;left:0;right:0;top:56px;text-align:center;font-size:10px;color:#64748b"><span class="num-a">啟用：顯示在所有應用</span><span class="num-b" style="position:absolute;left:0;right:0">停用：從所有應用隱藏</span></b>${finger("right:28px;top:28px")}</div>`;
+const appAllOnScene = `<div class="sc"><div style="position:absolute;left:24px;right:24px;top:4px;display:flex;flex-direction:column;gap:4px">${[0, 1, 2].map(() => '<div class="rw" style="position:relative;left:0;right:0;height:18px;animation:none"><i class="sb" style="flex:1;margin:0"></i><span class="swm"><i></i></span></div>').join("")}</div>${finger("left:calc(50% - 6px);top:40px")}</div>`;
+const accScene = `<div class="sc"><div class="rw" style="top:4px;animation:none"><span class="scc-ic" style="width:16px;height:16px"></span><b style="flex:1;font-size:11px;font-weight:900">管理應用</b><span class="acc-ar">⌄</span></div>${[0, 1, 2].map((i) => `<div class="gt gl" style="position:absolute;left:24px;right:24px;top:${34 + i * 18}px;height:14px;animation-delay:${(0.3 + i * 0.2).toFixed(1)}s"><i class="sb" style="flex:1;margin:0"></i></div>`).join("")}${finger("right:30px;top:12px")}</div>`;
+const appIconFieldScene = noteFieldScene;
+const appPlugAddScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-50px;top:2px;font-size:12px;padding:6px 14px;background:#0284c7;border-color:#0284c7;color:#fff">＋ 新增插件</span>
+  <div class="gtl" style="top:44px"><div class="gt gl" style="animation-delay:.3s"><span class="scc-ic" style="width:16px;height:16px"></span><i class="sb" style="flex:1;margin:0"></i></div></div>
+  ${finger("left:calc(50% - 6px);top:12px")}
+</div>`;
+
 const TIPS = {
   "cards-gear": { scene: panelScene(true), text: "按這裡打開系統設定。" },
   "cards-close": { scene: panelScene(false), text: "按這裡關閉設定視窗。" },
@@ -398,6 +420,40 @@ const TIPS = {
   "memo-del": { scene: calDelScene, text: "按一下，再按一次「再按一次刪除」才會真的刪除。" },
   "memo-save": { scene: memoSaveScene, text: "寫好了按儲存，記事會出現在清單裡。標題一定要填。" },
   "memo-note-ok": { scene: memoNoteOkScene, text: "按「了解」，這則提示就不再顯示。" },
+  "apps-more": { scene: panelScene(true).replace("⚙", "︙").replace("系統設定", "所有應用設定"), text: "按 ︙，打開所有應用設定：調整顯示方式、排序、管理應用與擴充插件。" },
+  "apps-open": { scene: appOpenScene, text: "點一下，打開這個應用。標示「需登入」的要先登入 Google。" },
+  "apps-plugin": { scene: appPluginScene, text: "這是外部插件，會在新的分頁打開網站。" },
+  "apps-gear": { scene: panelScene(true), text: "按這裡打開系統設定。" },
+  "apps-close": { scene: panelScene(false).replace("生活圖卡設定", "所有應用設定"), text: "按這裡關閉所有應用設定。" },
+  "apps-format": { scene: cardsFormatScene, text: "展開：切換圖卡或清單，也能調整大小與每行數量。" },
+  "apps-manage": { scene: accScene, text: "展開：開關每個應用，不想用的可以先停用。" },
+  "apps-sort": { scene: cardsSortScene, text: "展開：選預設、名稱，或自己訂編號排序。" },
+  "apps-plugins": { scene: accScene.replace("管理應用", "擴充插件"), text: "展開：貼上網址，把其他網站加進所有應用。" },
+  "apps-mode-card": { scene: modeScene(false), text: "圖卡：一格一格排開，一眼看到圖示。" },
+  "apps-mode-list": { scene: modeScene(true), text: "清單：一條一條由上往下排，名稱更清楚。" },
+  "apps-size-l": { scene: sizeScene("l"), text: "大：放大，長輩看更清楚。" },
+  "apps-size-m": { scene: sizeScene("m"), text: "中：預設大小。" },
+  "apps-size-s": { scene: sizeScene("s"), text: "小：縮小，一個畫面放更多個應用。" },
+  "apps-cols-2": { scene: colsScene(2), text: "每行 2 個：每個比較大。" },
+  "apps-cols-3": { scene: colsScene(3), text: "每行 3 個：每個比較小，一次看更多。" },
+  "apps-toggle": { scene: appToggleScene, text: "按一下開關：停用後，這個應用不會顯示在所有應用。" },
+  "apps-enable-all": { scene: appAllOnScene, text: "把停用的應用一次全部啟用。" },
+  "apps-sort-default": { scene: sortDefaultScene, text: "預設：照內建順序排列。" },
+  "apps-sort-name": { scene: sortNameScene, text: "名稱：依名稱筆畫自動排列。" },
+  "apps-sort-custom": { scene: cardsSortScene, text: "自訂：自己訂編號，決定每個應用的位置。" },
+  "apps-order-num": { scene: orderNumScene, text: "點編號選新位置，其他應用會自動順延。" },
+  "apps-order-up": { scene: orderUpScene, text: "▲ 往前移一格。" },
+  "apps-order-down": { scene: orderDownScene, text: "▼ 往後移一格。" },
+  "apps-order-reset": { scene: orderResetScene, text: "恢復成預設的排列順序。" },
+  "apps-plug-title": { scene: noteFieldScene("標題", "家人相簿"), text: "取個名字，會顯示在所有應用，最多 20 字。" },
+  "apps-plug-url": { scene: noteFieldScene("網址", "https://example.com"), text: "貼上要連結的網址，要以 https:// 開頭。" },
+  "apps-plug-icon": { scene: noteFieldScene("圖示連結", "https://…/icon.png"), text: "選填：貼上圖片網址當圖示，不填就用預設圖示。" },
+  "apps-plug-add": { scene: appPlugAddScene, text: "按這裡新增，插件會出現在所有應用。" },
+  "apps-plug-cancel": { scene: calPageScene(true), text: "取消編輯，回到新增模式。" },
+  "apps-plug-edit": { scene: editScene, text: "按鉛筆，修改這個插件的標題、網址或圖示。" },
+  "apps-plug-del": { scene: calDelScene, text: "按垃圾桶，再按一次「再按一次刪除」才會真的刪除。" },
+  "apps-login": { scene: loginScene(false), text: "登入後，設定會自動存到你的 Google 雲端硬碟，換手機也帶著走。" },
+  "apps-logout": { scene: loginScene(true), text: "登出帳號。在公共場所用完，記得登出。" },
   "notes-sort-pinned": { scene: reorder('<i class="fa-solid fa-thumbtack"></i>'), text: "這是釘選，會自動往前排放。" },
   "notes-sort-date": { scene: reorder('<span class="sm-txt">最新</span>'), text: "最新發布的公告，會排在最前面。" },
   "notes-sort-expire": { scene: reorder('<span class="sm-txt">剩1天</span>'), text: "快到期的公告，會自動往前排放。" },
@@ -543,6 +599,10 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 @keyframes swKnob { 0%,30% { transform: none; } 40%,90% { transform: translateX(20px); } 100% { transform: none; } }
 .lc-sel { animation: lcSel 3.6s ease-in-out infinite; }
 @keyframes lcSel { 0%,30% { background: #f8fafc; border-color: #e2e8f0; color: #1e293b; } 40%,90% { background: #0284c7; border-color: #0284c7; color: #fff; } 100% { background: #f8fafc; border-color: #e2e8f0; color: #1e293b; } }
+.swm { position: relative; width: 30px; height: 16px; border-radius: 8px; background: #cbd5e1; flex-shrink: 0; animation: swBg 3.6s ease-in-out infinite; } .swm i { position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.3); animation: swKnobS 3.6s ease-in-out infinite; }
+@keyframes swKnobS { 0%,30% { transform: none; } 40%,90% { transform: translateX(14px); } 100% { transform: none; } }
+.acc-ar { font-size: 14px; font-weight: 900; color: #64748b; animation: accRot 3.6s ease-in-out infinite; }
+@keyframes accRot { 0%,25% { transform: none; } 40%,90% { transform: rotate(180deg); } 100% { transform: none; } }
 @keyframes tipPress { 0%,12%,24%,100% { transform: scale(1); } 18% { transform: scale(.92); } }
 `;
   document.head.appendChild(st);

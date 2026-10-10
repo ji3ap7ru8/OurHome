@@ -99,7 +99,7 @@ function renderManage() {
   box.innerHTML = all.map((a) => {
     const on = isEnabled(a.id);
     return `
-    <button type="button" role="switch" aria-checked="${on}" data-action="app-toggle" data-id="${esc(a.id)}" class="w-full flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40 px-2.5 py-2 text-left active:scale-[.98] transition ${on ? "" : "opacity-60"}">
+    <button type="button" role="switch" aria-checked="${on}" data-tip="apps-toggle" data-action="app-toggle" data-id="${esc(a.id)}" class="w-full flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40 px-2.5 py-2 text-left active:scale-[.98] transition ${on ? "" : "opacity-60"}">
       <span class="w-8 h-8 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-sm")}</span>
       <span class="flex-1 min-w-0 text-xs font-bold text-slate-700 dark:text-slate-200 truncate">${esc(a.name)}</span>
       ${a.plugin ? '<span class="text-[9px] font-bold bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded-full shrink-0">外部</span>' : ""}
@@ -115,7 +115,7 @@ function renderManage() {
 /* ---------- 排序方式 + 自訂編號 ---------- */
 function sortRow(r, on) {
   return `
-    <button type="button" data-action="apps-sort" data-value="${r.id}" aria-pressed="${on}" class="w-full flex items-center justify-between rounded-xl px-3 py-2.5 border text-left active:scale-[.98] transition ${on ? "theme-border-primary theme-bg-light" : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40"}">
+    <button type="button" data-tip="apps-sort-${r.id}" data-action="apps-sort" data-value="${r.id}" aria-pressed="${on}" class="w-full flex items-center justify-between rounded-xl px-3 py-2.5 border text-left active:scale-[.98] transition ${on ? "theme-border-primary theme-bg-light" : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40"}">
       <span class="flex items-center gap-3 min-w-0">
         <i class="fa-solid ${r.icon} text-sm w-4 text-center ${on ? "theme-text-primary" : "text-slate-400"}"></i>
         <span class="min-w-0">
@@ -133,20 +133,20 @@ function orderEditor() {
   const nums = Array.from({ length: n }, (_, i) => i + 1);
   const rows = list.map((a, i) => `
     <div data-order-row="${esc(a.id)}" class="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40 px-2 py-1.5">
-      <select data-change="apps-order-num" data-id="${esc(a.id)}" aria-label="${esc(a.name)} 的編號" class="w-14 shrink-0 py-1.5 pl-2 pr-0 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm font-black text-center theme-text-primary">
+      <select data-tip="apps-order-num" data-change="apps-order-num" data-id="${esc(a.id)}" aria-label="${esc(a.name)} 的編號" class="w-14 shrink-0 py-1.5 pl-2 pr-0 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm font-black text-center theme-text-primary">
         ${nums.map((k) => `<option value="${k}"${k === i + 1 ? " selected" : ""}>${k}</option>`).join("")}
       </select>
       <span class="w-8 h-8 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-sm")}</span>
       <span class="flex-1 min-w-0 text-xs font-bold text-slate-700 dark:text-slate-200 truncate">${esc(a.name)}</span>
       ${a.plugin ? '<span class="text-[9px] font-bold bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded-full shrink-0">外部</span>' : ""}
-      <button type="button" data-action="apps-order-up" data-id="${esc(a.id)}" ${i === 0 ? "disabled" : ""} aria-label="往前一位" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 flex items-center justify-center shrink-0 active:scale-90 transition ${i === 0 ? "opacity-30" : ""}"><i class="fa-solid fa-chevron-up text-xs"></i></button>
-      <button type="button" data-action="apps-order-down" data-id="${esc(a.id)}" ${i === n - 1 ? "disabled" : ""} aria-label="往後一位" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 flex items-center justify-center shrink-0 active:scale-90 transition ${i === n - 1 ? "opacity-30" : ""}"><i class="fa-solid fa-chevron-down text-xs"></i></button>
+      <button type="button" data-tip="apps-order-up" data-action="apps-order-up" data-id="${esc(a.id)}" ${i === 0 ? "disabled" : ""} aria-label="往前一位" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 flex items-center justify-center shrink-0 active:scale-90 transition ${i === 0 ? "opacity-30" : ""}"><i class="fa-solid fa-chevron-up text-xs"></i></button>
+      <button type="button" data-tip="apps-order-down" data-action="apps-order-down" data-id="${esc(a.id)}" ${i === n - 1 ? "disabled" : ""} aria-label="往後一位" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 flex items-center justify-center shrink-0 active:scale-90 transition ${i === n - 1 ? "opacity-30" : ""}"><i class="fa-solid fa-chevron-down text-xs"></i></button>
     </div>`).join("");
   return `
     <div class="pt-1 space-y-2">
       <p class="text-[10px] text-slate-400 leading-relaxed">點左邊的編號選新位置，其他應用會自動順延；也可以用 ▲▼ 一格一格移。</p>
       <div id="orderList" class="space-y-1.5">${rows}</div>
-      <button type="button" data-action="apps-order-reset" class="w-full py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 text-xs font-bold text-center active:scale-95 transition"><i class="fa-solid fa-rotate-left mr-1"></i>還原預設順序</button>
+      <button type="button" data-tip="apps-order-reset" data-action="apps-order-reset" class="w-full py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 text-xs font-bold text-center active:scale-95 transition"><i class="fa-solid fa-rotate-left mr-1"></i>還原預設順序</button>
     </div>`;
 }
 
@@ -192,8 +192,8 @@ function renderPlugins() {
         <span class="text-xs font-bold text-slate-700 dark:text-slate-200 block truncate">${esc(p.name || pluginName(p.url))}</span>
         <span class="text-[10px] text-slate-400 block truncate">${esc(hostOf(p.url))}</span>
       </span>
-      <button type="button" data-action="plugin-edit" data-id="${esc(p.id)}" aria-label="編輯這個插件" class="shrink-0 w-8 h-8 bg-white dark:bg-slate-700 border ${editing ? "theme-border-primary theme-text-primary" : "border-slate-200 dark:border-slate-600 text-slate-400 hover:text-slate-600"} rounded-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-pen text-xs"></i></button>
-      <button type="button" data-action="plugin-remove" data-id="${esc(p.id)}" aria-label="${armed ? "再按一次確定刪除" : "刪除這個插件"}" class="shrink-0 h-8 ${armed ? "px-3 bg-rose-500 text-white text-[11px] font-bold" : "w-8 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 hover:text-rose-500"} rounded-lg flex items-center justify-center active:scale-90 transition">${armed ? "再按一次刪除" : '<i class="fa-solid fa-trash-can text-xs"></i>'}</button>
+      <button type="button" data-tip="apps-plug-edit" data-action="plugin-edit" data-id="${esc(p.id)}" aria-label="編輯這個插件" class="shrink-0 w-8 h-8 bg-white dark:bg-slate-700 border ${editing ? "theme-border-primary theme-text-primary" : "border-slate-200 dark:border-slate-600 text-slate-400 hover:text-slate-600"} rounded-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-pen text-xs"></i></button>
+      <button type="button" data-tip="apps-plug-del" data-action="plugin-remove" data-id="${esc(p.id)}" aria-label="${armed ? "再按一次確定刪除" : "刪除這個插件"}" class="shrink-0 h-8 ${armed ? "px-3 bg-rose-500 text-white text-[11px] font-bold" : "w-8 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 hover:text-rose-500"} rounded-lg flex items-center justify-center active:scale-90 transition">${armed ? "再按一次刪除" : '<i class="fa-solid fa-trash-can text-xs"></i>'}</button>
     </div>`;
   }).join("");
   fixAppIcons(box);

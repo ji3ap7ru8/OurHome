@@ -54,7 +54,7 @@ export const headerTemplate = `
                     <button id="headerManageBtn" data-action="notes-manage" data-tip="notes-manage" class="hidden h-10 px-4 rounded-full items-center gap-1.5 font-black text-sm text-white shadow-md hover:scale-105 active:scale-95 transition-all" style="background:#d97706"><i class="fa-solid fa-gear"></i> 管理</button>
 
                     <!-- 應用程式頁專用：︙ 所有應用設定（顏色跟著主色調；其他頁隱藏） -->
-                    <button id="headerMoreBtn" data-action="open-apps-options" class="hidden w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center" title="所有應用設定" aria-label="所有應用設定">
+                    <button id="headerMoreBtn" data-tip="apps-more" data-action="open-apps-options" class="hidden w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center" title="所有應用設定" aria-label="所有應用設定">
                         <i class="fa-solid fa-ellipsis-vertical text-lg theme-text-primary"></i>
                     </button>
 
