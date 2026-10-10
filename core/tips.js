@@ -344,6 +344,21 @@ const dockHomeScene = `<div class="sc">
 </div>`;
 const dockStatusScene = panelScene(true).replace("⚙", "▾").replace("系統設定", "網頁狀態");
 
+// ---------- 大廳 / 大廳設定 / 個人化 ----------
+const lobbyBlock = (st = "") => `<div class="lbk" style="${st}"><div class="lbk-h"><span class="scc-ic" style="width:14px;height:14px;border-radius:5px"></span><i class="sb" style="width:40px;margin:0"></i><b style="margin-left:auto;font-size:9px;color:#94a3b8">›</b></div><div class="lbk-s"><span></span><span></span><span></span></div></div>`;
+const pageSwap = (a, b) => `<div class="fmt fmt-a" style="top:4px;display:block;width:120px;margin-left:-60px">${memoMiniCard(0, a).replace("top:0px", "position:relative;top:0;left:0;margin:0")}</div><div class="fmt fmt-b" style="top:4px;display:block;width:120px;margin-left:-60px">${memoMiniCard(0, b, "background:#e0f2fe").replace("top:0px", "position:relative;top:0;left:0;margin:0")}</div>`;
+const lobbySecScene = `<div class="sc">${lobbyBlock("animation:fmtA 3.6s ease-in-out infinite")}<div class="fmt fmt-b" style="top:4px;display:block;width:130px;margin-left:-65px">${memoMiniCard(0, "進入這個服務的頁面", "background:#e0f2fe").replace("top:0px", "position:relative;top:0;left:0;margin:0")}</div>${finger("left:calc(50% - 6px);top:34px")}</div>`;
+const lobbyAppsScene = `<div class="sc">${pageSwap("大廳", "所有應用").replace(/fmt-a/, "fmt-a").replace("top:4px", "top:30px")}<span class="tip-pill sp-btn" style="position:absolute;right:20px;top:2px;font-size:12px;padding:5px 12px">所有應用 ›</span>${finger("right:40px;top:12px")}</div>`;
+const headerPaletteScene = `<div class="sc"><span class="scm-btn" style="right:14px;top:4px;width:30px;height:30px;font-size:14px;color:#7c3aed">🎨</span><div class="pnl pnl-in"><b style="font-size:11px">大廳設定</b><i class="sb"></i><i class="sb" style="width:60%"></i><i class="sb"></i></div>${finger("right:10px;top:12px")}</div>`;
+const themeScene = (m) => `<div class="sc"><div class="thm ${m === "dark" ? "thm-d" : m === "light" ? "thm-l" : "thm-s"}"><b>Aa</b><i class="sb"></i><i class="sb" style="width:60%"></i></div>${finger("left:calc(50% - 6px);top:50px")}</div>`;
+const colorScene = `<div class="sc"><div style="position:absolute;left:0;right:0;top:6px;display:flex;justify-content:center;gap:8px">${["#0284c7", "#059669", "#e11d48", "#7c3aed", "#d97706"].map((c, i) => `<span style="width:20px;height:20px;border-radius:50%;background:${c}${i === 3 ? ";box-shadow:0 0 0 3px #fff,0 0 0 5px " + c : ""}"></span>`).join("")}</div><span class="tip-pill colpill" style="position:absolute;left:50%;margin-left:-40px;top:44px;font-size:12px;padding:6px 18px;color:#fff">按鈕 ＋ 圖示</span>${finger("left:calc(50% + 32px);top:4px")}</div>`;
+const fontScene = (up) => `<div class="sc"><b class="fz ${up ? "fz-up" : "fz-down"}">字</b><span class="scm-btn" style="left:calc(50% - 16px);right:auto;top:52px;width:32px;height:32px;animation:tipPress 3.6s ease-in-out infinite;font-size:16px">${up ? "＋" : "－"}</span>${finger("left:calc(50% - 6px);top:58px")}</div>`;
+const tipsToggleScene = `<div class="sc"><b style="position:absolute;left:30px;top:22px;font-size:13px">💡 操作提示說明</b><span class="sw"><i></i></span><b style="position:absolute;left:0;right:0;top:62px;text-align:center;font-size:10px;color:#64748b"><span class="num-a">開：長按按鈕會跳出說明</span><span class="num-b" style="position:absolute;left:0;right:0">關：不再跳出說明</span></b>${finger("right:26px;top:26px")}</div>`;
+const dockToggleScene = `<div class="sc"><b style="position:absolute;left:24px;top:8px;font-size:12px">快捷列</b><span class="swm" style="position:absolute;right:30px;top:8px"><i></i></span>${dockBar(3).replace('<div class="dkb">', '<div class="dkb" style="animation:fmtA 3.6s ease-in-out infinite">')}${finger("right:26px;top:10px")}</div>`;
+const shortcutScene = `<div class="sc"><div class="scm-menu" style="left:calc(50% - 56px);right:auto;top:0;width:112px;transform-origin:50% 100%"><span>🏠 大廳</span><span>🧮 計算機</span></div>${dockBar(2)}${finger("left:calc(50% - 6px);top:50px")}</div>`;
+const lobbyToggleScene = `<div class="sc"><div class="rw" style="top:6px;animation:none"><span class="scc-ic" style="width:16px;height:16px"></span><b style="flex:1;font-size:11px;font-weight:900">家庭公告</b><span class="swm"><i></i></span></div>${lobbyBlock("top:38px;left:calc(50% - 70px);width:140px;animation:gtPop 3.6s ease-in-out infinite;opacity:0")}${finger("right:28px;top:14px")}</div>`;
+const lobbyDetailScene = `<div class="sc"><div class="rw" style="top:6px;animation:none"><b class="rw-n">1</b><b style="flex:1;font-size:11px;font-weight:900">家庭公告</b><span class="rw-a" style="animation:tipPress 3.6s ease-in-out infinite">›</span></div>${lineDlg('<b style="font-size:10px">大廳要顯示哪些內容</b><i class="sb"></i><i class="sb" style="width:60%"></i>', "top:34px;height:54px")}${finger("right:26px;top:14px")}</div>`;
+
 const TIPS = {
   "cards-gear": { scene: panelScene(true), text: "按這裡打開系統設定。" },
   "cards-close": { scene: panelScene(false), text: "按這裡關閉設定視窗。" },
@@ -474,6 +489,36 @@ const TIPS = {
   "dock-notification": { scene: remBellScene, text: "點一下，打開最新提醒；有新提醒時會有紅點。" },
   "dock-status": { scene: dockStatusScene, text: "點一下，查看網頁與雲端連線狀態。" },
   "dock-logout": { scene: loginScene(true), text: "點一下，登出帳號。在公共場所用完，記得登出。" },
+  "lobby-sec": { scene: lobbySecScene, text: "點區塊任何地方，進入「{name}」。" },
+  "lobby-card": { scene: cardOpenScene, text: "點一下，直接打開這張圖卡，顯示條碼。" },
+  "lobby-apps": { scene: lobbyAppsScene, text: "點這裡，看所有的應用程式。" },
+  "head-user": { scene: loginScene(false), text: "點一下：還沒登入會跳出登入；登入後可以查看網頁連線狀態。" },
+  "head-palette": { scene: headerPaletteScene, text: "按這裡，打開大廳設定：決定大廳顯示什麼、順序，還有操作提示與快捷列。" },
+  "set-gear": { scene: panelScene(true), text: "按這裡，切換到系統設定。" },
+  "set-close": { scene: panelScene(false).replace("生活圖卡設定", "設定"), text: "按這裡，關閉設定視窗。" },
+  "set-personal": { scene: accScene.replace("管理應用", "個人化"), text: "展開：操作提示、快捷列等個人化設定。" },
+  "set-tips": { scene: tipsToggleScene, text: "開：長按按鈕會跳出說明（就像現在）。關：不再跳出。" },
+  "set-theme-light": { scene: themeScene("light"), text: "淺色：白底，白天看比較清楚。" },
+  "set-theme-dark": { scene: themeScene("dark"), text: "深色：深底，晚上看比較不刺眼。" },
+  "set-theme-system": { scene: themeScene("sys"), text: "跟隨系統：手機切換深淺色，網頁也會跟著換。" },
+  "set-color": { scene: colorScene, text: "主色調改成「{name}」，按鈕與圖示會換成這個顏色。" },
+  "set-font-minus": { scene: fontScene(false), text: "字體縮小一點。" },
+  "set-font-plus": { scene: fontScene(true), text: "字體放大一點，長輩看更清楚。" },
+  "set-nick-reset": { scene: noteFieldScene("暱稱", "牛牛"), text: "把暱稱改回 Google 帳號的名稱。" },
+  "set-open-apps": { scene: panelScene(true).replace("系統設定", "所有應用設定"), text: "進入所有應用設定：顯示方式、排序、管理應用。" },
+  "set-open-cards": { scene: panelScene(true).replace("系統設定", "生活圖卡設定"), text: "進入生活圖卡設定：格式大小與排序。" },
+  "set-open-lobby": { scene: panelScene(true).replace("系統設定", "大廳設定"), text: "進入大廳設定：決定大廳顯示什麼、順序。" },
+  "set-dock": { scene: dockToggleScene, text: "開：顯示下方快捷列。關：隱藏，其他頁只留一顆「回大廳」。" },
+  "set-shortcut": { scene: shortcutScene, text: "點格子，換成想要的功能；5 格至少要保留一個「大廳」。" },
+  "lobby-show": { scene: accScene.replace("管理應用", "顯示管理"), text: "展開：選擇大廳要顯示哪些服務。" },
+  "lobby-order": { scene: accScene.replace("管理應用", "大廳排序"), text: "展開：調整服務在大廳的先後順序。" },
+  "lobby-toggle": { scene: lobbyToggleScene, text: "開：大廳會多一個「{name}」區塊。關：不顯示。" },
+  "lobby-num": { scene: orderNumScene, text: "點編號選新位置，其他服務會自動順延。" },
+  "lobby-detail": { scene: lobbyDetailScene, text: "按 ›，設定「{name}」在大廳要顯示哪些內容。" },
+  "lobby-reset": { scene: orderResetScene, text: "還原成跟「所有應用」一樣的順序。" },
+  "lobby-dclose": { scene: calCloseScene, text: "按 ✕，關閉這個小視窗。" },
+  "lobby-card-pick": { scene: linePickScene, text: "點圖卡打勾，可以選好幾張，大廳就會顯示。" },
+  "lobby-mode": { scene: noteAuthorScene, text: "點選項，決定大廳顯示哪些內容。" },
   "notes-sort-pinned": { scene: reorder('<i class="fa-solid fa-thumbtack"></i>'), text: "這是釘選，會自動往前排放。" },
   "notes-sort-date": { scene: reorder('<span class="sm-txt">最新</span>'), text: "最新發布的公告，會排在最前面。" },
   "notes-sort-expire": { scene: reorder('<span class="sm-txt">剩1天</span>'), text: "快到期的公告，會自動往前排放。" },
@@ -627,6 +672,19 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 .dki { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; } .dki b { width: 10px; height: 10px; border-radius: 3px; background: #94a3b8; }
 .dki-on { animation: dkOn 3.6s ease-in-out infinite; }
 @keyframes dkOn { 0%,30% { background: transparent; } 40%,90% { background: #bae6fd; } 100% { background: transparent; } }
+.lbk { position: absolute; left: 50%; top: 6px; width: 150px; margin-left: -75px; padding: 6px 8px; border-radius: 12px; background: rgba(255,255,255,.9); border: 2px solid #e2e8f0; box-shadow: 0 3px 6px rgba(0,0,0,.15); }
+.lbk-h { display: flex; align-items: center; gap: 5px; } .lbk-s { display: flex; gap: 4px; margin-top: 6px; } .lbk-s span { flex: 1; height: 26px; border-radius: 6px; background: #bbf7d0; border-top: 3px solid #4ade80; }
+.thm { position: absolute; left: 50%; top: 4px; width: 130px; height: 70px; margin-left: -65px; border-radius: 12px; padding: 8px 10px; border: 2px solid #94a3b8; font-size: 18px; } .thm b { display: block; margin-bottom: 4px; }
+.thm-l { background: #1e293b; color: #f8fafc; animation: thmL 3.6s ease-in-out infinite; } .thm-d { background: #f8fafc; color: #1e293b; animation: thmD 3.6s ease-in-out infinite; } .thm-s { background: #f8fafc; color: #1e293b; animation: thmS 3.6s ease-in-out infinite; }
+@keyframes thmL { 0%,30% { background: #1e293b; color: #f8fafc; } 45%,90% { background: #f8fafc; color: #1e293b; } 100% { background: #1e293b; color: #f8fafc; } }
+@keyframes thmD { 0%,30% { background: #f8fafc; color: #1e293b; } 45%,90% { background: #1e293b; color: #f8fafc; } 100% { background: #f8fafc; color: #1e293b; } }
+@keyframes thmS { 0%,20% { background: #f8fafc; color: #1e293b; } 35%,55% { background: #1e293b; color: #f8fafc; } 70%,100% { background: #f8fafc; color: #1e293b; } }
+.colpill { animation: colPill 3.6s ease-in-out infinite; }
+@keyframes colPill { 0%,30% { background: #0284c7; border-color: #0284c7; } 45%,90% { background: #7c3aed; border-color: #7c3aed; } 100% { background: #0284c7; border-color: #0284c7; } }
+.fz { position: absolute; left: 50%; top: 6px; width: 60px; margin-left: -30px; text-align: center; line-height: 1; }
+.fz-up { animation: fzUp 3.6s ease-in-out infinite; } .fz-down { animation: fzDown 3.6s ease-in-out infinite; }
+@keyframes fzUp { 0%,30% { font-size: 20px; } 45%,90% { font-size: 38px; } 100% { font-size: 20px; } }
+@keyframes fzDown { 0%,30% { font-size: 38px; } 45%,90% { font-size: 20px; } 100% { font-size: 38px; } }
 @keyframes tipPress { 0%,12%,24%,100% { transform: scale(1); } 18% { transform: scale(.92); } }
 `;
   document.head.appendChild(st);

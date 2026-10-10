@@ -9,10 +9,10 @@ export const settingsPanelTemplate = `
                     <h1 id="settingsHeaderTitle" class="text-base font-black text-slate-800 dark:text-slate-100 tracking-wider">系統設定</h1>
                 </div>
                 <div class="flex items-center gap-2">
-                <button id="settingsGearBtn" data-action="open-settings" data-mode="all" title="系統設定" class="hidden w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-slate-300/70 theme-text-primary flex items-center justify-center transition-all active:scale-90">
+                <button id="settingsGearBtn" data-tip="set-gear" data-action="open-settings" data-mode="all" title="系統設定" class="hidden w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-slate-300/70 theme-text-primary flex items-center justify-center transition-all active:scale-90">
                     <i class="fa-solid fa-gear text-base"></i>
                 </button>
-                <button data-action="close-settings" title="關閉設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90">
+                <button data-tip="set-close" data-action="close-settings" title="關閉設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
                 </div>
@@ -98,7 +98,7 @@ export const settingsPanelTemplate = `
 
                 <!-- 2. 圖卡二：個人化 (預設收合) -->
                 <div id="cardPersonal" class="setting-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 soft-shadow-sm overflow-hidden transition-all">
-                    <button data-accordion-trigger="personal" aria-expanded="false" aria-controls="contentPersonal" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                    <button data-tip="set-personal" data-accordion-trigger="personal" aria-expanded="false" aria-controls="contentPersonal" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl theme-bg-light theme-text-primary flex items-center justify-center text-base font-bold shrink-0">
                                 <i class="fa-solid fa-palette"></i>
@@ -125,7 +125,7 @@ export const settingsPanelTemplate = `
                             <div class="flex items-center gap-2">
                                 <input id="nicknameInput" data-input="nickname" type="text" maxlength="20" autocomplete="off" placeholder="暱稱"
                                     class="flex-1 min-w-0 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none focus:theme-border-primary disabled:opacity-50">
-                                <button id="nicknameResetBtn" data-action="nickname-reset" disabled
+                                <button id="nicknameResetBtn" data-tip="set-nick-reset" data-action="nickname-reset" disabled
                                     class="shrink-0 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100">
                                     預設Google名稱
                                 </button>
@@ -143,7 +143,7 @@ export const settingsPanelTemplate = `
                                 <i class="fa-regular fa-lightbulb text-slate-400 text-sm w-4 text-center"></i>
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-200">操作提示說明</span>
                             </div>
-                            <label class="relative inline-flex items-center gap-1.5 cursor-pointer">
+                            <label data-tip="set-tips" class="relative inline-flex items-center gap-1.5 cursor-pointer">
                                 <input type="checkbox" id="tipsToggle" data-change="tips" checked class="sr-only peer">
                                 <div class="oh-switch"></div><span class="oh-switch-text" aria-hidden="true"></span>
                             </label>
@@ -159,13 +159,13 @@ export const settingsPanelTemplate = `
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-200">外觀主題</span>
                             </div>
                             <div class="grid grid-cols-3 gap-2 pt-1">
-                                <button id="themeLightBtn" data-action="set-theme" data-theme="light" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
+                                <button id="themeLightBtn" data-tip="set-theme-light" data-action="set-theme" data-theme="light" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
                                     <i class="fa-regular fa-sun"></i> 淺色
                                 </button>
-                                <button id="themeDarkBtn" data-action="set-theme" data-theme="dark" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
+                                <button id="themeDarkBtn" data-tip="set-theme-dark" data-action="set-theme" data-theme="dark" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
                                     <i class="fa-regular fa-moon"></i> 深色
                                 </button>
-                                <button id="themeSystemBtn" data-action="set-theme" data-theme="system" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
+                                <button id="themeSystemBtn" data-tip="set-theme-system" data-action="set-theme" data-theme="system" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
                                     <i class="fa-solid fa-desktop"></i> 跟隨系統
                                 </button>
                             </div>
@@ -183,11 +183,11 @@ export const settingsPanelTemplate = `
                                 <span id="colorSwatchName" class="text-[10px] theme-text-primary font-bold">晨曦藍</span>
                             </div>
                             <div class="flex items-center justify-between pt-1 px-1">
-                                <button data-action="set-color" data-primary="#0284c7" data-light="#e0f2fe" data-dark="#0369a1" data-name="晨曦藍" class="w-8 h-8 rounded-full bg-sky-500 hover:scale-110 active:scale-95 transition-all ring-2 ring-offset-2 ring-sky-500 dark:ring-offset-slate-800"></button>
-                                <button data-action="set-color" data-primary="#059669" data-light="#d1fae5" data-dark="#047857" data-name="鼠尾草綠" class="w-8 h-8 rounded-full bg-emerald-600 hover:scale-110 active:scale-95 transition-all"></button>
-                                <button data-action="set-color" data-primary="#e11d48" data-light="#ffe4e6" data-dark="#be123c" data-name="蜜桃粉" class="w-8 h-8 rounded-full bg-rose-500 hover:scale-110 active:scale-95 transition-all"></button>
-                                <button data-action="set-color" data-primary="#7c3aed" data-light="#ede9fe" data-dark="#6d28d9" data-name="薰衣草紫" class="w-8 h-8 rounded-full bg-violet-600 hover:scale-110 active:scale-95 transition-all"></button>
-                                <button data-action="set-color" data-primary="#d97706" data-light="#fef3c7" data-dark="#b45309" data-name="琥珀橘" class="w-8 h-8 rounded-full bg-amber-600 hover:scale-110 active:scale-95 transition-all"></button>
+                                <button data-tip="set-color" data-tip-name="晨曦藍" data-action="set-color" data-primary="#0284c7" data-light="#e0f2fe" data-dark="#0369a1" data-name="晨曦藍" class="w-8 h-8 rounded-full bg-sky-500 hover:scale-110 active:scale-95 transition-all ring-2 ring-offset-2 ring-sky-500 dark:ring-offset-slate-800"></button>
+                                <button data-tip="set-color" data-tip-name="鼠尾草綠" data-action="set-color" data-primary="#059669" data-light="#d1fae5" data-dark="#047857" data-name="鼠尾草綠" class="w-8 h-8 rounded-full bg-emerald-600 hover:scale-110 active:scale-95 transition-all"></button>
+                                <button data-tip="set-color" data-tip-name="蜜桃粉" data-action="set-color" data-primary="#e11d48" data-light="#ffe4e6" data-dark="#be123c" data-name="蜜桃粉" class="w-8 h-8 rounded-full bg-rose-500 hover:scale-110 active:scale-95 transition-all"></button>
+                                <button data-tip="set-color" data-tip-name="薰衣草紫" data-action="set-color" data-primary="#7c3aed" data-light="#ede9fe" data-dark="#6d28d9" data-name="薰衣草紫" class="w-8 h-8 rounded-full bg-violet-600 hover:scale-110 active:scale-95 transition-all"></button>
+                                <button data-tip="set-color" data-tip-name="琥珀橘" data-action="set-color" data-primary="#d97706" data-light="#fef3c7" data-dark="#b45309" data-name="琥珀橘" class="w-8 h-8 rounded-full bg-amber-600 hover:scale-110 active:scale-95 transition-all"></button>
                             </div>
                         </div>
 
@@ -203,11 +203,11 @@ export const settingsPanelTemplate = `
                                 <span id="fontScaleLabel" class="text-xs theme-text-primary font-bold">100% (標準)</span>
                             </div>
                             <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/40 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-700">
-                                <button data-action="font-step" data-delta="-5" class="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-sm flex items-center justify-center soft-shadow-sm hover:scale-105 active:scale-95 transition-all">
+                                <button data-tip="set-font-minus" data-action="font-step" data-delta="-5" class="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-sm flex items-center justify-center soft-shadow-sm hover:scale-105 active:scale-95 transition-all">
                                     <i class="fa-solid fa-minus text-xs"></i>
                                 </button>
                                 <input id="fontSizeRange" type="range" min="80" max="150" value="100" step="5" data-input="font-scale" class="w-full h-2 bg-slate-200 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer">
-                                <button data-action="font-step" data-delta="5" class="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-sm flex items-center justify-center soft-shadow-sm hover:scale-105 active:scale-95 transition-all">
+                                <button data-tip="set-font-plus" data-action="font-step" data-delta="5" class="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-sm flex items-center justify-center soft-shadow-sm hover:scale-105 active:scale-95 transition-all">
                                     <i class="fa-solid fa-plus text-xs"></i>
                                 </button>
                             </div>
@@ -225,7 +225,7 @@ export const settingsPanelTemplate = `
 
                         <div data-only="system" class="space-y-4">
                         <!-- 5. 排版大廳佈置 -->
-                        <button data-action="open-settings" data-mode="personal" class="w-full flex items-center justify-between text-left group py-0.5">
+                        <button data-tip="set-open-lobby" data-action="open-settings" data-mode="personal" class="w-full flex items-center justify-between text-left group py-0.5">
                             <div class="flex items-center gap-3">
                                 <i class="fa-solid fa-table-cells-large text-slate-400 text-sm w-4 text-center"></i>
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-200">大廳設定</span>
@@ -236,7 +236,7 @@ export const settingsPanelTemplate = `
                         <hr class="border-slate-100 dark:border-slate-700/60">
 
                         <!-- 5-1. 所有應用設定（切換到「所有應用設定」頁） -->
-                        <button data-action="open-apps-options" class="w-full flex items-center justify-between text-left group py-0.5">
+                        <button data-tip="set-open-apps" data-action="open-apps-options" class="w-full flex items-center justify-between text-left group py-0.5">
                             <div class="flex items-center gap-3">
                                 <i class="fa-solid fa-border-all text-slate-400 text-sm w-4 text-center"></i>
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-200">所有應用設定</span>
@@ -247,7 +247,7 @@ export const settingsPanelTemplate = `
                         <hr class="border-slate-100 dark:border-slate-700/60">
 
                         <!-- 5-2. 生活圖卡設定（切換到「生活圖卡設定」頁） -->
-                        <button data-action="open-cards-options" class="w-full flex items-center justify-between text-left group py-0.5">
+                        <button data-tip="set-open-cards" data-action="open-cards-options" class="w-full flex items-center justify-between text-left group py-0.5">
                             <div class="flex items-center gap-3">
                                 <i class="fa-solid fa-images text-slate-400 text-sm w-4 text-center"></i>
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-200">生活圖卡設定</span>
@@ -265,17 +265,17 @@ export const settingsPanelTemplate = `
                                     <i class="fa-solid fa-sliders text-slate-400 text-sm w-4 text-center"></i>
                                     <span class="text-xs font-bold text-slate-700 dark:text-slate-200">排序下方快捷功能</span>
                                 </div>
-                                <label class="relative inline-flex items-center gap-1.5 cursor-pointer" title="顯示下方快捷功能">
+                                <label data-tip="set-dock" class="relative inline-flex items-center gap-1.5 cursor-pointer" title="顯示下方快捷功能">
                                     <input type="checkbox" id="dockVisibleToggle" data-change="dock-visible" checked class="sr-only peer">
                                     <div class="oh-switch"></div><span class="oh-switch-text" aria-hidden="true"></span>
                                 </label>
                             </div>
                             <div class="grid grid-cols-5 gap-1 pt-1 text-center">
-                                <button type="button" data-action="shortcut-pick" data-index="0" id="selectShortcut0" class="shortcut-slot flex flex-col items-center justify-center gap-0.5 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 active:scale-95 transition-all"></button>
-                                <button type="button" data-action="shortcut-pick" data-index="1" id="selectShortcut1" class="shortcut-slot flex flex-col items-center justify-center gap-0.5 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 active:scale-95 transition-all"></button>
-                                <button type="button" data-action="shortcut-pick" data-index="2" id="selectShortcut2" class="shortcut-slot flex flex-col items-center justify-center gap-0.5 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 active:scale-95 transition-all"></button>
-                                <button type="button" data-action="shortcut-pick" data-index="3" id="selectShortcut3" class="shortcut-slot flex flex-col items-center justify-center gap-0.5 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 active:scale-95 transition-all"></button>
-                                <button type="button" data-action="shortcut-pick" data-index="4" id="selectShortcut4" class="shortcut-slot flex flex-col items-center justify-center gap-0.5 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 active:scale-95 transition-all"></button>
+                                <button type="button" data-tip="set-shortcut" data-action="shortcut-pick" data-index="0" id="selectShortcut0" class="shortcut-slot flex flex-col items-center justify-center gap-0.5 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 active:scale-95 transition-all"></button>
+                                <button type="button" data-tip="set-shortcut" data-action="shortcut-pick" data-index="1" id="selectShortcut1" class="shortcut-slot flex flex-col items-center justify-center gap-0.5 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 active:scale-95 transition-all"></button>
+                                <button type="button" data-tip="set-shortcut" data-action="shortcut-pick" data-index="2" id="selectShortcut2" class="shortcut-slot flex flex-col items-center justify-center gap-0.5 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 active:scale-95 transition-all"></button>
+                                <button type="button" data-tip="set-shortcut" data-action="shortcut-pick" data-index="3" id="selectShortcut3" class="shortcut-slot flex flex-col items-center justify-center gap-0.5 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 active:scale-95 transition-all"></button>
+                                <button type="button" data-tip="set-shortcut" data-action="shortcut-pick" data-index="4" id="selectShortcut4" class="shortcut-slot flex flex-col items-center justify-center gap-0.5 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 active:scale-95 transition-all"></button>
                             </div>
                             <p id="shortcutHint" class="text-[10px] text-slate-400 leading-snug">點格子更換功能・5 格至少要保留一個「大廳」。關閉開關後，下方快捷列會隱藏，只能在大廳頁操作（其他頁會留一個「回大廳」小按鈕）。</p>
                         </div>
@@ -287,7 +287,7 @@ export const settingsPanelTemplate = `
 
                 <!-- 大廳設定（只在「大廳設定」模式顯示；內容由 components/lobby-settings.js 繪製） -->
                 <div id="cardLobbyShow" class="setting-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 soft-shadow-sm overflow-hidden transition-all hidden">
-                    <button data-accordion-trigger="lobbyShow" aria-expanded="false" aria-controls="content_lobbyShow" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                    <button data-tip="lobby-show" data-accordion-trigger="lobbyShow" aria-expanded="false" aria-controls="content_lobbyShow" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl theme-bg-light theme-text-primary flex items-center justify-center text-base font-bold shrink-0">
                                 <i class="fa-solid fa-eye"></i>
@@ -310,7 +310,7 @@ export const settingsPanelTemplate = `
                 </div>
 
                 <div id="cardLobbyOrder" class="setting-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 soft-shadow-sm overflow-hidden transition-all hidden">
-                    <button data-accordion-trigger="lobbyOrder" aria-expanded="false" aria-controls="content_lobbyOrder" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                    <button data-tip="lobby-order" data-accordion-trigger="lobbyOrder" aria-expanded="false" aria-controls="content_lobbyOrder" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl theme-bg-light theme-text-primary flex items-center justify-center text-base font-bold shrink-0">
                                 <i class="fa-solid fa-sort"></i>

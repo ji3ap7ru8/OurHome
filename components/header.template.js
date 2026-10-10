@@ -2,7 +2,7 @@
 export const headerTemplate = `
             <div class="relative z-10 px-5 pt-5 pb-2 flex justify-between items-center">
                 <!-- User Profile Badge (已登入顯示網頁狀態；未登入彈出登入頁) -->
-                <div id="headerUser" data-action="header-user" class="flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition-opacity active:scale-95" title="帳號資訊">
+                <div id="headerUser" data-tip="head-user" data-action="header-user" class="flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition-opacity active:scale-95" title="帳號資訊">
                     <div id="userAvatar" class="w-9 h-9 rounded-full overflow-hidden shrink-0 bg-slate-900 dark:bg-slate-700 text-white flex items-center justify-center font-black text-sm soft-shadow-sm">
                         <i class="fa-solid fa-user-large"></i>
                     </div>
@@ -74,7 +74,7 @@ export const headerTemplate = `
                     </button>
 
                     <!-- 個人化按鈕 -->
-                    <button id="headerPaletteBtn" data-action="open-settings" data-mode="personal" class="w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 soft-shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center" title="大廳設定" aria-label="大廳設定">
+                    <button id="headerPaletteBtn" data-tip="head-palette" data-action="open-settings" data-mode="personal" class="w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 soft-shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center" title="大廳設定" aria-label="大廳設定">
                         <i class="fa-solid fa-palette text-base theme-text-primary"></i>
                     </button>
                 </div>

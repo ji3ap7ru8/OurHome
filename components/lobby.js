@@ -4,6 +4,7 @@
 //   - 目前有簡略資訊的服務：家庭公告、家庭日曆、換誰洗碗、生活圖卡（其餘服務暫時不顯示）
 //   - 各服務要挑哪幾筆、整理成什麼欄位：core/lobby-feed.js（可用 Node 測試）
 import { state, on } from "../core/store.js";
+import { showTipHint } from "../core/tips.js";
 import { lobbyOrdered, getMode, modeLabelOf, lobbyCards } from "../core/lobby-model.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
 import { noteItems, memoItems, calendarItems, calendarFetchRange, CAL_EMPTY, bowlItems, cardItems } from "../core/lobby-feed.js";
@@ -128,7 +129,7 @@ const SECTIONS = {
         const fb = `fa-solid ${KINDS[k.kind]?.icon || "fa-image"} text-sm theme-text-primary`;
         const u = safeImg(k.iconUrl);
         const icon = u ? `<img data-icon data-fb="${esc(fb)}" src="${esc(u)}" alt="" referrerpolicy="no-referrer" class="w-full h-full object-contain">` : `<i class="${fb}"></i>`;
-        return `<button type="button" ${nav(id)} data-open-card="${esc(k.id)}" class="${BIG} flex items-center gap-3 active:scale-95 transition">
+        return `<button type="button" ${nav(id)} data-open-card="${esc(k.id)}" data-tip="lobby-card" class="${BIG} flex items-center gap-3 active:scale-95 transition">
           <span class="w-12 h-12 rounded-xl theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${icon}</span>
           <span class="min-w-0"><span class="block text-base font-black text-slate-800 dark:text-slate-100 truncate">${esc(k.name)}</span><span class="block text-xs font-semibold text-slate-400 truncate">${esc(k.kind)}</span></span>
         </button>`;
@@ -146,9 +147,9 @@ const modeLabel = (a) => (a.id === "生活圖卡" ? `已選 ${lobbyCards().lengt
 
 function shell(a) {
   // 除了「生活圖卡」（小卡直接打開那張圖卡），其餘服務點區塊任何地方都跳到該服務頁
-  const whole = a.id === "生活圖卡" ? "" : `${nav(a.id)} role="link" tabindex="-1"`;
+  const whole = a.id === "生活圖卡" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
   return `<section id="lobbySec-${esc(a.id)}" ${whole} class="glass-card rounded-3xl py-3${whole ? " cursor-pointer" : ""}">
-    <button type="button" ${nav(a.id)} class="w-full flex items-center gap-2 px-4 text-left">
+    <button type="button" ${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" class="w-full flex items-center gap-2 px-4 text-left">
       <span class="w-7 h-7 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-xs")}</span>
       <span class="text-sm font-black text-slate-800 dark:text-slate-100 truncate">${esc(a.name)}</span>
       <span class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 truncate">${esc(modeLabel(a))}</span>
@@ -192,7 +193,7 @@ export function renderLobby(el /* , services */) {
     <div class="px-5 pt-2 pb-6">
       <div class="flex items-center justify-between gap-3 mb-5">
         <h2 class="lobby-brand min-w-0 truncate">我們の家</h2>
-        <button type="button" data-action="nav" data-feature="應用程式" class="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-white/90 dark:bg-slate-800/90 soft-shadow-sm px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition">所有應用<i class="fa-solid fa-chevron-right text-[10px] text-slate-400 dark:text-slate-500"></i></button>
+        <button type="button" data-action="nav" data-feature="應用程式" data-tip="lobby-apps" class="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-white/90 dark:bg-slate-800/90 soft-shadow-sm px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition">所有應用<i class="fa-solid fa-chevron-right text-[10px] text-slate-400 dark:text-slate-500"></i></button>
       </div>
       <div id="lobbyFeed" class="space-y-4"></div>
     </div>`;
@@ -203,4 +204,5 @@ export function renderLobby(el /* , services */) {
     on("apps:change", again);
   }
   draw(true);
+  showTipHint("lobby");
 }

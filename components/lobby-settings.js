@@ -59,7 +59,7 @@ function renderShow() {
       ? list.map((a) => {
           const on = isShown(a.id);
           return `
-    <button type="button" role="switch" aria-checked="${on}" data-action="lobby-toggle" data-id="${esc(a.id)}" class="w-full text-left ${ROW} active:scale-[.98] transition">
+    <button type="button" role="switch" aria-checked="${on}" data-tip="lobby-toggle" data-tip-name="${esc(a.name)}" data-action="lobby-toggle" data-id="${esc(a.id)}" class="w-full text-left ${ROW} active:scale-[.98] transition">
       <span class="w-8 h-8 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-sm")}</span>
       <span class="flex-1 min-w-0 text-xs font-bold text-slate-700 dark:text-slate-200 truncate">${esc(a.name)}</span>
       ${a.plugin ? EXTERNAL : ""}
@@ -84,13 +84,13 @@ function renderOrder() {
       ? `<p class="text-[10px] text-slate-400 leading-relaxed">只排「顯示管理」裡開啟的服務，點左邊的編號選新位置，其他服務會自動順延；右邊的「>」可設定該服務在大廳的顯示方式。</p>
     <div id="lobbyOrderList" class="space-y-1.5">${list.map((a, i) => `
       <div data-order-row="${esc(a.id)}" class="${ROW} py-1.5">
-        <select data-change="lobby-order-num" data-id="${esc(a.id)}" aria-label="${esc(a.name)} 的編號" class="${NUM}">${list.map((_, k) => `<option value="${k + 1}"${k === i ? " selected" : ""}>${k + 1}</option>`).join("")}</select>
+        <select data-tip="lobby-num" data-change="lobby-order-num" data-id="${esc(a.id)}" aria-label="${esc(a.name)} 的編號" class="${NUM}">${list.map((_, k) => `<option value="${k + 1}"${k === i ? " selected" : ""}>${k + 1}</option>`).join("")}</select>
         <span class="w-8 h-8 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-sm")}</span>
         <span class="flex-1 min-w-0 text-xs font-bold text-slate-700 dark:text-slate-200 truncate">${esc(a.name)}</span>
         ${a.plugin ? EXTERNAL : ""}
-        ${a.plugin ? "" : `<button type="button" data-action="lobby-detail" data-id="${esc(a.id)}" aria-label="${esc(a.name)} 的大廳顯示設定" class="${ARROW}"><i class="fa-solid fa-chevron-right"></i></button>`}
+        ${a.plugin ? "" : `<button type="button" data-tip="lobby-detail" data-tip-name="${esc(a.name)}" data-action="lobby-detail" data-id="${esc(a.id)}" aria-label="${esc(a.name)} 的大廳顯示設定" class="${ARROW}"><i class="fa-solid fa-chevron-right"></i></button>`}
       </div>`).join("")}</div>
-    ${state.lobby.order.length ? '<button type="button" data-action="lobby-order-reset" class="w-full py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 text-xs font-bold text-center active:scale-95 transition"><i class="fa-solid fa-rotate-left mr-1"></i>還原成跟「所有應用」相同</button>' : ""}`
+    ${state.lobby.order.length ? '<button type="button" data-tip="lobby-reset" data-action="lobby-order-reset" class="w-full py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 text-xs font-bold text-center active:scale-95 transition"><i class="fa-solid fa-rotate-left mr-1"></i>還原成跟「所有應用」相同</button>' : ""}`
       : '<p class="text-[11px] text-slate-400 text-center py-3">大廳目前沒有要顯示的服務，請先在「顯示管理」開啟。</p>';
     fixAppIcons(box);
     if (focusId) {
@@ -117,7 +117,7 @@ function paintCards() {
   body.innerHTML = cardList.length
     ? `<p class="text-[10px] text-slate-400">選擇大廳要顯示的圖卡（可多選）</p>
       <div class="space-y-1.5 max-h-[50vh] overflow-y-auto">${cardList.map((c) => `
-      <button type="button" role="checkbox" aria-checked="${on.has(c.id)}" data-action="lobby-card-toggle" data-card-id="${esc(c.id)}" class="${CHOICE}">
+      <button type="button" role="checkbox" aria-checked="${on.has(c.id)}" data-tip="lobby-card-pick" data-action="lobby-card-toggle" data-card-id="${esc(c.id)}" class="${CHOICE}">
         <span class="flex-1 min-w-0 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">${esc(c.name || "（未命名）")}</span>${tick(on.has(c.id))}
       </button>`).join("")}</div>`
     : '<p class="text-[11px] text-slate-400 text-center py-3">還沒有新增任何圖卡，請先到「生活圖卡」新增。</p>';
@@ -138,7 +138,7 @@ function openDetail(id) {
   const cur = getMode(id);
   const isCards = id === "生活圖卡";
   const choices = (list) => '<p class="text-[10px] text-slate-400">大廳要顯示哪些內容</p>' + list.map((o) => `
-      <button type="button" data-action="lobby-mode-pick" data-id="${esc(id)}" data-value="${esc(o.value)}" class="${CHOICE}">
+      <button type="button" data-tip="lobby-mode" data-action="lobby-mode-pick" data-id="${esc(id)}" data-value="${esc(o.value)}" class="${CHOICE}">
         <span class="flex-1 text-sm font-bold text-slate-700 dark:text-slate-200">${esc(o.label)}</span>${tick(o.value === cur)}
       </button>`).join("");
   const body = opts.length
@@ -155,7 +155,7 @@ function openDetail(id) {
       <div class="flex items-center gap-2 pb-1">
         <span class="w-8 h-8 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-sm")}</span>
         <h3 class="flex-1 min-w-0 text-sm font-black text-slate-800 dark:text-slate-100 truncate">${esc(a.name)}</h3>
-        <button type="button" data-action="lobby-detail-close" aria-label="關閉" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" data-tip="lobby-dclose" data-action="lobby-detail-close" aria-label="關閉" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div id="lobbyDetailBody" class="space-y-2">${body}</div>
     </div>`;
