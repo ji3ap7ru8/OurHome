@@ -55,6 +55,7 @@ function renderDock() {
       const back = document.createElement("button");
       back.dataset.action = "nav";
       back.dataset.feature = "大廳";
+      back.dataset.tip = "dock-home";
       back.className = "flex items-center gap-1.5 px-1 text-sm font-bold theme-text-primary active:scale-95 transition-all";
       back.innerHTML = '<i class="fa-solid fa-house text-base"></i><span>回大廳</span>';
       dock.appendChild(back);
@@ -75,6 +76,8 @@ function renderDock() {
       (isActive ? "theme-text-primary" : "text-slate-400 dark:text-slate-400 hover:text-slate-600");
 
     Object.assign(button.dataset, DOCK_ACTIONS[feat.action] || {});
+    button.dataset.tip = DOCK_ACTIONS[feat.action] ? "dock-" + feat.action : "dock-go"; // 設定／提醒／狀態／登出各有說明；其餘是切換畫面
+    button.dataset.tipName = feat.name;
     if (["active", "normal", "service"].includes(feat.action)) {
       button.dataset.action = "nav";
       button.dataset.feature = featureId;

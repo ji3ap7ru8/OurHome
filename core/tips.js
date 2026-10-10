@@ -330,6 +330,20 @@ const appPlugAddScene = `<div class="sc">
   ${finger("left:calc(50% - 6px);top:12px")}
 </div>`;
 
+// ---------- 底部快捷列 ----------
+const dockBar = (hl) => `<div class="dkb">${[0, 1, 2, 3, 4].map((i) => `<span class="dki${i === hl ? " dki-on" : ""}"><b></b></span>`).join("")}</div>`;
+const dockGoScene = `<div class="sc">
+  <div class="fmt fmt-a" style="top:4px;display:block;width:120px;margin-left:-60px">${memoMiniCard(0, "目前的畫面").replace("top:0px", "position:relative;top:0;left:0;margin:0")}</div>
+  <div class="fmt fmt-b" style="top:4px;display:block;width:120px;margin-left:-60px">${memoMiniCard(0, "切換後的畫面", "background:#e0f2fe").replace("top:0px", "position:relative;top:0;left:0;margin:0")}</div>
+  ${dockBar(3)}${finger("left:calc(50% + 22px);top:56px")}
+</div>`;
+const dockHomeScene = `<div class="sc">
+  <div class="fmt fmt-a" style="top:4px;display:block;width:120px;margin-left:-60px">${memoMiniCard(0, "某個應用").replace("top:0px", "position:relative;top:0;left:0;margin:0")}</div>
+  <div class="fmt fmt-b" style="top:4px;display:block;width:120px;margin-left:-60px">${memoMiniCard(0, "🏠 大廳", "background:#e0f2fe").replace("top:0px", "position:relative;top:0;left:0;margin:0")}</div>
+  <span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-40px;top:52px;font-size:12px;padding:4px 14px;border-color:#0284c7;color:#0369a1">🏠 回大廳</span>${finger("left:calc(50% - 6px);top:60px")}
+</div>`;
+const dockStatusScene = panelScene(true).replace("⚙", "▾").replace("系統設定", "網頁狀態");
+
 const TIPS = {
   "cards-gear": { scene: panelScene(true), text: "按這裡打開系統設定。" },
   "cards-close": { scene: panelScene(false), text: "按這裡關閉設定視窗。" },
@@ -454,6 +468,12 @@ const TIPS = {
   "apps-plug-del": { scene: calDelScene, text: "按垃圾桶，再按一次「再按一次刪除」才會真的刪除。" },
   "apps-login": { scene: loginScene(false), text: "登入後，設定會自動存到你的 Google 雲端硬碟，換手機也帶著走。" },
   "apps-logout": { scene: loginScene(true), text: "登出帳號。在公共場所用完，記得登出。" },
+  "dock-go": { scene: dockGoScene, text: "點一下，切換到「{name}」。目前所在的畫面會亮起來。" },
+  "dock-home": { scene: dockHomeScene, text: "快捷列關閉時，點這裡回到大廳。" },
+  "dock-settings": { scene: panelScene(true), text: "點一下，打開系統設定。" },
+  "dock-notification": { scene: remBellScene, text: "點一下，打開最新提醒；有新提醒時會有紅點。" },
+  "dock-status": { scene: dockStatusScene, text: "點一下，查看網頁與雲端連線狀態。" },
+  "dock-logout": { scene: loginScene(true), text: "點一下，登出帳號。在公共場所用完，記得登出。" },
   "notes-sort-pinned": { scene: reorder('<i class="fa-solid fa-thumbtack"></i>'), text: "這是釘選，會自動往前排放。" },
   "notes-sort-date": { scene: reorder('<span class="sm-txt">最新</span>'), text: "最新發布的公告，會排在最前面。" },
   "notes-sort-expire": { scene: reorder('<span class="sm-txt">剩1天</span>'), text: "快到期的公告，會自動往前排放。" },
@@ -603,6 +623,10 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 @keyframes swKnobS { 0%,30% { transform: none; } 40%,90% { transform: translateX(14px); } 100% { transform: none; } }
 .acc-ar { font-size: 14px; font-weight: 900; color: #64748b; animation: accRot 3.6s ease-in-out infinite; }
 @keyframes accRot { 0%,25% { transform: none; } 40%,90% { transform: rotate(180deg); } 100% { transform: none; } }
+.dkb { position: absolute; left: 50%; bottom: 4px; width: 170px; margin-left: -85px; height: 28px; border-radius: 14px; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.18); display: flex; justify-content: space-around; align-items: center; }
+.dki { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; } .dki b { width: 10px; height: 10px; border-radius: 3px; background: #94a3b8; }
+.dki-on { animation: dkOn 3.6s ease-in-out infinite; }
+@keyframes dkOn { 0%,30% { background: transparent; } 40%,90% { background: #bae6fd; } 100% { background: transparent; } }
 @keyframes tipPress { 0%,12%,24%,100% { transform: scale(1); } 18% { transform: scale(.92); } }
 `;
   document.head.appendChild(st);
@@ -626,7 +650,7 @@ function openPop(target) {
   wrap.style.zIndex = "2147483000"; // 蓋過所有設定視窗
   wrap.innerHTML = `<div class="tip-pop absolute w-[260px] rounded-2xl border-2 border-amber-400 bg-amber-50 text-amber-950 shadow-2xl px-4 pt-3 pb-3">
     <div aria-hidden="true">${t.scene}</div>
-    <p class="text-base font-black leading-snug text-center">${esc(t.text)}</p>
+    <p class="text-base font-black leading-snug text-center">${esc(t.text.replace("{name}", target.dataset.tipName || "這個功能"))}</p>
     <p class="text-[11px] font-bold text-amber-700/70 mt-2 text-center">點空白處關閉</p>
   </div>`;
   document.body.appendChild(wrap);
