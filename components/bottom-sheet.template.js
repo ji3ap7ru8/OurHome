@@ -3,7 +3,7 @@ export const bottomSheetTemplate = `
         <div id="bottomSheet" class="bottom-sheet closed absolute bottom-0 left-0 right-0 bg-[#fcfbf9] dark:bg-slate-900 rounded-t-[36px] z-50 flex flex-col justify-between soft-shadow-lg border-t border-slate-200/60 dark:border-slate-800">
             <!-- 共用 Header -->
             <div class="sheet-header pt-3 pb-2 px-5 flex flex-col shrink-0 select-none cursor-ns-resize touch-none border-b border-slate-200/60 dark:border-slate-800">
-                <div class="w-full flex justify-center py-1">
+                <div data-tip="sheet-drag" class="w-full flex justify-center py-1">
                     <div class="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full hover:bg-slate-400 transition-colors"></div>
                 </div>
                 <div class="w-full flex items-center justify-between mt-1">
@@ -34,7 +34,7 @@ export const bottomSheetTemplate = `
 
             <!-- 內容區塊 2: 帳號登入 (使用 Google 帳號登入) -->
             <div id="sheetContentLogin" class="flex-1 flex flex-col justify-center items-center px-6 py-8 space-y-6 hidden">
-                <div class="text-center space-y-2">
+                <div data-tip="sheet-login-info" class="text-center space-y-2">
                     <div class="w-14 h-14 rounded-3xl theme-bg-light theme-text-primary flex items-center justify-center text-2xl mx-auto mb-2 soft-shadow-sm">
                         <i class="fa-solid fa-user-lock"></i>
                     </div>
@@ -43,7 +43,7 @@ export const bottomSheetTemplate = `
                 </div>
 
                 <!-- 使用 Google 帳號登入按鈕 -->
-                <button data-action="login-google" class="w-full max-w-xs py-3.5 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-700 dark:text-slate-100 font-bold text-xs flex items-center justify-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-700 soft-shadow-sm transition-all active:scale-95 cursor-pointer">
+                <button data-tip="sheet-login" data-action="login-google" class="w-full max-w-xs py-3.5 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-700 dark:text-slate-100 font-bold text-xs flex items-center justify-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-700 soft-shadow-sm transition-all active:scale-95 cursor-pointer">
                     <i class="fa-brands fa-google text-lg text-red-500"></i>
                     <span>使用 Google 帳號登入</span>
                 </button>
@@ -51,7 +51,7 @@ export const bottomSheetTemplate = `
 
             <!-- 內容區塊 3: 管理員驗證（輸入密碼才能解鎖管理員功能） -->
             <div id="sheetContentAdmin" class="flex-1 flex flex-col justify-center items-center px-6 py-8 space-y-5 hidden">
-                <div class="text-center space-y-2">
+                <div data-tip="sheet-admin-info" class="text-center space-y-2">
                     <div class="w-14 h-14 rounded-3xl theme-bg-light theme-text-primary flex items-center justify-center text-2xl mx-auto mb-2 soft-shadow-sm">
                         <i class="fa-solid fa-user-shield"></i>
                     </div>
@@ -62,7 +62,7 @@ export const bottomSheetTemplate = `
                     <input id="adminPasswordInput" type="text" data-mask="on" data-lpignore="true" data-1p-ignore data-form-type="other" name="x-admin-pass" autocomplete="off" placeholder="管理員密碼" class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm text-slate-800 dark:text-slate-100 text-center tracking-widest focus:outline-none focus:border-orange-500">
                     <p id="adminPasswordError" class="hidden text-[11px] font-bold text-rose-600 text-center"></p>
                 </div>
-                <button data-action="admin-verify" class="w-full max-w-xs py-3.5 px-4 theme-bg-primary text-white rounded-2xl font-bold text-xs soft-shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
+                <button data-tip="sheet-admin" data-action="admin-verify" class="w-full max-w-xs py-3.5 px-4 theme-bg-primary text-white rounded-2xl font-bold text-xs soft-shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
                     <i class="fa-solid fa-unlock"></i>
                     <span>驗證</span>
                 </button>

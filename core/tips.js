@@ -650,6 +650,10 @@ const TIPS = {
   "tm-plus": { scene: tapScene("＋1 分鐘"), text: "倒數中，再多加 1 分鐘。" },
   "tm-cancel": { scene: calDelScene, text: "按一下，再按一次「再按一次確定取消」才會取消計時。" },
   "tm-toggle": { scene: tglScene("開關", "開：啟用", "關：不啟用"), text: "按一下，開啟或關閉「{name}」。" },
+  // ---- 帳號登入視窗 ----
+  "sheet-drag": { scene: remCloseScene, text: "按住這條往下拖，可以收起視窗；往上拖可以拉高。" },
+  "sheet-login-info": { scene: loginScene(false), text: "登入 Google 帳號後，資料會同步到雲端，換手機也帶得走。下面的按鈕就是登入。" },
+  "sheet-admin-info": { scene: lockScene(true), text: "輸入管理員密碼，再按「驗證」，才能用管理員功能。" },
   // ---- 其他 ----
   "go-status": { scene: dockStatusScene, text: "按這裡，打開設定，查看網頁與雲端連線狀態。" },
   "autologin-ok": { scene: tapScene("了解"), text: "按「了解」，關掉這個自動登入提醒。" },
