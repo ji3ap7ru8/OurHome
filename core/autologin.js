@@ -41,7 +41,7 @@ export function showAutoLoginNotice() {
   el.setAttribute("role", "alert");
   el.className = "fixed left-1/2 z-[95] w-[94vw] max-w-md -translate-x-1/2 rounded-2xl border-2 border-amber-400 bg-amber-100 px-4 py-3 text-amber-950 shadow-2xl ring-4 ring-amber-300/60 flex items-center gap-3 text-sm font-black leading-snug transition-opacity duration-300";
   el.style.top = "calc(env(safe-area-inset-top, 0px) + 12px)";
-  el.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-2xl text-amber-600 shrink-0"></i><span class="flex-1">目前是自動登入<br><span class="font-bold">如在公共場所使用，請務必登出，確保 Google 帳號安全。</span></span><button type="button" class="shrink-0 rounded-xl bg-amber-500 px-4 py-2 text-white shadow">了解</button>';
+  el.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-2xl text-amber-600 shrink-0"></i><span class="flex-1">目前是自動登入<br><span class="font-bold">如在公共場所使用，請務必登出，確保 Google 帳號安全。</span></span><button type="button" data-tip="autologin-ok" class="shrink-0 rounded-xl bg-amber-500 px-4 py-2 text-white shadow">了解</button>';
   document.body.appendChild(el);
   noticeEl = el;
   let timer = null;

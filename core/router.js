@@ -71,7 +71,7 @@ function updateBanner() {
   const el = document.createElement("div");
   el.dataset.cloudBanner = "";
   el.className = "mx-4 mt-2 mb-1 px-4 py-2.5 rounded-2xl bg-amber-100 text-amber-900 text-sm font-bold flex items-center gap-2";
-  el.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i><span class="flex-1">${name}：${why}。目前資料只暫存在這個畫面，重新整理會消失。</span><button data-action="open-settings" data-mode="status" class="underline shrink-0">設定</button>`;
+  el.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i><span class="flex-1">${name}：${why}。目前資料只暫存在這個畫面，重新整理會消失。</span><button data-tip="go-status" data-action="open-settings" data-mode="status" class="underline shrink-0">設定</button>`;
   outlet.insertBefore(el, outlet.firstChild);
 }
 
@@ -83,6 +83,6 @@ function renderNotice(el, icon, title, msg, needLogin = false) {
       </div>
       <h2 class="text-2xl font-black text-slate-800 dark:text-slate-100 mb-2">${title}</h2>
       <p class="text-base text-slate-500 dark:text-slate-400 font-medium leading-relaxed">${msg}</p>
-      ${needLogin ? `<button data-action="open-sheet" data-sheet="login" class="mt-6 theme-bg-primary text-white font-bold text-base px-8 py-3 rounded-full soft-shadow-md">登入 Google 帳號</button>` : ""}
+      ${needLogin ? `<button data-tip="sheet-login" data-action="open-sheet" data-sheet="login" class="mt-6 theme-bg-primary text-white font-bold text-base px-8 py-3 rounded-full soft-shadow-md">登入 Google 帳號</button>` : ""}
     </div>`;
 }

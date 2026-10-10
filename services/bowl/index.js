@@ -2,6 +2,7 @@
 // 需登入（requiresLogin）；登入帳號的電子郵件還要在雲端硬碟 default 的 bowlEmails 名單內（App 裡只能查看，不能改）。
 // 沒有「你是哪一位」身分選擇：能進入的人都看得到排班，也都能調整排班。
 import { on, state } from "../../core/store.js";
+import { showTipHint, closeTips } from "../../core/tips.js";
 import { canEnterBowl, getBowlEmails } from "../../core/bowl-emails.js";
 import { VACATION_COLOR, bowlApi } from "./data.js";
 import { openLineSendDialog, closeLineSendDialog } from "../../core/line-send.js";
@@ -100,18 +101,18 @@ function renderMain() {
       <div class="mb-2"><div class="text-xs font-black text-slate-500 dark:text-slate-400 mb-1">${icon} ${label}</div>
         <div class="flex flex-wrap gap-1">${chores().map((m) => {
           const on_ = r[task] === m.id;
-          return `<button data-a="set" data-date="${dateStr}" data-task="${task}" data-id="${m.id}" ${r.off ? "disabled" : ""} aria-pressed="${on_}" aria-label="${label} ${esc(m.name)}"
+          return `<button data-tip="bowl-set" data-tip-name="${esc(m.name)}" data-a="set" data-date="${dateStr}" data-task="${task}" data-id="${m.id}" ${r.off ? "disabled" : ""} aria-pressed="${on_}" aria-label="${label} ${esc(m.name)}"
             class="flex-1 min-w-[2.2rem] py-2 rounded-lg text-lg font-black shadow-sm transition active:scale-95 ${r.off ? "opacity-35 bg-slate-200 dark:bg-slate-700" : on_ ? "text-white" : "bg-white dark:bg-slate-700"}" style="${on_ ? `background:${m.color}` : ""}">${m.emoji}</button>`;
         }).join("")}</div></div>`;
     return `<div class="${w} rounded-2xl p-2.5 ${today ? "border-2 theme-border-primary" : "border-[1.5px] border-slate-200 dark:border-slate-700"} bg-white dark:bg-slate-800" style="${tint ? `background-image:linear-gradient(${tint},${tint})` : ""}">
       ${dateHead(dateStr, badge)}${row("clear", ICON.clear, "收碗")}${row("wash", ICON.wash, "洗碗")}
-      <button data-a="vac" data-date="${dateStr}" class="w-full py-2 rounded-lg text-xs font-black ${r.off ? "text-white" : "border border-dashed border-slate-300 dark:border-slate-500 text-slate-600 dark:text-slate-300 bg-white/70 dark:bg-slate-700/60"}" style="${r.off ? `background:${VACATION_COLOR}` : ""}">${r.off ? "🏖️ 已休假" : "🏖️ 休假"}</button></div>`;
+      <button data-tip="bowl-vac" data-a="vac" data-date="${dateStr}" class="w-full py-2 rounded-lg text-xs font-black ${r.off ? "text-white" : "border border-dashed border-slate-300 dark:border-slate-500 text-slate-600 dark:text-slate-300 bg-white/70 dark:bg-slate-700/60"}" style="${r.off ? `background:${VACATION_COLOR}` : ""}">${r.off ? "🏖️ 已休假" : "🏖️ 休假"}</button></div>`;
   };
 
   const hist = days.filter((d) => d.offset < 0);
   const near = days.filter((d) => d.offset >= 0 && d.offset <= 2);
   const later = days.filter((d) => d.offset >= 3);
-  const arrow = (k, dir, ic) => `<button data-a="scroll" data-k="${k}" data-dir="${dir}" aria-label="${dir < 0 ? "往左" : "往右"}" class="w-7 h-7 rounded-full bg-white/80 dark:bg-slate-700 theme-text-primary text-xs shadow-sm active:scale-90"><i class="fa-solid ${ic}"></i></button>`;
+  const arrow = (k, dir, ic) => `<button data-tip="bowl-scroll" data-a="scroll" data-k="${k}" data-dir="${dir}" aria-label="${dir < 0 ? "往左" : "往右"}" class="w-7 h-7 rounded-full bg-white/80 dark:bg-slate-700 theme-text-primary text-xs shadow-sm active:scale-90"><i class="fa-solid ${ic}"></i></button>`;
   const section = (icon, title, hint, k) => `<div class="flex items-center justify-between mx-1 mt-5 mb-2"><h3 class="text-sm font-black text-slate-700 dark:text-slate-200"><i class="${icon} theme-text-primary"></i> ${title}</h3>${k ? `<span class="flex items-center gap-1.5"><span class="text-[0.7rem] font-bold text-slate-400 mr-1">${hint}</span>${arrow(k, -1, "fa-chevron-left")}${arrow(k, 1, "fa-chevron-right")}</span>` : `<span class="text-[0.7rem] font-bold text-slate-400">${hint}</span>`}</div>`;
   const canAdd = curAhead < MAX_AHEAD;
 
@@ -120,14 +121,14 @@ function renderMain() {
     <div class="rounded-3xl overflow-hidden bg-white/90 dark:bg-slate-800/90 soft-shadow-sm border border-white dark:border-slate-700">
       <div class="flex items-center justify-between px-4 py-2.5 text-white" style="background:linear-gradient(135deg,var(--primary-color),var(--primary-dark))">
         <span class="text-base font-black"><i class="fa-solid fa-thumbtack"></i> 今日執勤</span>
-        <button type="button" data-a="send" class="ml-auto mr-2 text-xs font-black bg-white text-emerald-700 px-3 py-1 rounded-full active:scale-95"><i class="fa-solid fa-paper-plane"></i> 發送</button>
+        <button type="button" data-tip="bowl-send" data-a="send" class="ml-auto mr-2 text-xs font-black bg-white text-emerald-700 px-3 py-1 rounded-full active:scale-95"><i class="fa-solid fa-paper-plane"></i> 發送</button>
         <span class="text-xs font-black bg-white/25 px-2.5 py-1 rounded-full">${todayStr.slice(5)} 週${weekday(todayStr)}</span>
       </div>
       <div class="grid grid-cols-2 divide-x divide-slate-200 dark:divide-slate-700 px-2 py-4 text-center">
         ${[["clear", `${ICON.clear} 收碗`], ["wash", `${ICON.wash} 洗碗`]].map(([k, l]) => `<div class="flex flex-col items-center gap-2"><div class="text-xs font-black text-slate-500 dark:text-slate-400">${l}</div>${avatarDot(td[k], td.off)}<div class="text-lg font-black" style="color:${td.off ? VACATION_COLOR : td[k] ? colorOf(td[k]) : "#94a3b8"}">${td.off ? "休假" : td[k] && byId(td[k]) ? esc(byId(td[k]).name) : "尚未安排"}</div></div>`).join("")}
       </div>
       <div class="border-t border-dashed border-slate-300 dark:border-slate-600" style="background:color-mix(in srgb, var(--primary-light) 40%, transparent)">
-        <button data-a="stat" aria-expanded="${statOpen}" class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-black text-slate-600 dark:text-slate-300"><span><i class="fa-solid fa-scale-balanced theme-text-primary"></i> 欠碗統計</span><i data-stat-chev class="fa-solid fa-chevron-down text-xs text-slate-400" style="transition:transform .3s ease;transform:rotate(${statOpen ? 180 : 0}deg)"></i></button>
+        <button data-tip="bowl-stat" data-a="stat" aria-expanded="${statOpen}" class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-black text-slate-600 dark:text-slate-300"><span><i class="fa-solid fa-scale-balanced theme-text-primary"></i> 欠碗統計</span><i data-stat-chev class="fa-solid fa-chevron-down text-xs text-slate-400" style="transition:transform .3s ease;transform:rotate(${statOpen ? 180 : 0}deg)"></i></button>
         <div data-stat-body style="display:grid;grid-template-rows:${statOpen ? "1fr" : "0fr"};opacity:${statOpen ? 1 : 0};transition:grid-template-rows .3s ease,opacity .3s ease">
           <div style="overflow:hidden;min-height:0"><div class="px-4 pb-3 text-sm font-bold text-slate-600 dark:text-slate-300 text-center space-y-1">
             ${statLines(days)}
@@ -144,11 +145,11 @@ function renderMain() {
     <div class="grid grid-cols-3 gap-2.5">${near.map(editCard).join("")}</div>
 
     ${section("fa-solid fa-calendar-plus", "之後的日子", "左右滑動・可編輯・可新增", "later")}
-    <div class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1 -mx-3.5 px-3.5 cursor-grab" data-scroll="later">${later.map((d) => editCard(d, "shrink-0 w-[8.25rem]")).join("")}${canAdd ? `<button data-a="addday" class="shrink-0 w-[8.25rem] min-h-[8rem] rounded-2xl border-2 border-dashed theme-border-primary theme-text-primary bg-white/50 dark:bg-slate-800/50 flex flex-col items-center justify-center gap-1 font-black text-sm active:scale-95 transition"><i class="fa-solid fa-plus text-xl"></i>新增一天</button>` : ""}</div>
+    <div class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1 -mx-3.5 px-3.5 cursor-grab" data-scroll="later">${later.map((d) => editCard(d, "shrink-0 w-[8.25rem]")).join("")}${canAdd ? `<button data-tip="bowl-addday" data-a="addday" class="shrink-0 w-[8.25rem] min-h-[8rem] rounded-2xl border-2 border-dashed theme-border-primary theme-text-primary bg-white/50 dark:bg-slate-800/50 flex flex-col items-center justify-center gap-1 font-black text-sm active:scale-95 transition"><i class="fa-solid fa-plus text-xl"></i>新增一天</button>` : ""}</div>
 
     <div class="flex gap-2.5 mt-6 pb-24">
-      <button data-a="auto" class="flex-1 py-3.5 rounded-2xl theme-bg-primary text-white text-base font-black soft-shadow-sm active:scale-95 transition"><i class="fa-solid fa-bolt"></i> 自動排班</button>
-      <button data-a="reset" class="flex-1 py-3.5 rounded-2xl bg-slate-300 dark:bg-slate-600 text-slate-800 dark:text-slate-100 text-base font-black active:scale-95 transition"><i class="fa-solid fa-rotate-left"></i> 重設未來</button>
+      <button data-tip="bowl-auto" data-a="auto" class="flex-1 py-3.5 rounded-2xl theme-bg-primary text-white text-base font-black soft-shadow-sm active:scale-95 transition"><i class="fa-solid fa-bolt"></i> 自動排班</button>
+      <button data-tip="bowl-reset" data-a="reset" class="flex-1 py-3.5 rounded-2xl bg-slate-300 dark:bg-slate-600 text-slate-800 dark:text-slate-100 text-base font-black active:scale-95 transition"><i class="fa-solid fa-rotate-left"></i> 重設未來</button>
     </div>`;
 }
 
@@ -322,6 +323,7 @@ export default {
   requiresLogin: true,
   mount(el) {
     alive = true;
+    showTipHint("bowl");
     root = document.createElement("div");
     root.className = "px-3.5 pb-6";
     root.innerHTML = `<div data-view></div>`;
@@ -348,5 +350,5 @@ export default {
     offOverwrite = on("bowl:overwrite", () => { overwriteSave(); });
     reload();
   },
-  unmount() { closeLineSendDialog(); flush(); alive = false; offOverwrite?.(); offOverwrite = null; statOpen = false; saveState = "idle"; offApi?.(); offApi = null; offData?.(); offData = null; offCloud?.(); offCloud = null; root?.remove(); root = null; extraAhead = 0; },
+  unmount() { closeTips(); closeLineSendDialog(); flush(); alive = false; offOverwrite?.(); offOverwrite = null; statOpen = false; saveState = "idle"; offApi?.(); offApi = null; offData?.(); offData = null; offCloud?.(); offCloud = null; root?.remove(); root = null; extraAhead = 0; },
 };

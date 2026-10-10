@@ -15,7 +15,7 @@ import { lockAdmin } from "../core/admin.js";
 import { showToast } from "../core/toast.js";
 import { mountLineBotIds } from "./line-bot-ids.js";
 import { setAutoLogin } from "../core/autologin.js";
-import { setTips } from "../core/tips.js";
+import { setTips, showTipHint, closeTips } from "../core/tips.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -83,6 +83,7 @@ function renderOpenState(mode) {
   if (!page) return;
   if (mode === lastMode) return; // 管理員驗證視窗開關也會觸發 overlay:change，設定視窗沒變就不要重畫（卡片會被收合）
   lastMode = mode;
+  if (mode) showTipHint("settings"); else closeTips();
 
   if (!mode) {
     lockAdmin(); // 關閉設定視窗 → 管理員功能重新上鎖

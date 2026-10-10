@@ -1,6 +1,7 @@
 // 碼表 — 純前端 UI，運算邏輯在 engine.js。
 // 訪客可用（不設 requiresLogin）。不寫入任何永久儲存；重新整理即重置。
 // 計時狀態放在模組層級：切換到其他服務時碼表仍會繼續跑，Dock 上方會出現小膠囊。
+import { showTipHint, closeTips } from "../../core/tips.js";
 import { createStopwatch, fmtStopwatch } from "./engine.js";
 import { setChip } from "../../core/chips.js";
 import { holdAwake, releaseAwake } from "../../core/wakelock.js";
@@ -71,9 +72,9 @@ function render() {
 
       <div class="grid grid-cols-2 gap-3 mb-4">
         ${st === "running"
-          ? `<button data-act="lap" class="${big} bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200"><i class="fa-solid fa-flag mr-2"></i>分圈</button>`
-          : `<button data-act="reset" ${st === "idle" ? "disabled" : ""} class="${big} ${st === "idle" ? "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500" : confirmReset ? "bg-red-500 text-white text-xl" : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100"}">${confirmReset ? "再按一次歸零" : "歸零"}</button>`}
-        <button data-act="${st === "running" ? "pause" : "start"}" class="${big} theme-bg-primary text-white soft-shadow-md"><i class="fa-solid ${st === "running" ? "fa-pause" : "fa-play"} mr-2"></i>${st === "running" ? "暫停" : st === "paused" ? "繼續" : "開始"}</button>
+          ? `<button data-tip="sw-lap" data-act="lap" class="${big} bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200"><i class="fa-solid fa-flag mr-2"></i>分圈</button>`
+          : `<button data-tip="sw-reset" data-act="reset" ${st === "idle" ? "disabled" : ""} class="${big} ${st === "idle" ? "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500" : confirmReset ? "bg-red-500 text-white text-xl" : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100"}">${confirmReset ? "再按一次歸零" : "歸零"}</button>`}
+        <button data-tip="sw-main" data-act="${st === "running" ? "pause" : "start"}" class="${big} theme-bg-primary text-white soft-shadow-md"><i class="fa-solid ${st === "running" ? "fa-pause" : "fa-play"} mr-2"></i>${st === "running" ? "暫停" : st === "paused" ? "繼續" : "開始"}</button>
       </div>
 
       <div class="bg-white/90 dark:bg-slate-800/90 rounded-3xl soft-shadow-sm py-3" data-laps>${lapRows()}</div>
@@ -142,6 +143,7 @@ export default {
   access: "public",
   mount(el) {
     root = el;
+    showTipHint("stopwatch");
     confirmReset = false;
     render();
     startLoop();
@@ -150,6 +152,7 @@ export default {
     refreshChip();
   },
   unmount() {
+    closeTips();
     root?.removeEventListener("click", onClick);
     document.removeEventListener("keydown", onKey);
     if (raf) cancelAnimationFrame(raf);

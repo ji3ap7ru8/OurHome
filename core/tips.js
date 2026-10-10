@@ -77,7 +77,7 @@ const tile = (w, h, extra = "") => `<div class="gt" style="width:${w}px;height:$
 const popGrid = (n, cols, w, h) => `<div class="gtg" style="grid-template-columns:repeat(${cols},${w}px)">${Array.from({ length: n }, (_, i) => tile(w, h, `animation-delay:${(i * 0.18).toFixed(2)}s`)).join("")}</div>`;
 const popList = (n) => `<div class="gtl">${Array.from({ length: n }, (_, i) => `<div class="gt gl" style="animation-delay:${(i * 0.22).toFixed(2)}s"><span class="scc-ic" style="width:16px;height:16px"></span><i class="sb" style="flex:1;margin:0"></i></div>`).join("")}</div>`;
 const modeScene = (list) => `<div class="sc">${list ? popList(3) : popGrid(4, 2, 56, 38)}${finger("left:calc(50% + 40px);top:34px")}</div>`;
-const colsScene = (n) => `<div class="sc">${popGrid(n * 2, n, n === 2 ? 58 : 40, 34)}</div>`;
+const colsScene = (n) => `<div class="sc">${popGrid(n * 2, n, n === 2 ? 58 : n === 3 ? 40 : 30, 34)}</div>`;
 const sizeScene = (t) => `<div class="sc" style="display:flex;align-items:flex-end;justify-content:center;gap:12px;padding-bottom:10px">
   ${[["s", 28, "小"], ["m", 40, "中"], ["l", 54, "大"]].map(([k, s, l]) => `<div style="text-align:center"><div class="gt-s${k === t ? " gt-on" : ""}" style="width:${s}px;height:${s}px"><span class="scc-ic" style="width:${Math.round(s * .4)}px;height:${Math.round(s * .4)}px"></span></div><b style="font-size:11px">${l}</b></div>`).join("")}
   ${finger(`left:calc(50% + ${t === "s" ? -42 : t === "m" ? -4 : 38}px);top:30px`)}
@@ -98,6 +98,10 @@ const sortNameScene = `<div class="sc">
 const sortDefaultScene = `<div class="sc" style="text-align:center">
   <div style="display:flex;justify-content:center;gap:12px;margin-top:10px">${["第1張", "第2張", "第3張"].map((t, i) => `<div class="gt" style="width:50px;height:44px;animation-delay:${(i * 0.5).toFixed(1)}s;flex-direction:column;gap:2px"><span class="scc-ic" style="width:18px;height:18px"></span><b style="font-size:10px">${t}</b></div>`).join("")}</div>
   <div class="arr"><i></i></div><b style="font-size:10px;color:#64748b">先建立 → 後建立</b>
+</div>`;
+const tapScene = (label) => `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-50px;top:26px">${label}</span>
+  ${finger("left:calc(50% + 10px);top:38px")}
 </div>`;
 const panelScene = (open) => `<div class="sc">
   <span class="scm-btn" style="right:14px;top:4px;width:30px;height:30px;font-size:14px;animation:none${open ? "" : ";opacity:.6"}">${open ? "⚙" : "✕"}</span>
@@ -473,6 +477,7 @@ const TIPS = {
   "apps-size-m": { scene: sizeScene("m"), text: "中：預設大小。" },
   "apps-size-s": { scene: sizeScene("s"), text: "小：縮小，一個畫面放更多個應用。" },
   "apps-cols-2": { scene: colsScene(2), text: "每行 2 個：每個比較大。" },
+  "apps-cols-4": { scene: colsScene(4), text: "每行 4 個：每個最小，一次看最多。" },
   "apps-cols-3": { scene: colsScene(3), text: "每行 3 個：每個比較小，一次看更多。" },
   "apps-toggle": { scene: appToggleScene, text: "按一下開關：停用後，這個應用不會顯示在所有應用。" },
   "apps-enable-all": { scene: appAllOnScene, text: "把停用的應用一次全部啟用。" },
@@ -512,6 +517,11 @@ const TIPS = {
   "set-theme-system": { scene: themeScene("sys"), text: "跟隨系統：手機切換深淺色，網頁也會跟著換。" },
   "set-color": { scene: colorScene, text: "主色調改成「{name}」，按鈕與圖示會換成這個顏色。" },
   "set-font-minus": { scene: fontScene(false), text: "字體縮小一點。" },
+  "set-font-range": { scene: fontScene(true), text: "左右拖動滑桿，字體大小立刻改變。" },
+  "bowl-save": { scene: tapScene("💾 覆蓋儲存"), text: "把目前的排班結果覆蓋儲存起來。" },
+  "bowl-gear": { scene: panelScene(true), text: "按這裡打開「換誰洗碗」設定。" },
+  "sheet-login": { scene: loginScene(false), text: "按這裡用 Google 帳號登入。" },
+  "sheet-admin": { scene: lockScene(true), text: "輸入管理員密碼後，按這裡解鎖。" },
   "set-font-plus": { scene: fontScene(true), text: "字體放大一點，長輩看更清楚。" },
   "set-nick-reset": { scene: noteFieldScene("暱稱", "牛牛"), text: "把暱稱改回 Google 帳號的名稱。" },
   "set-open-apps": { scene: panelScene(true).replace("系統設定", "所有應用設定"), text: "進入所有應用設定：顯示方式、排序、管理應用。" },
@@ -576,6 +586,73 @@ const TIPS = {
   "notes-sort-expire": { scene: reorder('<span class="sm-txt">剩1天</span>'), text: "快到期的公告，會自動往前排放。" },
   "notes-open": { scene: openScene, text: "點一下便利貼，打開完整內容。" },
   "notes-manage": { scene: manageScene, text: "登入後，按這裡新增或編輯公告。" },
+  // ---- 換誰洗碗設定 / 洗碗頁 ----
+  "bowl-opt-close": { scene: panelScene(false).replace("生活圖卡設定", "換誰洗碗設定"), text: "按這裡，關閉換誰洗碗設定。" },
+  "bowl-members": { scene: accScene.replace("管理應用", "成員權限"), text: "展開：查看可以進入「換誰洗碗」的成員名單（只能看，不能改）。" },
+  "bowl-set": { scene: linePickScene, text: "點頭像，指定這項由「{name}」負責；再點一次就取消。" },
+  "bowl-vac": { scene: tglScene("🏖️ 放假", "開：這天放假，不排班", "關：恢復排班"), text: "按一下，這天標成放假；再按一次取消放假。" },
+  "bowl-scroll": { scene: calMonthScene(true), text: "按箭頭，左右捲動看更多日子（也可以用手指滑動）。" },
+  "bowl-send": { scene: pillToast("✈ 發送", "已送出"), text: "把今日執勤用 LINE 通知家人，要先到系統設定填好 LINE 資料。" },
+  "bowl-stat": { scene: accScene.replace("管理應用", "欠碗統計"), text: "展開：看每個人欠了幾次碗。" },
+  "bowl-addday": { scene: tapScene("＋ 新增一天"), text: "往後多排一天，最多只能排到固定天數。" },
+  "bowl-auto": { scene: pillToast("⚡ 自動排班", "已排好"), text: "照公平順序，自動把還沒排的日子排好。" },
+  "bowl-reset": { scene: orderResetScene, text: "清空未來的排班，重新來過；已過去的紀錄不會動。" },
+  // ---- 碼表 ----
+  "sw-main": { scene: tapScene("▶ 開始"), text: "開始計時；計時中按一下暫停，暫停後可以繼續。" },
+  "sw-lap": { scene: tapScene("🚩 分圈"), text: "記下目前這一圈的時間，碼錶繼續跑。" },
+  "sw-reset": { scene: calDelScene, text: "暫停後才能用：按一下，再按一次「再按一次歸零」才會歸零。" },
+  // ---- 生活圖卡 ----
+  "cards-back": { scene: calPageScene(true), text: "按「返回」，回到圖卡清單。" },
+  "cards-x": { scene: calCloseScene, text: "按 ✕，關閉放大畫面。" },
+  "cards-delrow": { scene: tapScene("✕ 刪除這筆"), text: "按 ✕，刪掉這一筆內容。" },
+  "cards-addrow": { scene: tapScene("＋ 新增一筆內容"), text: "同一張圖卡可以放好幾筆內容，按這裡多加一筆。" },
+  "cards-save": { scene: memoSaveScene, text: "寫好了按儲存。名稱一定要填。" },
+  "cards-cancel": { scene: calPageScene(true), text: "取消，不儲存並關閉視窗。" },
+  // ---- 記帳本 ----
+  "ledger-open": { scene: memoCardScene, text: "點一筆帳目，打開來修改或刪除。" },
+  "ledger-prev": { scene: calMonthScene(false), text: "看上一個月的帳目。" },
+  "ledger-next": { scene: calMonthScene(true), text: "看下一個月的帳目。" },
+  "ledger-ct": { scene: memoTabScene, text: "切換圖表：看「支出」或「收入」各分類占多少。" },
+  "ledger-add": { scene: memoAddScene, text: "按 ＋，記一筆新的收入或支出。" },
+  "ledger-close": { scene: memoCloseScene, text: "按 ✕，關閉視窗（沒按儲存的內容不會留下）。" },
+  "ledger-type": { scene: linePickScene, text: "選「支出」或「收入」，分類會跟著換。" },
+  "ledger-cat": { scene: memoPickScene, text: "點一個分類，這筆帳就歸到那一類。" },
+  "ledger-del": { scene: calDelScene, text: "按一下，再按一次「再按一次刪除」才會真的刪除。" },
+  "ledger-save": { scene: memoSaveScene, text: "金額和分類填好後按儲存，帳目就會記下來。" },
+  // ---- 翻譯機 ----
+  "tr-swap": { scene: tapScene("⇄ 對調語言"), text: "把「來源語言」和「目標語言」對調。" },
+  "tr-mic": { scene: tapScene("🎤 語音輸入"), text: "按一下開始說話，說完會變成文字；再按一次停止。" },
+  "tr-clear": { scene: orderResetScene, text: "清除輸入的文字和翻譯結果。" },
+  "tr-go": { scene: pillToast("翻譯", "譯文出來了", true), text: "按一下，把上面的文字翻譯成目標語言。" },
+  "tr-phrase": { scene: tapScene("常用句"), text: "點一下，直接翻譯「{name}」，不用網路。" },
+  "tr-google": { scene: tapScene("用 Google 翻譯開啟"), text: "在新分頁用 Google 翻譯網頁開啟。" },
+  "tr-speak": { scene: tapScene("🔊 朗讀"), text: "用聲音把翻譯結果唸出來。" },
+  "tr-copy": { scene: pillToast("📋 複製", "已複製"), text: "複製翻譯結果，可以貼到 LINE 等地方。" },
+  "tr-big": { scene: tapScene("⛶ 放大給對方看"), text: "把譯文放得很大，直接給對方看；點一下畫面就關閉。" },
+  "tr-x": { scene: calCloseScene, text: "按 ✕（或點畫面任何地方），關閉放大畫面。" },
+  // ---- 計算機 ----
+  "calc-key": { scene: tapScene("7"), text: "點一下，輸入「{name}」。" },
+  "calc-op": { scene: tapScene("+"), text: "按「{name}」。" },
+  "calc-clear": { scene: orderResetScene, text: "按 C，全部清除，重新開始。" },
+  "calc-back": { scene: tapScene("⌫"), text: "按一下，刪掉最後輸入的一格。" },
+  "calc-eq": { scene: pillToast("＝", "算出答案"), text: "按 =，算出答案。" },
+  "calc-fold": { scene: tapScene("打折"), text: "先輸入原價，再按「{name}」，就算出打折後要付的錢。" },
+  "calc-fold-custom": { scene: tapScene("其他"), text: "折數不在旁邊的按鈕裡，按這裡自己輸入。" },
+  "calc-fold-go": { scene: tapScene("套用"), text: "輸入折數（例如 6.5 或 65）後按套用。" },
+  // ---- 計時器 ----
+  "tm-alarm-stop": { scene: tapScene("關閉"), text: "時間到了，按這裡關掉鬧鈴。" },
+  "tm-alarm-more": { scene: tapScene("再 1 分鐘"), text: "還沒好，再多倒數 1 分鐘。" },
+  "tm-preset": { scene: tapScene("常用時間"), text: "點一下，直接設成「{name}」。" },
+  "tm-idea": { scene: tapScene("提醒"), text: "點一下，把「{name}」填進「要提醒什麼」。" },
+  "tm-clear": { scene: orderResetScene, text: "把設定的時間歸零，重新設定。" },
+  "tm-start": { scene: tapScene("▶ 開始"), text: "按一下開始倒數；先設定好時間才能按。" },
+  "tm-pause": { scene: tapScene("⏸ 暫停"), text: "倒數中按一下暫停，暫停後可以繼續。" },
+  "tm-plus": { scene: tapScene("＋1 分鐘"), text: "倒數中，再多加 1 分鐘。" },
+  "tm-cancel": { scene: calDelScene, text: "按一下，再按一次「再按一次確定取消」才會取消計時。" },
+  "tm-toggle": { scene: tglScene("開關", "開：啟用", "關：不啟用"), text: "按一下，開啟或關閉「{name}」。" },
+  // ---- 其他 ----
+  "go-status": { scene: dockStatusScene, text: "按這裡，打開設定，查看網頁與雲端連線狀態。" },
+  "autologin-ok": { scene: tapScene("了解"), text: "按「了解」，關掉這個自動登入提醒。" },
 };
 
 const HOLD_MS = 500;

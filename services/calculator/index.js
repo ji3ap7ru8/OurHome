@@ -1,5 +1,6 @@
 // 實用計算機 — Stage 4：純前端 UI，運算邏輯在 engine.js。
 // 訪客可用（不設 requiresLogin）。不寫入任何永久儲存，離開頁面即清除。
+import { showTipHint, closeTips } from "../../core/tips.js";
 import { newState, press, applyDiscount, foldToPct, foldLabel, fmt, exprText, OPS } from "./engine.js";
 
 const QUICK_FOLDS = [90, 85, 80, 70, 50]; // 實付百分比：9折、85折、8折、7折、5折
@@ -27,6 +28,7 @@ function keyClass(k) {
   return base + "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 soft-shadow-sm";
 }
 
+const keyTip = (k) => (k === "C" ? "calc-clear" : k === "⌫" ? "calc-back" : k === "=" ? "calc-eq" : /^[\d.]+$/.test(k) ? "calc-key" : "calc-op");
 const LABELS = { "⌫": "刪除一格", C: "全部清除", "=": "等於", "÷": "除", "×": "乘", "−": "減", "+": "加", "%": "百分比" };
 
 function render() {
@@ -52,19 +54,19 @@ function render() {
           <span class="text-sm font-extrabold text-slate-600 dark:text-slate-300"><i class="fa-solid fa-tags theme-text-primary"></i> 打折快算（先輸入原價）</span>
         </div>
         <div class="grid grid-cols-6 gap-2">
-          ${QUICK_FOLDS.map((p) => `<button data-fold="${p}" aria-label="打${foldLabel(p)}" class="h-12 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 font-black text-base active:scale-95 transition">${foldLabel(p)}</button>`).join("")}
-          <button data-fold-custom aria-label="自訂折數" class="h-12 rounded-xl border-2 border-dashed border-amber-400 text-amber-700 dark:text-amber-300 font-black text-base active:scale-95 transition">其他</button>
+          ${QUICK_FOLDS.map((p) => `<button data-tip="calc-fold" data-tip-name="${foldLabel(p)}" data-fold="${p}" aria-label="打${foldLabel(p)}" class="h-12 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 font-black text-base active:scale-95 transition">${foldLabel(p)}</button>`).join("")}
+          <button data-tip="calc-fold-custom" data-fold-custom aria-label="自訂折數" class="h-12 rounded-xl border-2 border-dashed border-amber-400 text-amber-700 dark:text-amber-300 font-black text-base active:scale-95 transition">其他</button>
         </div>
         ${customOpen ? `
         <div class="mt-2 flex gap-2 items-center bg-white/90 dark:bg-slate-800/90 rounded-2xl p-2 soft-shadow-sm">
           <input data-fold-input type="number" inputmode="decimal" step="any" placeholder="輸入幾折，例如 6.5 或 65" class="flex-1 min-w-0 h-11 px-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-bold text-base">
-          <button data-fold-go class="h-11 px-4 rounded-xl theme-bg-primary text-white font-black">套用</button>
+          <button data-tip="calc-fold-go" data-fold-go class="h-11 px-4 rounded-xl theme-bg-primary text-white font-black">套用</button>
         </div>
         <p data-fold-err class="text-sm font-bold text-red-500 mt-1 px-1 hidden">請輸入 1～100 之間的折數</p>` : ""}
       </div>
 
       <div class="grid grid-cols-4 gap-2.5">
-        ${ROWS.flat().map((k) => `<button data-key="${k}" aria-label="${LABELS[k] || k}" class="${keyClass(k)}">${k}</button>`).join("")}
+        ${ROWS.flat().map((k) => `<button data-tip="${keyTip(k)}" data-tip-name="${LABELS[k] || k}" data-key="${k}" aria-label="${LABELS[k] || k}" class="${keyClass(k)}">${k}</button>`).join("")}
       </div>
     </div>`;
 }
@@ -116,6 +118,7 @@ export default {
   access: "public",
   mount(el) {
     root = el;
+    showTipHint("calculator");
     s = newState();
     customOpen = false;
     render();
@@ -132,6 +135,7 @@ export default {
     document.addEventListener("keydown", onKey);
   },
   unmount() {
+    closeTips();
     document.removeEventListener("keydown", onKey);
     root?.removeEventListener("click", onClick);
     onKey = null;

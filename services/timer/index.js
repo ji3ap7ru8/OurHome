@@ -1,6 +1,7 @@
 // 倒數計時器 — 純前端 UI，運算邏輯在 engine.js。
 // 訪客可用（不設 requiresLogin）。不寫入任何永久儲存；重新整理即重置。
 // 計時狀態放在模組層級：切換到其他服務時仍會繼續倒數，時間到會全螢幕提醒。
+import { showTipHint, closeTips } from "../../core/tips.js";
 import { createTimer, fmtClock, fmtSpoken, fromHMS, splitHMS, PRESETS } from "./engine.js";
 import { unlockAudio, startAlarm, stopAlarm } from "../../core/alarm.js";
 import { holdAwake, releaseAwake, wakeLockSupported } from "../../core/wakelock.js";
@@ -93,8 +94,8 @@ function showAlarm() {
     <h2 class="text-4xl font-black mb-3">時間到了！</h2>
     ${timer.label ? `<p class="text-3xl font-black mb-3 break-all">${esc(timer.label)}</p>` : ""}
     <p class="text-lg font-bold opacity-90 mb-10">已倒數 ${fmtSpoken(timer.totalMs)}</p>
-    <button data-alarm="stop" class="w-full max-w-xs h-16 rounded-full bg-white text-rose-600 text-2xl font-black soft-shadow-lg active:scale-95 transition mb-4">關閉</button>
-    <button data-alarm="more" class="w-full max-w-xs h-14 rounded-full border-2 border-white/80 text-white text-xl font-black active:scale-95 transition">再 1 分鐘</button>`;
+    <button data-tip="tm-alarm-stop" data-alarm="stop" class="w-full max-w-xs h-16 rounded-full bg-white text-rose-600 text-2xl font-black soft-shadow-lg active:scale-95 transition mb-4">關閉</button>
+    <button data-tip="tm-alarm-more" data-alarm="more" class="w-full max-w-xs h-14 rounded-full border-2 border-white/80 text-white text-xl font-black active:scale-95 transition">再 1 分鐘</button>`;
   alarmEl.addEventListener("click", (e) => {
     const b = e.target.closest("[data-alarm]");
     if (!b) return;
@@ -155,12 +156,12 @@ function stepperPanel() {
       </div>
     </div>
     <div class="grid grid-cols-6 gap-2 mb-4">
-      ${PRESETS.map((p) => `<button data-preset="${p.ms}" class="col-span-2 h-12 rounded-xl font-black text-base active:scale-95 transition ${timer.setMs === p.ms ? "theme-bg-primary text-white" : "bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200"}">${p.label}</button>`).join("")}
+      ${PRESETS.map((p) => `<button data-tip="tm-preset" data-tip-name="${p.label}" data-preset="${p.ms}" class="col-span-2 h-12 rounded-xl font-black text-base active:scale-95 transition ${timer.setMs === p.ms ? "theme-bg-primary text-white" : "bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200"}">${p.label}</button>`).join("")}
     </div>
     <div class="mb-4">
       <input data-label type="text" maxlength="20" value="${esc(timer.label)}" placeholder="要提醒什麼？（可不填）" class="w-full h-12 px-4 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-bold text-base">
       <div class="flex flex-wrap gap-2 mt-2">
-        ${LABEL_IDEAS.map((l) => `<button data-idea="${l}" class="px-3 h-9 rounded-full bg-white dark:bg-slate-800 soft-shadow-sm text-sm font-bold text-slate-600 dark:text-slate-300 active:scale-95 transition">${l}</button>`).join("")}
+        ${LABEL_IDEAS.map((l) => `<button data-tip="tm-idea" data-tip-name="${l}" data-idea="${l}" class="px-3 h-9 rounded-full bg-white dark:bg-slate-800 soft-shadow-sm text-sm font-bold text-slate-600 dark:text-slate-300 active:scale-95 transition">${l}</button>`).join("")}
       </div>
     </div>`;
 }
@@ -171,21 +172,21 @@ function controls() {
   if (st === "idle") {
     const off = timer.setMs <= 0;
     return `<div class="grid grid-cols-3 gap-3">
-      <button data-act="clear" class="${big} text-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100">清除</button>
-      <button data-act="start" ${off ? "disabled" : ""} class="${big} col-span-2 ${off ? "bg-slate-300 dark:bg-slate-700 text-slate-500" : "theme-bg-primary text-white soft-shadow-md"}"><i class="fa-solid fa-play mr-2"></i>開始</button>
+      <button data-tip="tm-clear" data-act="clear" class="${big} text-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100">清除</button>
+      <button data-tip="tm-start" data-act="start" ${off ? "disabled" : ""} class="${big} col-span-2 ${off ? "bg-slate-300 dark:bg-slate-700 text-slate-500" : "theme-bg-primary text-white soft-shadow-md"}"><i class="fa-solid fa-play mr-2"></i>開始</button>
     </div>`;
   }
   return `
     <div class="grid grid-cols-2 gap-3 mb-3">
-      <button data-act="${st === "running" ? "pause" : "start"}" class="${big} theme-bg-primary text-white soft-shadow-md"><i class="fa-solid ${st === "running" ? "fa-pause" : "fa-play"} mr-2"></i>${st === "running" ? "暫停" : "繼續"}</button>
-      <button data-act="plus" class="${big} bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 text-xl">＋1 分鐘</button>
+      <button data-tip="${st === "running" ? "tm-pause" : "tm-start"}" data-act="${st === "running" ? "pause" : "start"}" class="${big} theme-bg-primary text-white soft-shadow-md"><i class="fa-solid ${st === "running" ? "fa-pause" : "fa-play"} mr-2"></i>${st === "running" ? "暫停" : "繼續"}</button>
+      <button data-tip="tm-plus" data-act="plus" class="${big} bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 text-xl">＋1 分鐘</button>
     </div>
-    <button data-act="cancel" class="w-full h-12 rounded-full font-black text-base active:scale-95 transition ${cancelArmed ? "bg-red-500 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100"}">${cancelArmed ? "再按一次確定取消" : "取消計時"}</button>`;
+    <button data-tip="tm-cancel" data-act="cancel" class="w-full h-12 rounded-full font-black text-base active:scale-95 transition ${cancelArmed ? "bg-red-500 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100"}">${cancelArmed ? "再按一次確定取消" : "取消計時"}</button>`;
 }
 
 function options() {
   const sw = (key, on, text) => `
-    <button data-toggle="${key}" role="switch" aria-checked="${on}" class="flex items-center justify-between w-full px-1 py-2 text-base font-bold text-slate-700 dark:text-slate-200">
+    <button data-tip="tm-toggle" data-tip-name="${text}" data-toggle="${key}" role="switch" aria-checked="${on}" class="flex items-center justify-between w-full px-1 py-2 text-base font-bold text-slate-700 dark:text-slate-200">
       <span>${text}</span>
       <span class="w-12 h-7 rounded-full p-0.5 transition ${on ? "theme-bg-primary" : "bg-slate-300 dark:bg-slate-600"}"><span class="block w-6 h-6 rounded-full bg-white transition ${on ? "translate-x-5" : ""}"></span></span>
     </button>`;
@@ -329,6 +330,7 @@ export default {
   access: "public",
   mount(el) {
     root = el;
+    showTipHint("timer");
     cancelArmed = false;
     render();
     root.addEventListener("click", onClick);
@@ -339,6 +341,7 @@ export default {
     refreshChip();
   },
   unmount() {
+    closeTips();
     root?.removeEventListener("click", onClick);
     root?.removeEventListener("pointerdown", onPointerDown);
     root?.removeEventListener("input", onInput);

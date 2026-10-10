@@ -166,7 +166,7 @@ function renderDetail() {
   setPage("detail"); // 詳細頁：整個背景（含上方標題列、下方底欄區）一起模糊，見 app.css
   const h = hdrTitle();
   if (h) h.innerHTML = `<div class="flex items-center gap-3 min-w-0">
-        <button data-back class="flat-chip rounded-2xl px-4 py-2 font-bold active:scale-95 transition shrink-0"><i class="fa-solid fa-chevron-left"></i> 返回</button>
+        <button data-tip="cards-back" data-back class="flat-chip rounded-2xl px-4 py-2 font-bold active:scale-95 transition shrink-0"><i class="fa-solid fa-chevron-left"></i> 返回</button>
         <h2 class="text-xl font-extrabold text-slate-900 dark:text-slate-100 truncate min-w-0">${esc(c.name)}</h2>
       </div>`; // 返回鈕 + 名稱搬到頂部列左側（取代原本的標題）
   root.innerHTML = `
@@ -184,7 +184,7 @@ function openFullscreen(c, only = null) {
   o.setAttribute("data-card-fs", "");
   o.className = "absolute inset-0 z-[100] flex items-center justify-center bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl"; // 放大時整個畫面蓋上主題底色（淺色=白、深色=黑）+ 模糊
   o.innerHTML = `
-    <button data-x aria-label="關閉" class="absolute top-6 right-6 w-11 h-11 rounded-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shadow text-xl text-slate-700 dark:text-slate-100 z-10"><i class="fa-solid fa-xmark"></i></button>
+    <button data-tip="cards-x" data-x aria-label="關閉" class="absolute top-6 right-6 w-11 h-11 rounded-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shadow text-xl text-slate-700 dark:text-slate-100 z-10"><i class="fa-solid fa-xmark"></i></button>
     <div data-card class="bg-white rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 p-5 flex items-center justify-center transition-transform duration-200" style="width:85vw;max-width:28rem;touch-action:none">${face(c, true, only)}</div>
     <div class="absolute bottom-8 text-sm font-semibold text-slate-600 dark:text-slate-200 bg-white/90 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 rounded-full px-4 py-2 pointer-events-none">單擊切換橫／直向 ｜ 雙指可縮放</div>`;
   const card = o.querySelector("[data-card]");
@@ -211,7 +211,7 @@ function openForm(c = null) {
     <div data-row class="flex items-center gap-2">
       <input data-label value="${esc(x.label || "")}" maxlength="10" placeholder="備註" aria-label="備註（選填）" class="${input} !w-20 shrink-0 !px-2">
       <input data-value value="${esc(x.value || "")}" maxlength="500" aria-label="內容" class="${input} min-w-0 flex-1">
-      <button type="button" data-delrow aria-label="刪除這筆" class="w-10 h-10 rounded-xl bg-slate-200 text-slate-600 shrink-0 active:scale-90 transition"><i class="fa-solid fa-xmark"></i></button>
+      <button type="button" data-tip="cards-delrow" data-delrow aria-label="刪除這筆" class="w-10 h-10 rounded-xl bg-slate-200 text-slate-600 shrink-0 active:scale-90 transition"><i class="fa-solid fa-xmark"></i></button>
     </div>`;
   const m = document.createElement("div");
   m.className = "fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4";
@@ -224,14 +224,14 @@ function openForm(c = null) {
         <div class="font-bold text-sm"><span data-codelabel>內容</span>（可新增多個）</div>
         <p data-hint class="text-xs font-semibold text-slate-500 mb-2"></p>
         <div data-rows class="space-y-2">${(start.length ? start : [{}]).map(row).join("")}</div>
-        <button type="button" data-addrow class="mt-2 w-full py-2 rounded-xl border-2 border-dashed border-slate-300 text-slate-600 font-bold text-sm active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增一筆內容</button>
+        <button type="button" data-tip="cards-addrow" data-addrow class="mt-2 w-full py-2 rounded-xl border-2 border-dashed border-slate-300 text-slate-600 font-bold text-sm active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增一筆內容</button>
       </div>
       <label class="font-bold text-sm block">圖卡圖示連結（選填，https 圖片直接連結）<input name="iconUrl" type="url" value="${esc(d.iconUrl)}" placeholder="https://.../icon.png" class="${input}"></label>
       ${d.imageUrl ? `<label class="font-bold text-sm block">內容圖片連結（舊資料，可清空）<input name="imageUrl" type="url" value="${esc(d.imageUrl)}" class="${input}"></label>` : ""}
       <p data-err class="text-red-600 font-bold text-sm hidden"></p>
       <div class="flex gap-2 pt-1">
-        <button type="submit" class="flat-btn flex-1 text-white py-3 rounded-xl font-bold text-base active:scale-95 transition">儲存</button>
-        <button type="button" data-close class="px-5 py-3 rounded-xl font-bold bg-slate-200 text-slate-800">取消</button>
+        <button type="submit" data-tip="cards-save" class="flat-btn flex-1 text-white py-3 rounded-xl font-bold text-base active:scale-95 transition">儲存</button>
+        <button type="button" data-tip="cards-cancel" data-close class="px-5 py-3 rounded-xl font-bold bg-slate-200 text-slate-800">取消</button>
       </div>
     </form>`;
   const f = m.querySelector("form");

@@ -9,10 +9,10 @@ export const bowlOptionsTemplate = `
                     <h1 class="text-base font-black text-slate-800 dark:text-slate-100 tracking-wider">換誰洗碗設定</h1>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button data-action="open-settings" data-mode="all" title="系統設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-slate-300/70 theme-text-primary flex items-center justify-center transition-all active:scale-90">
+                    <button data-tip="set-gear" data-action="open-settings" data-mode="all" title="系統設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-slate-300/70 theme-text-primary flex items-center justify-center transition-all active:scale-90">
                         <i class="fa-solid fa-gear text-base"></i>
                     </button>
-                    <button data-action="close-apps-options" title="關閉設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90">
+                    <button data-tip="bowl-opt-close" data-action="close-apps-options" title="關閉設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
@@ -21,7 +21,7 @@ export const bowlOptionsTemplate = `
             <div class="flex-1 overflow-y-auto px-4 py-4 space-y-4 no-scrollbar pb-12">
 
                 <div id="bowlCardMembers" class="setting-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 soft-shadow-sm overflow-hidden transition-all">
-                    <button data-accordion-trigger="bmembers" aria-expanded="false" aria-controls="contentBMembers" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                    <button data-tip="bowl-members" data-accordion-trigger="bmembers" aria-expanded="false" aria-controls="contentBMembers" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl theme-bg-light theme-text-primary flex items-center justify-center text-base font-bold shrink-0">
                                 <i class="fa-solid fa-user-gear"></i>
