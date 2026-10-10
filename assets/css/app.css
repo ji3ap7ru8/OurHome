@@ -1,0 +1,574 @@
+:root {
+    --primary-color: #0284c7;
+    --primary-light: #e0f2fe;
+    --primary-dark: #0369a1;
+}
+
+body {
+    font-family: 'Noto Sans TC', 'Inter', sans-serif;
+    background-color: #f1f5f9;
+}
+
+/* ===== 手機高度修正：不再用 100vh（手機上會比實際可視區高，底部快捷列被瀏覽器工具列蓋住） =====
+   第 1 層：html/body/外框用百分比高度，永遠等於「目前實際可視區」
+   第 2 層：--app-h 用 100dvh（動態視窗高度），給背景層等需要 vh 的地方用
+   第 3 層：不支援 dvh 的舊瀏覽器，由 core/viewport.js 量測 innerHeight 寫入 --app-h */
+html, body { height: 100%; }
+body { min-height: 0; }
+#appContainer { height: 100%; }
+:root { --app-h: 100vh; }
+@supports (height: 100dvh) { :root { --app-h: 100dvh; } }
+html.vh-js, html.vh-js body { height: var(--app-h); }
+
+/* 底部快捷列與內容留白：加上手機底部安全區（手勢條、圓角） */
+.dock-wrap { bottom: calc(.75rem + env(safe-area-inset-bottom, 0px)); }
+#appContainer > .overflow-y-auto { padding-bottom: calc(var(--dock-pad, 5rem) + env(safe-area-inset-bottom, 0px)); }
+
+/* 動態主題色工具類 */
+.theme-bg-primary { background-color: var(--primary-color) !important; }
+.theme-text-primary { color: var(--primary-color) !important; }
+.theme-border-primary { border-color: var(--primary-color) !important; }
+.theme-bg-light { background-color: var(--primary-light) !important; }
+
+.soft-shadow-lg {
+    box-shadow: 0 16px 32px -8px rgba(100, 116, 139, 0.25), 0 8px 12px -6px rgba(100, 116, 139, 0.1);
+}
+
+.soft-shadow-md {
+    box-shadow: 0 8px 20px -4px rgba(148, 163, 184, 0.3);
+}
+
+.soft-shadow-sm {
+    box-shadow: 0 4px 12px rgba(148, 163, 184, 0.18);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.blob-1 { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+.blob-2 { border-radius: 60% 40% 30% 70% / 50% 30% 70% 50%; }
+.blob-3 { border-radius: 50% 50% 30% 70% / 60% 40% 60% 40%; }
+
+.bottom-sheet {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s ease;
+    will-change: height, transform;
+    background-color: #fcfbf9 !important;
+}
+
+.dark .bottom-sheet {
+    background-color: #0f172a !important;
+}
+
+.bottom-sheet.closed { transform: translateY(105%); }
+.bottom-sheet.open-default { transform: translateY(0); height: 65%; }
+.bottom-sheet.open-expanded { transform: translateY(0); height: 92%; }
+.bottom-sheet.dragging { transition: none; } /* 拖曳調整高度時跟手，不要動畫 */
+
+.backdrop { transition: opacity 0.3s ease; }
+
+/* 自訂 Slider 滑桿樣式 */
+input[type=range] {
+    accent-color: var(--primary-color);
+}
+
+/* ===== 家庭日曆（services/calendar） ===== */
+.cal-root { position: relative; min-height: 100%; padding: 0 .75rem 5.5rem; }
+/* 背景浮水印：大型日曆圖示（跟著主色調） */
+.cal-root::before, .cal-root::after { content: "\f073"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; pointer-events: none; color: var(--primary-color); opacity: .07; }
+.cal-root::before { right: -1.5rem; bottom: 4rem; font-size: 12rem; transform: rotate(-10deg); }
+.cal-root::after { content: "\f274"; left: -1.2rem; top: 55%; font-size: 7rem; transform: rotate(12deg); }
+
+/* 桌曆本體：紙張 + 裝訂環 + 主題色月份標題 */
+.cal-paper { position: relative; margin-top: 1.15rem; background: #fff; border: 1px solid var(--primary-light); border-radius: 1.1rem; box-shadow: 0 14px 28px -10px rgba(15, 23, 42, .25), 0 3px 8px rgba(15, 23, 42, .08); }
+.dark .cal-paper { background: #1e293b; border-color: #334155; box-shadow: 0 14px 28px -10px rgba(0, 0, 0, .6); }
+.cal-rings { position: absolute; top: -.8rem; left: 0; right: 0; display: flex; justify-content: space-around; padding: 0 1.6rem; z-index: 4; pointer-events: none; }
+.cal-rings i { width: .72rem; height: 1.75rem; border-radius: 999px; background: linear-gradient(90deg, #64748b, #f8fafc 45%, #94a3b8); box-shadow: 0 2px 4px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(255, 255, 255, .35); }
+.cal-head { position: relative; overflow: hidden; border-radius: 1.1rem 1.1rem 0 0; padding: 1.3rem 1rem .85rem; color: #fff; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); }
+.dark .cal-head { background: linear-gradient(135deg, var(--primary-dark), color-mix(in srgb, var(--primary-dark) 55%, #000)); }
+.cal-head::before, .cal-head::after { content: ""; position: absolute; border-radius: 999px; border: 14px solid rgba(255, 255, 255, .12); pointer-events: none; }
+.cal-head::before { width: 9rem; height: 9rem; right: -3.2rem; top: -4rem; }
+.cal-head::after { width: 6rem; height: 6rem; left: -2.4rem; bottom: -3.4rem; border-width: 10px; }
+.cal-head-main { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; }
+.dark .cal-head-main { margin-top: 0; }
+.cal-mo { display: flex; align-items: baseline; gap: .3rem; line-height: 1; }
+.cal-mo b { font-size: 3.4rem; font-weight: 900; letter-spacing: -.02em; text-shadow: 0 2px 6px rgba(0, 0, 0, .2); }
+.cal-mo-unit { font-size: 1.35rem; font-weight: 900; }
+.cal-mo-side { display: flex; flex-direction: column; gap: .2rem; margin-left: .35rem; }
+.cal-mo-side em { font-style: normal; font-size: 1.05rem; font-weight: 800; }
+.cal-mo-side small { font-size: .6rem; font-weight: 700; letter-spacing: .18em; opacity: .85; }
+.cal-nav { width: 2.75rem; height: 2.75rem; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, .22); color: #fff; font-size: 1rem; border: 1px solid rgba(255, 255, 255, .45); transition: transform .15s, background .15s; }
+.cal-nav:active { transform: scale(.92); background: rgba(255, 255, 255, .38); }
+.cal-nav:disabled { opacity: .45; }
+
+.cal-wd { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 800; font-size: .85rem; padding: .5rem 0; background: var(--primary-light); color: var(--primary-dark); border-bottom: 2px solid var(--primary-color); }
+.dark .cal-wd { background: color-mix(in srgb, var(--primary-dark) 28%, #1e293b); color: #e2e8f0; }
+.cal-body { overflow: hidden; }
+.cal-week { position: relative; min-height: 5.5rem; border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 14%, #e2e8f0); }
+.cal-week:last-child { border-bottom: 0; }
+.dark .cal-week { border-color: #334155; }
+.cal-bg { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal-cell { padding: .25rem; border-right: 1px solid color-mix(in srgb, var(--primary-color) 10%, #f1f5f9); cursor: pointer; transition: background .15s; }
+.dark .cal-cell { border-color: #334155; color: #e2e8f0; }
+.cal-cell:last-child { border-right: 0; }
+.cal-cell:active { background: var(--primary-light); }
+.dark .cal-cell:active { background: color-mix(in srgb, var(--primary-color) 25%, #1e293b); }
+.cal-cell:nth-child(7n+1) .cal-num, .cal-cell:nth-child(7n) .cal-num { color: #f43f5e; }
+.cal-cell.other { color: #94a3b8; background: repeating-linear-gradient(135deg, transparent 0 6px, rgba(148, 163, 184, .16) 6px 7px); }
+.cal-cell.other .cal-num { color: #94a3b8 !important; }
+.cal-num { display: inline-block; min-width: 1.6rem; height: 1.6rem; line-height: 1.6rem; text-align: center; font-size: .88rem; font-weight: 800; border-radius: 999px; }
+.cal-cell.today { background: var(--primary-light); box-shadow: inset 0 0 0 2px var(--primary-color); }
+.dark .cal-cell.today { background: color-mix(in srgb, var(--primary-color) 22%, #1e293b); }
+.cal-cell.today .cal-num { background: var(--primary-color); color: #fff !important; box-shadow: 0 2px 6px color-mix(in srgb, var(--primary-color) 55%, transparent); }
+.cal-bars { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1.45rem; gap: 3px 0; padding: 1.95rem 0 .35rem; pointer-events: none; }
+.cal-bar { border: 0; pointer-events: auto; margin: 0 2px; padding: 0 .4rem; border-radius: 6px; color: #fff; font-size: .72rem; font-weight: 700; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 1px 3px rgba(0, 0, 0, .2); text-shadow: 0 0 2px rgba(0, 0, 0, .35); }
+.cal-bar.cl { margin-left: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.cal-bar.cr { margin-right: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.cal-note { display: flex; align-items: center; gap: .45rem; padding: .6rem 1rem; font-size: .85rem; font-weight: 800; color: var(--primary-dark); background: var(--primary-light); border-top: 1px dashed var(--primary-color); border-radius: 0 0 1.1rem 1.1rem; }
+.dark .cal-note { background: color-mix(in srgb, var(--primary-dark) 28%, #1e293b); color: #e2e8f0; }
+.cal-note-tip { margin-left: auto; font-size: .75rem; font-weight: 700; opacity: .7; }
+.cal-spin { width:2rem; height:2rem; border:3px solid var(--primary-light); border-top-color:var(--primary-color); border-radius:50%; animation:cal-spin .7s linear infinite; }
+@keyframes cal-spin { to { transform:rotate(360deg); } }
+.cal-modal { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.5); backdrop-filter:blur(2px); display:flex; align-items:flex-end; justify-content:center; }
+.cal-sheet { width:100%; max-width:28rem; max-height:90vh; overflow-y:auto; background:#fff; color:#1e293b; border-radius:1.25rem 1.25rem 0 0; }
+.dark .cal-sheet { background:#1e293b; color:#f1f5f9; }
+.cal-sheet-head { gap:.5rem; position:sticky; top:0; z-index:2; display:flex; justify-content:space-between; align-items:center; padding:.9rem 1rem; font-size:1.2rem; font-weight:900; background:inherit; border-bottom:1px solid #e2e8f0; }
+.dark .cal-sheet-head { border-color:#334155; }
+.cal-x { width:2.25rem; height:2.25rem; border-radius:999px; background:#f1f5f9; color:#475569; }
+.dark .cal-x { background:#334155; color:#e2e8f0; }
+.cal-foot { position:sticky; bottom:0; display:flex; gap:.5rem; padding:.75rem 1rem; background:inherit; border-top:1px solid #e2e8f0; }
+.dark .cal-foot { border-color:#334155; }
+.cal-card { background:color-mix(in srgb, var(--primary-light) 30%, #fff); border:1px solid #e2e8f0; border-left-width:6px; border-radius:.9rem; padding:.9rem 1rem; font-size:1rem; line-height:1.5; }
+.dark .cal-card { border-color:#334155; background:color-mix(in srgb, var(--primary-color) 10%, #1e293b); }
+.cal-tile { flex:none; width:3.1rem; border-radius:.7rem; overflow:hidden; text-align:center; background:#fff; color:#1e293b; border:1px solid var(--primary-color); box-shadow:0 2px 6px rgba(15,23,42,.15); }
+.cal-tile small { display:block; background:var(--primary-color); color:#fff; font-size:.7rem; font-weight:800; line-height:1.15rem; }
+.cal-tile b { display:block; font-size:1.55rem; font-weight:900; line-height:1.9rem; }
+.dark .cal-tile { background:#0f172a; color:#f1f5f9; }
+.cal-card p { margin-top:.4rem; }
+.cal-ib { width:2.25rem; height:2.25rem; border-radius:999px; background:var(--primary-light); color:var(--primary-dark); font-size:.85rem; font-weight:700; }
+.cal-ib.danger { background:#fee2e2; color:#dc2626; width:auto; padding:0 .65rem; }
+.cal-sw { display:flex; align-items:center; justify-content:center; width:2.4rem; height:2.4rem; border-radius:999px; border:1px solid #cbd5e1; font-size:.7rem; font-weight:700; color:#475569; }
+.cal-toast { position:fixed; left:50%; bottom:7rem; transform:translateX(-50%); z-index:70; max-width:85vw; background:#334155; color:#fff; font-weight:700; padding:.65rem 1rem; border-radius:.6rem; text-align:center; }
+.cal-toast.err { background:#dc2626; }
+
+/* ===== 計時器：時間到鈴鐺搖晃（services/timer） ===== */
+@keyframes ring-shake {
+    0%, 100% { transform: rotate(0); }
+    15% { transform: rotate(-18deg); }
+    30% { transform: rotate(16deg); }
+    45% { transform: rotate(-12deg); }
+    60% { transform: rotate(10deg); }
+    75% { transform: rotate(-4deg); }
+}
+.ring-shake { display: inline-block; transform-origin: 50% 10%; animation: ring-shake 1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .ring-shake { animation: none; } }
+
+/* ===== 個人記事本 / 家庭記帳：單選膠囊（services/memo, services/ledger） ===== */
+.pick input:checked + span { background: var(--primary-color); color: #fff; border-color: transparent; }
+.pick input:focus-visible + span { outline: 3px solid var(--primary-color); outline-offset: 2px; }
+.pick-in input:checked + span { background: #16a34a; color: #fff; border-color: transparent; }
+.pick-ex input:checked + span { background: #dc2626; color: #fff; border-color: transparent; }
+
+/* ---- 「應用程式」頁專用背景：點陣 + 主題色光暈 + 圓環（跟著主色調變色） ---- */
+.bg-apps-layer {
+    position: sticky; top: 0; height: var(--app-h); margin-bottom: calc(-1 * var(--app-h)); flex: none; /* 頁面捲動時背景固定不動 */
+    opacity: 0;
+    transition: opacity .45s ease;
+    background:
+        radial-gradient(120% 55% at 0% 0%, var(--primary-light) 0%, transparent 62%),
+        radial-gradient(100% 50% at 100% 100%, var(--primary-light) 0%, transparent 66%),
+        radial-gradient(circle, rgba(100, 116, 139, .22) 1.3px, transparent 1.7px) 0 0 / 20px 20px;
+}
+.bg-apps-layer::before,
+.bg-apps-layer::after {
+    content: "";
+    position: absolute;
+    border-radius: 9999px;
+    border: 20px solid var(--primary-light);
+    opacity: .7;
+}
+.bg-apps-layer::before { width: 15rem; height: 15rem; top: -5.5rem; right: -6rem; }
+.bg-apps-layer::after { width: 12rem; height: 12rem; bottom: 6rem; left: -5rem; border-width: 16px; }
+.dark .bg-apps-layer { filter: saturate(.6) brightness(.35); }
+#appContainer[data-view="apps"] .bg-apps-layer { opacity: 1; }
+#appContainer[data-view="apps"] #bgShapes { opacity: 0 !important; }
+
+/* 輸入框取得焦點時，外框跟著主色調（所有應用 › 擴充插件的網址欄） */
+.theme-focus-border:focus { border-color: var(--primary-color) !important; }
+
+/* ===== 最新提醒：有未讀時鈴鐺左右晃動（晃一下、停一下，循環） ===== */
+@keyframes bell-wiggle {
+    0%, 40%, 100% { transform: rotate(0); }
+    8% { transform: rotate(-16deg); }
+    16% { transform: rotate(14deg); }
+    24% { transform: rotate(-10deg); }
+    32% { transform: rotate(6deg); }
+}
+.bell-wiggle { display: inline-block; transform-origin: 50% 12%; animation: bell-wiggle 2.5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .bell-wiggle { animation: none; } }
+
+/* ===== 家庭公告頁：固定的暖色配色，不受外觀主題 / 主色調 / 深色模式影響 ===== */
+#appContainer[data-view="notes"],
+#appContainer[data-view="notes"] > .overflow-y-auto { background-color: #faf5f0 !important; }
+#appContainer[data-view="notes"] #bgShapes { opacity: 0 !important; }
+#appContainer[data-view="notes"] #headerMount > div { background-color: #fef3c7; border-bottom: 1px solid #fde68a; padding-top: .9rem; padding-bottom: .9rem; }
+#appContainer[data-view="notes"] #notificationBtn { background-color: #fff !important; }
+#appContainer[data-view="notes"] #bellIcon { color: #d97706 !important; }
+
+/* ===== 家庭日曆頁：方格紙 + 主題色光暈背景（跟著主色調與深淺色變化） ===== */
+#appContainer[data-view="calendar"] #bgShapes { opacity: 0 !important; }
+#appContainer[data-view="calendar"] > .overflow-y-auto {
+    background-color: var(--primary-light) !important;
+    background-color: color-mix(in srgb, var(--primary-light) 45%, #fff) !important;
+    background-image:
+        radial-gradient(90% 40% at 100% 0%, color-mix(in srgb, var(--primary-color) 18%, transparent), transparent 70%),
+        radial-gradient(80% 35% at 0% 100%, color-mix(in srgb, var(--primary-color) 14%, transparent), transparent 70%),
+        linear-gradient(color-mix(in srgb, var(--primary-color) 10%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--primary-color) 10%, transparent) 1px, transparent 1px);
+    background-size: auto, auto, 26px 26px, 26px 26px;
+}
+#appContainer.dark[data-view="calendar"] > .overflow-y-auto {
+    background-color: color-mix(in srgb, var(--primary-dark) 16%, #0f172a) !important;
+    background-image:
+        radial-gradient(90% 40% at 100% 0%, color-mix(in srgb, var(--primary-color) 20%, transparent), transparent 70%),
+        radial-gradient(80% 35% at 0% 100%, color-mix(in srgb, var(--primary-color) 14%, transparent), transparent 70%),
+        linear-gradient(color-mix(in srgb, var(--primary-color) 13%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--primary-color) 13%, transparent) 1px, transparent 1px);
+    background-size: auto, auto, 26px 26px, 26px 26px;
+}
+#appContainer[data-view="calendar"] #notificationBtn,
+#appContainer[data-view="calendar"] #headerIdBtn { box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-color) 30%, transparent); }
+
+/* ===== 生活圖卡頁：極簡扁平風（純色背景 + 粗圈邊框圖卡，無漸層／動畫／光澤；顏色全由主色調推算，換主題色就跟著變） ===== */
+#appContainer[data-view="cards"] {
+    /* 圈圈配色：r1 = 主色；r2~r5 = 主色的鄰近色（不支援相對色彩語法的舊瀏覽器改用主色混合色） */
+    --r1: var(--primary-color);
+    --r2: color-mix(in srgb, var(--primary-color) 65%, #f59e0b);
+    --r3: color-mix(in srgb, var(--primary-color) 65%, #22c55e);
+    --r4: color-mix(in srgb, var(--primary-color) 65%, #ef4444);
+    --r5: color-mix(in srgb, var(--primary-color) 65%, #f9a8d4);
+    --flat-bg: color-mix(in srgb, var(--primary-color) 3%, #f8fafc); /* 淺色：同大廳的淡底 */
+    --card-fill: #fbf8f1; /* 圖卡：米白色 */
+}
+@supports (color: hsl(from red h s l)) {
+    #appContainer[data-view="cards"] {
+        --r2: hsl(from var(--primary-color) calc(h + 40) s l);
+        --r3: hsl(from var(--primary-color) calc(h - 40) s l);
+        --r4: hsl(from var(--primary-color) calc(h + 80) s l);
+        --r5: hsl(from var(--primary-color) calc(h - 80) s l);
+    }
+}
+#appContainer.dark[data-view="cards"] { --flat-bg: color-mix(in srgb, var(--primary-color) 6%, #1e2229); --card-fill: #3a3935; }
+#appContainer[data-view="cards"] #bgShapes { opacity: 0 !important; }
+#appContainer[data-view="cards"] > .overflow-y-auto { background: var(--flat-bg) !important; }
+
+/* 背景：參考「大小圓圈 + 粗圈邊框 + 淡色填充」的扁平桌布（固定不隨捲動；顏色跟著主題色） */
+.bg-cards-layer {
+    position: sticky; top: 0; height: var(--app-h); margin-bottom: calc(-1 * var(--app-h)); flex: none; overflow: hidden;
+    opacity: 0; transition: opacity .3s ease;
+}
+.bg-cards-layer svg { width: 100%; height: 100%; display: block; }
+#appContainer[data-view="cards"] .bg-cards-layer { opacity: 1; }
+.bgc { stroke-width: 7; fill: color-mix(in srgb, var(--rc) 14%, var(--flat-bg)); stroke: color-mix(in srgb, var(--rc) 30%, var(--flat-bg)); } /* 淡彩，同大廳背景的柔和感 */
+.dark .bgc { fill: color-mix(in srgb, var(--rc) 12%, var(--flat-bg)); stroke: color-mix(in srgb, var(--rc) 32%, var(--flat-bg)); }
+.bgc.c1 { --rc: var(--r1); } .bgc.c2 { --rc: var(--r2); } .bgc.c3 { --rc: var(--r3); }
+.bgc.c4 { --rc: var(--r4); } .bgc.c5 { --rc: var(--r5); }
+
+/* 圖卡：圓角方塊 + 粗邊框 + 淡色填充（不透明，蓋在背景圓圈上也清楚） */
+.flat-card, .flat-chip {
+    --ring: var(--r1);
+    border: 4px solid var(--ring);
+    background: var(--card-fill);
+}
+.flat-card:nth-child(5n+2) { --ring: var(--r2); }
+.flat-card:nth-child(5n+3) { --ring: var(--r3); }
+.flat-card:nth-child(5n+4) { --ring: var(--r4); }
+.flat-card:nth-child(5n+5) { --ring: var(--r5); }
+.flat-icon { color: color-mix(in srgb, var(--ring) 78%, #1e293b); }
+.dark .flat-icon { color: var(--ring); }
+.flat-ibox { background: color-mix(in srgb, var(--ring) 22%, transparent); }
+
+/* 「新增圖卡」：同形狀的虛線框 */
+.flat-add {
+    color: var(--primary-dark);
+    border: 4px dashed color-mix(in srgb, var(--primary-color) 55%, var(--flat-bg));
+    background: transparent;
+}
+.dark .flat-add { color: color-mix(in srgb, var(--primary-color) 60%, #fff); }
+
+/* 詳細頁：背景維持原本的圓圈桌布，但整張模糊化（含上方標題列、下方底欄區；快捷列本身不受影響）；條碼面板維持純白（掃描清晰） */
+.bg-cards-layer svg { transition: filter .3s ease, opacity .3s ease; }
+#appContainer[data-view="cards"][data-cards-page="detail"] .bg-cards-layer svg {
+    filter: blur(18px);
+    transform: scale(1.12); /* 放大一點，避免模糊後四周邊緣變淡 */
+    opacity: .6;
+}
+.flat-face { background: #fff; border: 6px solid var(--primary-color); }
+.flat-chip { --ring: var(--primary-color); border-width: 3px; color: #334155; }
+.dark .flat-chip { color: #e2e8f0; }
+
+/* 表單：純色 + 主色細框 */
+.flat-form { background: #fff; border: 3px solid var(--primary-color); }
+.dark .flat-form { background: #1e293b; }
+.flat-btn { background: var(--primary-color); }
+
+/* ===== 家庭日曆：左上角日曆切換（家庭日曆 / Google 日曆 / 全部） ===== */
+.cal-src { display: inline-flex; align-items: center; gap: .5rem; max-width: 100%; height: 2.5rem; padding: 0 .9rem; border-radius: 1rem; font-size: .95rem; font-weight: 800; color: var(--primary-dark); background: #fff; border: 1.5px solid var(--primary-color); box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-color) 28%, transparent); }
+.dark .cal-src { background: #1e293b; color: #f1f5f9; }
+.cal-src [data-src-name] { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-src-caret { font-size: .7rem; opacity: .85; }
+.cal-src:active { transform: scale(.97); }
+.cal-menu { position: absolute; z-index: 20; top: .15rem; left: .75rem; right: .75rem; max-height: 60vh; overflow-y: auto; padding: .4rem; background: #fff; color: #1e293b; border: 1px solid var(--primary-color); border-radius: 1rem; box-shadow: 0 16px 32px -8px rgba(15, 23, 42, .35); }
+.dark .cal-menu { background: #1e293b; color: #f1f5f9; }
+.cal-menu-item { display: flex; align-items: center; gap: .65rem; width: 100%; padding: .6rem .65rem; border-radius: .7rem; text-align: left; }
+.cal-menu-item + .cal-menu-item { margin-top: .15rem; }
+.cal-menu-item.on { background: var(--primary-light); }
+.dark .cal-menu-item.on { background: color-mix(in srgb, var(--primary-color) 25%, #1e293b); }
+.cal-menu-item > .fa-check { margin-left: auto; color: var(--primary-color); }
+.cal-dot { flex: none; width: .85rem; height: .85rem; border-radius: 999px; box-shadow: 0 0 0 2px rgba(255, 255, 255, .8), 0 0 0 3px rgba(148, 163, 184, .5); }
+.cal-menu-txt { min-width: 0; display: flex; flex-direction: column; }
+.cal-menu-txt b { font-size: 1rem; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-menu-txt small { font-size: .72rem; font-weight: 600; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-menu-empty { padding: .7rem; text-align: center; font-size: .8rem; font-weight: 700; color: #94a3b8; line-height: 1.5; }
+.cal-src-tag { display: inline-flex; align-items: center; gap: .35rem; font-size: .8rem !important; font-weight: 800; color: var(--primary-dark); background: var(--primary-light); padding: .15rem .6rem; border-radius: 999px; }
+
+/* 家庭日曆「當日行程」：與最新提醒相同的底部面板外觀 */
+.cal-sheet.nt { background:#fcfbf9; border-radius:36px 36px 0 0; border-top:1px solid rgba(226,232,240,.6); }
+.dark .cal-sheet.nt { background:#0f172a; border-top-color:#1e293b; }
+.bottom-sheet .cal-ib { width:2rem; height:2rem; font-size:.75rem; }
+.bottom-sheet .cal-ib.danger { min-width:2rem; width:auto; padding:0 .5rem; font-size:.7rem; white-space:nowrap; }
+.cal-sheet.nt { display:flex; flex-direction:column; overflow:hidden; max-height:85vh; }
+.cal-sheet.nt > form { display:flex; flex-direction:column; min-height:0; }
+.cal-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; overscroll-behavior:contain; }
+/* 行程詳情：置中的日曆風格浮動視窗 */
+.cal-modal.center { align-items:center; padding:1rem; }
+.cal-sheet.pop { position:relative; max-width:22rem; border-radius:1.1rem; overflow:visible; margin-top:.8rem; background:#fff; box-shadow:0 20px 40px -10px rgba(0,0,0,.45); }
+.dark .cal-sheet.pop { background:#1e293b; }
+.cal-sheet.pop .cal-pop-head { padding-top:1.5rem; padding-bottom:1rem; }
+/* 大廳的家庭日曆小卡：縮小版的行程浮動視窗（日曆環 + 頁首 + 日期牌） */
+.lob-cal .cal-rings { top: -.6rem; padding: 0 1.1rem; }
+.lob-cal .cal-rings i { width: .55rem; height: 1.3rem; }
+.lob-cal-head { padding: 1rem .8rem .65rem; }
+.lob-cal-date { font-size: 1.5rem; font-weight: 900; line-height: 2rem; letter-spacing: .02em; color: #fff; text-shadow: 0 1px 3px rgba(15,23,42,.25); }
+.cal-pop-tile { flex:none; width:3.4rem; border-radius:.7rem; overflow:hidden; text-align:center; background:#fff; color:#1e293b; box-shadow:0 2px 6px rgba(15,23,42,.25); }
+.cal-pop-tile small { display:block; background:rgba(0,0,0,.18); color:#fff; font-size:.7rem; font-weight:800; line-height:1.15rem; }
+.cal-pop-tile b { display:block; font-size:1.6rem; font-weight:900; line-height:2rem; }
+.cal-modal { transition: opacity .25s ease; }
+.cal-sheetbox { position:relative; width:100%; max-width:28rem; height:100%; pointer-events:none; }
+.cal-sheetbox > * { pointer-events:auto; }
+.cal-sheet.pop { animation: cal-pop-in .25s cubic-bezier(.16,1,.3,1); }
+@keyframes cal-pop-in { from { opacity:0; transform:translateY(14px) scale(.94); } to { opacity:1; transform:none; } }
+
+/* 右側滑出的設定視窗：收起時（在畫面外）不要把陰影／邊線滲進畫面右緣 */
+#settingsPage.translate-x-full,
+#appsOptionsPage.translate-x-full,
+#cardsOptionsPage.translate-x-full,
+#calendarIdPage.translate-x-full,
+#adminReminderPage.translate-x-full {
+    box-shadow: none !important;
+    border-color: transparent !important;
+    visibility: hidden;
+    transition: transform .3s ease-out, visibility 0s linear .3s;
+}
+
+/* ===== 換誰洗碗頁：主題色「泡泡」背景（肥皂泡 + 柔和光暈；全由主色調推算，跟著主題色與深淺色變化；與大廳的彩色色塊區隔） ===== */
+#appContainer[data-view="bowl"] #bgShapes { opacity: 0 !important; }
+#appContainer[data-view="bowl"] > .overflow-y-auto {
+    --bb: color-mix(in srgb, var(--primary-color) 30%, transparent);   /* 泡泡邊緣 */
+    --bf: color-mix(in srgb, var(--primary-color) 7%, transparent);    /* 泡泡內部 */
+    --bh: rgba(255, 255, 255, .85);                                   /* 泡泡高光 */
+    background-color: color-mix(in srgb, var(--primary-light) 40%, #fff) !important;
+    background-image:
+        radial-gradient(circle at 34% 30%, var(--bh) 0 7%, transparent 8%),
+        radial-gradient(circle at 50% 50%, var(--bf) 0 62%, var(--bb) 64% 68%, transparent 70%),
+        radial-gradient(circle at 34% 30%, var(--bh) 0 7%, transparent 8%),
+        radial-gradient(circle at 50% 50%, var(--bf) 0 62%, var(--bb) 64% 68%, transparent 70%),
+        radial-gradient(circle at 34% 30%, var(--bh) 0 7%, transparent 8%),
+        radial-gradient(circle at 50% 50%, var(--bf) 0 62%, var(--bb) 64% 68%, transparent 70%),
+        radial-gradient(circle at 34% 30%, var(--bh) 0 7%, transparent 8%),
+        radial-gradient(circle at 50% 50%, var(--bf) 0 62%, var(--bb) 64% 68%, transparent 70%),
+        radial-gradient(120% 45% at 100% 0%, color-mix(in srgb, var(--primary-color) 20%, transparent), transparent 70%),
+        radial-gradient(100% 40% at 0% 100%, color-mix(in srgb, var(--primary-color) 16%, transparent), transparent 70%);
+    background-repeat: no-repeat;
+    background-size:
+        5.5rem 5.5rem, 5.5rem 5.5rem,
+        3.2rem 3.2rem, 3.2rem 3.2rem,
+        7rem 7rem, 7rem 7rem,
+        2.4rem 2.4rem, 2.4rem 2.4rem,
+        auto, auto;
+    background-position:
+        92% 3%, 92% 3%,
+        4% 14%, 4% 14%,
+        -2rem 62%, -2rem 62%,
+        88% 78%, 88% 78%,
+        0 0, 0 0;
+}
+#appContainer.dark[data-view="bowl"] > .overflow-y-auto {
+    --bb: color-mix(in srgb, var(--primary-color) 45%, transparent);
+    --bf: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    --bh: rgba(255, 255, 255, .35);
+    background-color: color-mix(in srgb, var(--primary-dark) 16%, #0f172a) !important;
+}
+#appContainer[data-view="bowl"] #notificationBtn,
+#appContainer[data-view="bowl"] #headerBowlBtn { box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-color) 30%, transparent); }
+
+/* 開關（checkbox）：關 = 灰色軌道 + 圓鈕在左 + 文字「關」；開 = 主色調軌道 + 圓鈕在右 + 文字「開」
+   用法：<input type="checkbox" class="sr-only"><div class="oh-switch"></div><span class="oh-switch-text"></span> */
+.oh-switch { position: relative; flex-shrink: 0; width: 2.25rem; height: 1.25rem; border-radius: 9999px; background: #cbd5e1; transition: background-color .2s; }
+.dark .oh-switch { background: #475569; }
+.oh-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 1rem; height: 1rem; border-radius: 9999px; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .3); transition: transform .2s; }
+input:checked + .oh-switch { background: var(--primary-color); }
+input:checked + .oh-switch::after { transform: translateX(1rem); }
+input:focus-visible + .oh-switch { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+.oh-switch-text { min-width: 1.1rem; font-size: 10px; font-weight: 700; color: #94a3b8; }
+.oh-switch-text::before { content: "關"; }
+input:checked ~ .oh-switch-text { color: var(--primary-color); }
+input:checked ~ .oh-switch-text::before { content: "開"; }
+
+
+/* ===== 大廳：玻璃化區塊（半透明白 + 背景模糊 + 亮邊 + 內側高光；背後的柔色圓塊會透出來） ===== */
+.glass-card {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.08) 100%);
+    -webkit-backdrop-filter: blur(20px) saturate(1.9) brightness(1.08) contrast(1.04);
+    backdrop-filter: blur(20px) saturate(1.9) brightness(1.08) contrast(1.04);
+    border: 1px solid rgba(255,255,255,.8);
+    box-shadow: 0 14px 34px -10px rgba(31,41,55,.22), 0 2px 6px rgba(31,41,55,.06), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(255,255,255,.4);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease;
+}
+/* 光澤：左上斜向高光帶 + 邊緣內側亮邊（像玻璃反光），不擋點擊 */
+.glass-card::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2;
+    background: linear-gradient(115deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.16) 22%, rgba(255,255,255,0) 42%, rgba(255,255,255,0) 72%, rgba(255,255,255,.22) 100%);
+}
+.glass-card::after {
+    content: ""; position: absolute; inset: 1px; border-radius: inherit; pointer-events: none; z-index: 2;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.35), inset 0 14px 20px -14px rgba(255,255,255,.95), inset 0 -12px 18px -14px rgba(255,255,255,.5);
+}
+/* 放大感：按下 / 滑過時像凸透鏡一樣微微放大、陰影加深 */
+.glass-card:active { transform: scale(1.02); box-shadow: 0 20px 40px -10px rgba(31,41,55,.28), inset 0 1px 0 rgba(255,255,255,1); }
+@media (hover: hover) { .glass-card:hover { transform: scale(1.012); } }
+.dark .glass-card {
+    background: linear-gradient(135deg, rgba(51,65,85,.36) 0%, rgba(30,41,59,.14) 100%);
+    border-color: rgba(255,255,255,.16);
+    box-shadow: 0 14px 34px -10px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.16);
+}
+.dark .glass-card::before { background: linear-gradient(115deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,.05) 22%, rgba(255,255,255,0) 42%); }
+.dark .glass-card::after { box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), inset 0 12px 18px -14px rgba(255,255,255,.25); }
+
+/* 大廳標題「我們の家」：可愛圓體（粉圓 Huninn，index.html 只載入這 4 個字；沒載入時退回黑體） */
+.lobby-brand {
+    font-family: "Huninn", "Chiron GoRound TC", "jf-openhuninn", "Noto Sans TC", sans-serif;
+    font-weight: 400;
+    font-size: 2rem;
+    line-height: 1.25;
+    letter-spacing: .14em;
+    color: var(--primary-dark);
+    text-shadow: 0 2px 0 rgba(255,255,255,.85), 0 6px 14px color-mix(in srgb, var(--primary-color) 28%, transparent);
+}
+.dark .lobby-brand { color: color-mix(in srgb, var(--primary-color) 55%, #fff); text-shadow: 0 2px 10px color-mix(in srgb, var(--primary-color) 40%, transparent); }
+
+/* 遮罩輸入框：不用 type=password，瀏覽器就不會詢問是否儲存密碼 */
+input[data-mask="on"] { -webkit-text-security: disc; text-security: disc; }
+
+/* ===== 我的筆記頁：筆記本風格（橫線紙張 + 左側紅線 + 打孔；顏色全由主色調推算，跟著主題色與深淺色變化） ===== */
+#appContainer[data-view="memo"] #bgShapes { opacity: 0 !important; }
+#appContainer[data-view="memo"] > .overflow-y-auto {
+    background-color: color-mix(in srgb, var(--primary-light) 60%, #f1f5f9) !important; /* 桌面 */
+    background-image: radial-gradient(circle, color-mix(in srgb, var(--primary-color) 14%, transparent) 1.3px, transparent 1.7px) !important;
+    background-size: 18px 18px !important;
+}
+#appContainer.dark[data-view="memo"] > .overflow-y-auto {
+    background-color: color-mix(in srgb, var(--primary-dark) 14%, #0f172a) !important;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, .07) 1.3px, transparent 1.7px) !important;
+}
+#appContainer[data-view="memo"] #viewOutlet {
+    --mp-paper: color-mix(in srgb, var(--primary-light) 22%, #fffef9);
+    --mp-line: color-mix(in srgb, var(--primary-color) 20%, transparent);
+    --mp-margin: color-mix(in srgb, var(--primary-color) 55%, transparent);
+    --mp-hole: color-mix(in srgb, var(--primary-light) 60%, #f1f5f9);
+    --mp-ring: color-mix(in srgb, var(--primary-color) 30%, transparent);
+    margin: .25rem .7rem 0; padding-bottom: 5.5rem;
+    border: 1px solid color-mix(in srgb, var(--primary-color) 16%, transparent); border-bottom: 0;
+    border-radius: 1.4rem 1.4rem 0 0;
+    box-shadow: 0 -2px 16px rgba(15, 23, 42, .08), inset 0 1px 0 rgba(255, 255, 255, .7);
+    background-color: var(--mp-paper);
+    background-image:
+        radial-gradient(circle at 1.15rem 50%, var(--mp-hole) 0 .38rem, var(--mp-ring) .4rem .5rem, transparent .54rem),
+        linear-gradient(90deg, transparent 2.7rem, var(--mp-margin) 2.7rem, var(--mp-margin) calc(2.7rem + 2px), transparent calc(2.7rem + 2px)),
+        repeating-linear-gradient(to bottom, transparent 0, transparent calc(2rem - 1px), var(--mp-line) calc(2rem - 1px), var(--mp-line) 2rem);
+    background-size: 100% 4.5rem, 100% 100%, 100% 100%;
+    background-repeat: repeat-y, no-repeat, repeat;
+}
+#appContainer.dark[data-view="memo"] #viewOutlet {
+    --mp-paper: color-mix(in srgb, var(--primary-dark) 16%, #1e293b);
+    --mp-line: rgba(255, 255, 255, .07);
+    --mp-margin: color-mix(in srgb, var(--primary-color) 50%, transparent);
+    --mp-hole: color-mix(in srgb, var(--primary-dark) 14%, #0f172a);
+    --mp-ring: rgba(255, 255, 255, .14);
+    box-shadow: 0 -2px 16px rgba(0, 0, 0, .45);
+}
+.memo-root { padding: .6rem .9rem 1.5rem 3.3rem; }
+.memo-date { font-size: 1.05rem; font-weight: 900; color: var(--primary-dark); letter-spacing: .03em; }
+.dark .memo-date { color: color-mix(in srgb, var(--primary-color) 55%, #fff); }
+.memo-count { font-size: .75rem; font-weight: 800; padding: .2rem .7rem; border-radius: 999px; color: var(--primary-dark); background: var(--primary-light); border: 1px dashed var(--primary-color); }
+.dark .memo-count { background: color-mix(in srgb, var(--primary-color) 22%, #1e293b); color: #e2e8f0; }
+.memo-sticky { position: relative; transform: rotate(-.6deg); box-shadow: 0 6px 12px -6px rgba(15, 23, 42, .3); }
+.memo-sticky::before { content: ""; position: absolute; top: -.45rem; left: 50%; width: 3rem; height: .9rem; margin-left: -1.5rem; background: color-mix(in srgb, var(--primary-color) 28%, transparent); transform: rotate(2deg); border-radius: 2px; }
+.memo-search { width: 100%; padding: .65rem .5rem .65rem 2rem; font-size: 1rem; font-weight: 600; color: #0f172a; background: transparent; border: 0; border-bottom: 2px solid var(--primary-color); border-radius: 0; outline: none; }
+.memo-search::placeholder { color: #94a3b8; }
+.memo-search:focus { border-bottom-color: var(--primary-dark); background: color-mix(in srgb, var(--primary-light) 45%, transparent); }
+.dark .memo-search { color: #f1f5f9; }
+.memo-tab { flex: none; padding: .45rem 1rem .4rem; font-size: .875rem; font-weight: 800; border-radius: .7rem .7rem 0 0; border: 1px solid color-mix(in srgb, var(--primary-color) 28%, #e2e8f0); border-bottom: 0; color: #475569; background: color-mix(in srgb, var(--primary-light) 55%, #fff); transition: transform .12s; }
+.memo-tab.on { background: var(--primary-color); color: #fff; border-color: transparent; padding-top: .6rem; box-shadow: 0 -3px 8px -3px color-mix(in srgb, var(--primary-color) 55%, transparent); }
+.dark .memo-tab { background: color-mix(in srgb, var(--primary-color) 14%, #1e293b); color: #cbd5e1; border-color: #334155; }
+.dark .memo-tab.on { background: var(--primary-color); color: #fff; }
+.memo-tabs { border-bottom: 2px solid var(--primary-color); }
+.memo-card { --memo-accent: #64748b; position: relative; display: block; width: 100%; text-align: left; padding: .9rem 1rem; border-radius: .35rem 1rem 1rem .35rem; border: 1px solid color-mix(in srgb, var(--primary-color) 14%, #e2e8f0); border-left: 5px solid var(--memo-accent); background: color-mix(in srgb, var(--primary-light) 10%, #fff); box-shadow: 0 6px 12px -7px rgba(15, 23, 42, .3); transition: transform .12s; }
+.memo-card::before { content: ""; position: absolute; top: -.45rem; right: 1.6rem; width: 2.6rem; height: .85rem; background: color-mix(in srgb, var(--memo-accent) 38%, transparent); transform: rotate(-3deg); border-radius: 2px; }
+.memo-card:nth-child(even) { transform: rotate(.25deg); }
+.memo-card:nth-child(odd) { transform: rotate(-.25deg); }
+.memo-card:active { transform: scale(.98); }
+.dark .memo-card { background: color-mix(in srgb, var(--primary-dark) 12%, #1e293b); border-color: #334155; border-left-color: var(--memo-accent); }
+.memo-lines { line-height: 2rem; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2rem - 1px), color-mix(in srgb, var(--primary-color) 22%, transparent) calc(2rem - 1px), color-mix(in srgb, var(--primary-color) 22%, transparent) 2rem); background-attachment: local; background-color: transparent !important; }
+.memo-fab { box-shadow: 0 10px 20px -6px color-mix(in srgb, var(--primary-color) 60%, transparent), 0 3px 8px rgba(15, 23, 42, .18); }
+
+/* 我的筆記：新增／編輯記事（記事本風格；所有列高為 2rem 的倍數，與橫線對齊） */
+.memo-paper { --ln: color-mix(in srgb, var(--primary-color) 25%, transparent); position: relative; padding: 1rem 1.1rem 0 3.3rem; color: #1e293b;
+  background-color: #fffef9; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(2rem - 1px), var(--ln) calc(2rem - 1px), var(--ln) 2rem); background-position: 0 1rem; }
+.memo-paper::before { content: ""; position: absolute; top: 0; bottom: 0; left: 2.5rem; width: 2px; background: color-mix(in srgb, var(--primary-color) 55%, transparent); }
+.memo-paper::after { content: ""; position: absolute; top: 0; bottom: 0; left: .75rem; width: 1rem; background-image: radial-gradient(circle, color-mix(in srgb, var(--primary-color) 28%, #fff) 0 .4rem, transparent .45rem); background-size: 1rem 4rem; background-position: 0 1.4rem; }
+.memo-paper-tape { position: absolute; top: -.35rem; left: 50%; width: 5rem; height: 1.1rem; margin-left: -2.5rem; background: color-mix(in srgb, var(--primary-color) 30%, transparent); transform: rotate(-2deg); border-radius: 2px; }
+.memo-ink { color: #1e293b; }
+.memo-row { min-height: 2rem; line-height: 2rem; }
+.memo-label { font-size: .8rem; font-weight: 800; color: var(--primary-dark); }
+.memo-line-input { display: block; width: 100%; background: transparent; border: 0; outline: 0; padding: 0; line-height: 2rem; color: #0f172a; font-weight: 600; resize: none; }
+.memo-line-input::placeholder { color: #94a3b8; }
+.memo-sep { border-bottom: 2px solid color-mix(in srgb, var(--primary-color) 75%, transparent); box-sizing: border-box; }
+.memo-title { height: 2rem; font-size: 1.2rem; font-weight: 900; }
+.memo-newcat { height: 2rem; font-size: .95rem; flex: 1; min-width: 0; }
+.memo-body { font-size: 1rem; line-height: 2rem; }
+.memo-chips { display: flex; flex-wrap: wrap; column-gap: .45rem; }
+.memo-chips > label { height: 2rem; display: flex; align-items: center; }
+.memo-pick { display: block; padding: 0 .85rem; line-height: 1.6rem; font-size: .85rem; font-weight: 800; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--primary-color) 45%, #cbd5e1); background: rgba(255,255,255,.7); color: #334155; }
+input:checked + .memo-pick { background: var(--primary-color); color: #fff; border-color: transparent; }
+.memo-addcat { height: 1.6rem; padding: 0 .8rem; font-size: .8rem; font-weight: 800; border-radius: 999px; color: var(--primary-dark); border: 1px dashed var(--primary-color); background: transparent; }
+.dark .memo-paper { color: #e2e8f0; background-color: #1e293b; --ln: color-mix(in srgb, var(--primary-color) 22%, transparent); }
+.dark .memo-ink, .dark .memo-line-input { color: #f1f5f9; }
+.dark .memo-label { color: color-mix(in srgb, var(--primary-color) 55%, #fff); }
+.dark .memo-pick { background: rgba(15,23,42,.5); color: #cbd5e1; border-color: #475569; }
+.dark input:checked + .memo-pick { background: var(--primary-color); color: #fff; }
+
+/* 大廳：我的筆記小卡（橫線筆記紙 + 左側分類色條 + 膠帶） */
+.lob-memo { position: relative; flex: none; scroll-snap-align: start; width: 11rem; padding: .35rem .75rem .5rem .8rem; border-radius: .25rem .75rem .75rem .25rem; color: #1e293b;
+  border: 1px solid rgba(148,163,184,.35); border-left: 4px solid var(--memo-accent, #64748b); background-color: #fffef9;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(1.6rem - 1px), color-mix(in srgb, var(--memo-accent, #64748b) 28%, transparent) calc(1.6rem - 1px), color-mix(in srgb, var(--memo-accent, #64748b) 28%, transparent) 1.6rem);
+  background-position: 0 .35rem; box-shadow: 0 4px 10px -4px rgba(15,23,42,.25); }
+.lob-memo-tape { position: absolute; top: -.4rem; right: 1.2rem; width: 2.2rem; height: .75rem; background: color-mix(in srgb, var(--memo-accent, #64748b) 38%, transparent); transform: rotate(3deg); border-radius: 2px; }
+.lob-memo-meta { display: flex; align-items: center; gap: .35rem; height: 1.6rem; line-height: 1.6rem; font-size: .7rem; font-weight: 800; color: var(--memo-accent, #64748b); }
+.lob-memo-title { display: block; height: 1.6rem; line-height: 1.6rem; font-size: .95rem; font-weight: 900; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dark .lob-memo { color: #f1f5f9; background-color: #1e293b; border-color: #334155; border-left-color: var(--memo-accent, #64748b); }

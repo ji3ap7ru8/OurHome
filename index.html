@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-TW" style="font-size: 100%;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我們の家 - 專業牛牛服務站</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        if (window.tailwind) tailwind.config = { darkMode: 'class' };
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- 大廳標題「我們の家」專用字體（只載入這 4 個字，很小） -->
+    <link href="https://fonts.googleapis.com/css2?family=Huninn&text=%E6%88%91%E5%80%91%E3%81%AE%E5%AE%B6&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/app.css">
+    <!-- 網頁Logo圖示 -->
+    <link rel="icon" type="image/png" href="OurHome.png">
+    <link rel="apple-touch-icon" href="OurHome.png">
+    <!-- 啟動載入畫面（內嵌樣式，不等其他檔案；bootstrap 完成後由 core/loading.js 移除） -->
+    <style>
+        #appSplash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#f8fafc;color:#475569;font-family:'Noto Sans TC',sans-serif;font-weight:700;font-size:15px;transition:opacity .25s ease}
+        #appSplash img{width:72px;height:72px;border-radius:18px}
+        #appSplash.hide{opacity:0;pointer-events:none}
+        @media (prefers-color-scheme:dark){#appSplash{background:#0f172a;color:#cbd5e1}}
+        .oh-spinner{width:30px;height:30px;border-radius:50%;border:4px solid rgba(148,163,184,.35);border-top-color:#0284c7;animation:oh-spin .8s linear infinite}
+        @keyframes oh-spin{to{transform:rotate(360deg)}}
+        @media (prefers-reduced-motion:reduce){.oh-spinner{animation-duration:2s}}
+    </style>
+</head>
+<body class="flex items-center justify-center select-none overflow-hidden bg-slate-100">
+    <div id="appSplash" role="status" aria-live="polite">
+        <img src="OurHome.png" alt="">
+        <div class="oh-spinner"></div>
+        <div>載入中...</div>
+    </div>
+    <script>setTimeout(function(){var e=document.getElementById('appSplash');if(e)e.remove();},15000);</script>
+
+
+    <!-- Mobile Viewport Container (App Shell) -->
+    <div id="appContainer" class="relative w-full max-w-md bg-slate-50 dark:bg-slate-900 transition-colors duration-300 overflow-hidden flex flex-col justify-between shadow-md">
+
+        <!-- 大廳主畫面 -->
+        <div class="flex-1 overflow-y-auto no-scrollbar relative flex flex-col pb-20 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+
+        <!-- Soft Pastel Background Shapes -->
+        <!-- 背景固定不跟著捲動：外層 sticky（高度 0）貼在畫面頂端，內層鋪滿一個畫面高度，介面在上面滑動 -->
+        <div id="bgShapes" class="sticky top-0 h-0 pointer-events-none z-0 transition-opacity duration-300 dark:opacity-10">
+          <div class="absolute top-0 left-0 w-full overflow-hidden" style="height:100vh;height:100dvh">
+            <div class="absolute -top-10 -left-10 w-44 h-44 bg-amber-100/90 blob-1"></div>
+            <div class="absolute top-2 -right-8 w-40 h-40 bg-purple-200/70 blob-2"></div>
+            <div class="absolute -top-12 right-12 w-32 h-32 bg-sky-200/80 rounded-full"></div>
+            <div class="absolute top-16 left-28 w-36 h-28 bg-rose-200/70 blob-1"></div>
+
+            <div class="absolute top-1/3 -left-12 w-48 h-48 bg-emerald-100/70 blob-2"></div>
+            <div class="absolute top-1/2 -right-12 w-52 h-52 bg-amber-100/75 blob-1"></div>
+            <div class="absolute top-[42%] left-10 w-36 h-36 bg-indigo-100/60 rounded-full"></div>
+
+            <div class="absolute bottom-28 -left-8 w-44 h-44 bg-rose-100/75 blob-3"></div>
+            <div class="absolute bottom-16 right-4 w-40 h-40 bg-sky-100/80 blob-2"></div>
+            <div class="absolute -bottom-8 left-1/3 w-48 h-36 bg-purple-100/70 rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- 「生活圖卡」頁專用背景：扁平粗圈圓形 / 圓角菱形（顏色跟著主題色，見 app.css） -->
+        <div id="bgCards" class="bg-cards-layer pointer-events-none z-0" aria-hidden="true">
+            <svg viewBox="0 0 390 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <circle class="bgc c2" cx="30" cy="30" r="125"/>
+                <circle class="bgc c3" cx="365" cy="95" r="78"/>
+                <rect class="bgc c1" x="-100" y="-100" width="200" height="200" rx="46" transform="translate(-30 360) rotate(45)"/>
+                <circle class="bgc c4" cx="410" cy="410" r="125"/>
+                <circle class="bgc c5" cx="45" cy="650" r="95"/>
+                <circle class="bgc c3" cx="330" cy="735" r="85"/>
+                <circle class="bgc c2" cx="200" cy="790" r="42"/>
+            </svg>
+        </div>
+
+        <!-- 「應用程式」頁專用背景：點陣 + 主題色光暈 + 圓環（只在該頁顯示，見 app.css） -->
+        <div id="bgApps" class="bg-apps-layer overflow-hidden pointer-events-none z-0"></div>
+
+            <!-- 頂部列 (components/header.js) -->
+            <div id="headerMount"></div>
+
+            <!-- 服務模組掛載點：Stage 2~4 的 /services/* 會渲染到這裡 -->
+            <div id="viewOutlet" class="relative z-10 flex-1"></div>
+        </div>
+
+        <!-- 底欄 Dock (components/dock.js) -->
+        <div class="dock-wrap absolute left-0 right-0 px-5 z-30 pointer-events-none">
+            <div id="dockContainer" class="pointer-events-auto bg-white/95 dark:bg-slate-800/95 backdrop-blur-md rounded-full px-5 py-2 flex justify-between items-center soft-shadow-md border border-slate-100 dark:border-slate-700"></div>
+        </div>
+
+        <!-- 共用遮罩 -->
+        <div id="backdrop" data-action="close-all" class="backdrop pointer-events-none opacity-0 fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-40"></div>
+
+        <!-- 共用 Bottom Sheet (components/bottom-sheet.js) -->
+        <div id="bottomSheetMount"></div>
+
+        <!-- 右側設定視窗 (components/settings-panel.js) -->
+        <div id="settingsMount"></div>
+
+        <!-- 應用程式頁的右側選項視窗 (components/apps-options.js) -->
+        <div id="appsOptionsMount"></div>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+    <script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(function(){});</script>
+</body>
+</html>
