@@ -94,7 +94,7 @@ export function openLineSendDialog({ title = "發送訊息", subtitle = "", buil
   const empty = `<p class="text-sm font-medium text-slate-500 dark:text-slate-400 text-center py-4">還沒有 LINE 接收對象，請先到「系統設定 > LINE Bot」新增。</p>`;
 
   wrap.innerHTML = `
-  <div class="lsd-pop relative w-full max-w-[360px]" data-box style="padding-bottom:${TAIL}px">
+  <div class="lsd-pop relative w-full max-w-[440px]" data-box style="padding-bottom:${TAIL}px">
     <svg data-svg class="absolute inset-0 w-full h-full pointer-events-none" style="overflow:visible" aria-hidden="true">
       <path data-shadow class="lsd-shadow" transform="translate(${-SHADOW} ${SHADOW})"></path>
       <path data-main class="lsd-main"></path>
