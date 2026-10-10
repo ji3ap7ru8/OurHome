@@ -187,7 +187,7 @@ function openManage() {
         <h3 class="text-xl font-black"><i class="fa-solid fa-thumbtack text-amber-600"></i> 管理公告 <span class="text-sm font-extrabold bg-amber-200 px-2 py-0.5 rounded-full align-middle">${notes.length} / ${MAX_NOTES}</span></h3>
         <button data-close data-tip="notes-close" aria-label="關閉" class="w-9 h-9 rounded-full bg-white/80 text-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <button data-new class="w-full py-3 rounded-xl border-2 border-dashed border-amber-500 bg-amber-100/60 text-amber-800 font-black text-base mb-4 active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增便利貼</button>
+      <button data-new data-tip="notes-new" class="w-full py-3 rounded-xl border-2 border-dashed border-amber-500 bg-amber-100/60 text-amber-800 font-black text-base mb-4 active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增便利貼</button>
       <div class="space-y-4">
         ${list.length ? list.map((n, i) => `
           <div class="relative flex items-center gap-2 pl-3.5 pr-2.5 py-3 rounded-b-lg border-t-4 shadow-md" style="${style(n)};transform:rotate(${[-0.8, 0.8, -0.4, 0.5][i % 4]}deg)">
@@ -200,8 +200,8 @@ function openManage() {
               <div class="font-black text-base truncate mt-0.5">${esc(n.title || n.content || "（無標題）")}</div>
               <div class="text-xs font-bold opacity-75"><i class="fa-solid fa-user"></i> ${esc(n.author)}・${esc(n.publishDate.slice(5))}</div>
             </div>
-            <button data-edit="${n.id}" aria-label="編輯" class="shrink-0 w-10 h-10 rounded-full bg-white/80 text-blue-700 active:scale-90 transition"><i class="fa-solid fa-pen"></i></button>
-            <button data-del="${n.id}" aria-label="刪除" class="shrink-0 w-10 h-10 rounded-full bg-white/80 text-red-600 active:scale-90 transition"><i class="fa-solid fa-trash"></i></button>
+            <button data-edit="${n.id}" data-tip="notes-edit" aria-label="編輯" class="shrink-0 w-10 h-10 rounded-full bg-white/80 text-blue-700 active:scale-90 transition"><i class="fa-solid fa-pen"></i></button>
+            <button data-del="${n.id}" data-tip="notes-del" aria-label="刪除" class="shrink-0 w-10 h-10 rounded-full bg-white/80 text-red-600 active:scale-90 transition"><i class="fa-solid fa-trash"></i></button>
           </div>`).join("") : '<p class="text-center font-bold py-8 opacity-60">目前沒有便利貼</p>'}
       </div>
     </div>`);
@@ -268,7 +268,7 @@ function openForm(n = null) {
       <i class="fa-solid ${icon} w-4 text-center text-amber-600"></i>
       <span class="text-[0.95rem] font-extrabold text-slate-800 dark:text-slate-100">${text}</span>${right}
     </div>`;
-  const opt = (kind, v, cap = "") => `<button type="button" role="radio" data-opt="${kind}" data-v="${esc(v)}" class="flex items-center justify-center gap-1.5 py-3 rounded-xl border-2 text-base font-extrabold transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><i data-tick class="fa-solid fa-check text-xs hidden"></i><span class="truncate">${esc(v)}</span>${cap ? `<span class="text-xs font-bold opacity-70 shrink-0">${cap}</span>` : ""}</button>`;
+  const opt = (kind, v, cap = "") => `<button type="button" role="radio" data-opt="${kind}" data-tip="notes-${kind}" data-v="${esc(v)}" class="flex items-center justify-center gap-1.5 py-3 rounded-xl border-2 text-base font-extrabold transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><i data-tick class="fa-solid fa-check text-xs hidden"></i><span class="truncate">${esc(v)}</span>${cap ? `<span class="text-xs font-bold opacity-70 shrink-0">${cap}</span>` : ""}</button>`;
 
   // ---- 組出視窗 ----
   const host = document.getElementById("appContainer") || document.body;
@@ -301,10 +301,10 @@ function openForm(n = null) {
             <section class="${SEC}">
               <div class="flex items-center justify-between gap-3">
                 <div class="min-w-0">
-                  <div class="text-base font-extrabold">📌 置頂</div>
+                  <div data-tip="notes-pin" class="text-base font-extrabold">📌 置頂</div>
                   <div class="text-xs font-bold text-slate-400">僅「重要／緊急」可使用</div>
                 </div>
-                <button type="button" role="switch" data-pin aria-label="置頂" class="shrink-0 relative w-14 h-8 rounded-full bg-slate-300 dark:bg-slate-600 transition disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
+                <button type="button" role="switch" data-pin data-tip="notes-pin" aria-label="置頂" class="shrink-0 relative w-14 h-8 rounded-full bg-slate-300 dark:bg-slate-600 transition disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">
                   <span data-knob class="absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow transition-transform"></span>
                 </button>
               </div>
@@ -320,15 +320,15 @@ function openForm(n = null) {
           <!-- 第 2 頁：標題、內容（內容框佔滿剩餘空間） -->
           <div data-page="1" class="absolute inset-0 hidden flex-col px-5 py-4 gap-3">
             <label class="block shrink-0">
-              <span class="${SUB} flex justify-between"><span>標題</span><span data-cnt="title"></span></span>
+              <span class="${SUB} flex justify-between"><span data-tip="notes-fld-title">標題</span><span data-cnt="title"></span></span>
               <input name="title" value="${esc(d.title)}" maxlength="30" placeholder="例如：週六回阿嬤家" class="${FIELD}">
             </label>
             <label class="flex-1 min-h-0 flex flex-col">
-              <span class="${SUB} flex justify-between shrink-0"><span>內容</span><span data-cnt="content"></span></span>
+              <span class="${SUB} flex justify-between shrink-0"><span data-tip="notes-fld-content">內容</span><span data-cnt="content"></span></span>
               <textarea name="content" maxlength="300" placeholder="想跟家人說的話…" class="${FIELD} flex-1 min-h-0 resize-none leading-relaxed">${esc(d.content)}</textarea>
             </label>
             <label class="block shrink-0">
-              <span class="${SUB}">附加連結（選填）</span>
+              <span data-tip="notes-fld-link" class="${SUB}">附加連結（選填）</span>
               <span class="relative block">
                 <i class="fa-solid fa-link absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
                 <input name="link" type="url" inputmode="url" value="${esc(d.link)}" placeholder="https://..." class="${FIELD} !pl-10">
@@ -340,10 +340,10 @@ function openForm(n = null) {
           <div data-page="2" class="absolute inset-0 hidden overflow-y-auto overscroll-contain no-scrollbar px-5 py-4">
             ${head("fa-clock", "顯示時間")}
             <div role="radiogroup" aria-label="顯示時間" class="grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800 mb-3">
-              ${[["綁定期限", "fa-hourglass-half"], ["永久顯示", "fa-infinity"]].map(([v, ic]) => `<button type="button" role="radio" data-opt="status" data-v="${v}" class="flex items-center justify-center gap-2 py-2.5 rounded-lg text-base font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><i class="fa-solid ${ic}"></i>${v}</button>`).join("")}
+              ${[["綁定期限", "fa-hourglass-half"], ["永久顯示", "fa-infinity"]].map(([v, ic]) => `<button type="button" role="radio" data-opt="status" data-tip="notes-status" data-v="${v}" class="flex items-center justify-center gap-2 py-2.5 rounded-lg text-base font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"><i class="fa-solid ${ic}"></i>${v}</button>`).join("")}
             </div>
             <div class="grid grid-cols-2 gap-2.5">
-              <label class="block"><span class="${SUB}">發布日期</span><input type="date" name="publishDate" value="${d.publishDate}" class="${FIELD}"></label>
+              <label class="block"><span data-tip="notes-fld-time" class="${SUB}">發布日期</span><input type="date" name="publishDate" value="${d.publishDate}" class="${FIELD}"></label>
               <label class="block"><span class="${SUB}">發布時間</span><input type="time" name="publishTime" value="${d.publishTime}" class="${FIELD}"></label>
             </div>
             <div data-exp class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
@@ -353,7 +353,7 @@ function openForm(n = null) {
               </div>
               <div class="flex items-center gap-2 mt-3 overflow-x-auto no-scrollbar" role="group" aria-label="快速設定截止時間">
                 <span class="shrink-0 text-xs font-bold text-slate-400">快速設定</span>
-                ${[["d1", "隔天"], ["d3", "3 天後"], ["d7", "1 週後"], ["m1", "1 個月後"]].map(([k, t]) => `<button type="button" data-quick="${k}" class="shrink-0 px-3.5 py-1.5 rounded-full border border-amber-300 bg-white dark:bg-slate-800 text-amber-800 dark:text-amber-300 text-sm font-extrabold active:scale-95 transition">${t}</button>`).join("")}
+                ${[["d1", "隔天"], ["d3", "3 天後"], ["d7", "1 週後"], ["m1", "1 個月後"]].map(([k, t]) => `<button type="button" data-quick="${k}" data-tip="notes-quick" class="shrink-0 px-3.5 py-1.5 rounded-full border border-amber-300 bg-white dark:bg-slate-800 text-amber-800 dark:text-amber-300 text-sm font-extrabold active:scale-95 transition">${t}</button>`).join("")}
               </div>
             </div>
           </div>
@@ -362,8 +362,8 @@ function openForm(n = null) {
         <div class="shrink-0 p-4 border-t border-slate-200/70 dark:border-slate-800 bg-[#fcfbf9] dark:bg-slate-900 space-y-2">
           <p data-err role="alert" class="hidden px-3.5 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-300 text-sm font-bold"></p>
           <div class="flex gap-2.5">
-            <button type="button" data-back class="px-5 py-3.5 rounded-2xl bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-base active:scale-95 transition flex items-center gap-1.5"><i data-back-ic class="fa-solid fa-chevron-left text-sm"></i><span data-back-t>取消</span></button>
-            <button type="submit" class="flex-1 py-3.5 rounded-2xl bg-amber-600 hover:bg-amber-700 disabled:opacity-60 text-white font-bold text-base shadow-md flex items-center justify-center gap-2 active:scale-[0.98] transition">
+            <button type="button" data-back data-tip="notes-step-back" class="px-5 py-3.5 rounded-2xl bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-base active:scale-95 transition flex items-center gap-1.5"><i data-back-ic class="fa-solid fa-chevron-left text-sm"></i><span data-back-t>取消</span></button>
+            <button type="submit" data-tip="notes-step-next" class="flex-1 py-3.5 rounded-2xl bg-amber-600 hover:bg-amber-700 disabled:opacity-60 text-white font-bold text-base shadow-md flex items-center justify-center gap-2 active:scale-[0.98] transition">
               <span data-next-t>下一頁</span><i data-next-ic class="fa-solid fa-chevron-right text-sm"></i>
             </button>
           </div>

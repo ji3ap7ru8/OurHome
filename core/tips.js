@@ -255,6 +255,25 @@ const lineCloseScene = `<div class="sc">
   ${finger("left:calc(50% + 50px);top:6px")}
 </div>`;
 
+// ---------- 家庭公告：管理 / 新增 / 編輯便利貼 ----------
+const nFormDlg = (title) => `<div class="so-big" style="top:30px;height:58px;background:#fff;border-color:#cbd5e1;color:#1e293b;border-top-width:6px;border-top-color:#f59e0b;border-radius:12px;padding:6px 8px"><b style="font-size:10px">${title}</b><i class="sb"></i><i class="sb" style="width:60%"></i></div>`;
+const noteNewScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:30px;right:30px;top:2px;text-align:center;font-size:12px;padding:6px 0;border:2px dashed #f59e0b;background:#fef3c7;color:#92400e">＋ 新增便利貼</span>
+  ${nFormDlg("新增便利貼")}
+  ${finger("left:calc(50% - 6px);top:12px")}
+</div>`;
+const noteEditScene = `<div class="sc">
+  ${rowsScene([{ dy: 0, html: rwBody("", "苗栗冰箱", '<span class="rw-a" style="background:#dbeafe">✎</span>') }]).replace('<div class="sc">', '').replace(/<\/div>$/, '')}
+  ${nFormDlg("編輯便利貼").replace("top:30px", "top:30px;left:calc(50% - 40px);width:150px")}
+  ${finger("left:calc(100% - 66px);top:6px")}
+</div>`;
+const noteTagScene = `<div class="sc"><div style="position:absolute;left:14px;right:14px;top:10px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center">${lchip("緊急", 0)}${lchip("重要", 2)}${lchip("一般", 0)}${lchip("其他", 0)}</div><div style="position:absolute;left:30px;right:30px;top:60px;height:20px;border-radius:6px;border-bottom:4px solid #f59e0b;background:#fef3c7;animation:fmtB 3.6s ease-in-out infinite"></div>${finger("left:calc(50% - 20px);top:20px")}</div>`;
+const noteAuthorScene = `<div class="sc"><div style="position:absolute;left:30px;right:30px;top:8px;display:flex;flex-direction:column;gap:6px">${lchip("Google 帳號名稱", 0)}${lchip("暱稱", 2)}</div>${finger("left:calc(50% - 20px);top:36px")}</div>`;
+const notePinScene = `<div class="sc"><b style="position:absolute;left:30px;top:20px;font-size:13px">📌 置頂</b><span class="sw"><i></i></span><span class="sm" style="top:6px;right:22px;animation:fmtB 3.6s ease-in-out infinite;font-size:16px">📌</span>${finger("right:26px;top:26px")}</div>`;
+const noteStatusScene = `<div class="sc"><div style="position:absolute;left:24px;right:24px;top:10px;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:10px;background:#f1f5f9;font-size:12px;font-weight:900;text-align:center"><span class="num-a" style="padding:6px 0;border-radius:8px;background:#fff;color:#b45309;box-shadow:0 1px 3px rgba(0,0,0,.18)">⏳ 綁定期限</span><span class="num-b" style="padding:6px 0;border-radius:8px;background:#fff;color:#b45309;box-shadow:0 1px 3px rgba(0,0,0,.18);grid-column:2;grid-row:1;opacity:0">♾ 永久顯示</span></div><div class="gt gl" style="position:absolute;left:30px;right:30px;top:54px;animation:fmtA 3.6s ease-in-out infinite;opacity:1"><b style="font-size:10px">截止日期 10/20　截止時間 18:00</b></div>${finger("left:calc(50% + 40px);top:20px")}</div>`;
+const noteQuickScene = `<div class="sc"><div style="position:absolute;left:20px;right:20px;top:6px;text-align:center;font-size:12px;font-weight:900;position:absolute">截止日期：<span style="position:relative;display:inline-block;width:60px"><span class="num-a" style="position:absolute;left:0">10/11</span><span class="num-b" style="position:absolute;left:0">10/18</span></span></div><div style="position:absolute;left:10px;right:10px;top:36px;display:flex;gap:5px;justify-content:center"><span class="lc">隔天</span><span class="lc">3 天後</span><span class="lc sp-btn" style="background:#fef3c7;border-color:#f59e0b">1 週後</span><span class="lc">1 個月後</span></div>${finger("left:calc(50% + 4px);top:48px")}</div>`;
+const noteFieldScene = (label, txt) => `<div class="sc"><b style="position:absolute;left:30px;top:6px;font-size:11px">${label}</b>${tpi(txt)}</div>`;
+
 const TIPS = {
   "cards-gear": { scene: panelScene(true), text: "按這裡打開系統設定。" },
   "cards-close": { scene: panelScene(false), text: "按這裡關閉設定視窗。" },
@@ -321,6 +340,20 @@ const TIPS = {
   "line-go": { scene: lineGoScene, text: "確定要送，就按這裡，訊息會立刻發到 LINE。" },
   "line-back": { scene: lineBackScene, text: "還沒送出，回到上一步重新選人。" },
   "line-close": { scene: lineCloseScene, text: "按 ✕，取消發送並關閉視窗。" },
+  "notes-new": { scene: noteNewScene, text: "按這裡，新增一張便利貼。" },
+  "notes-edit": { scene: noteEditScene, text: "按鉛筆，修改這張便利貼。" },
+  "notes-del": { scene: calDelScene, text: "按垃圾桶，3 秒內再按一次「再按一次刪除」才會真的刪除。" },
+  "notes-tag": { scene: noteTagScene, text: "選標籤，便利貼的顏色會跟著變：重要黃色、一般綠色…" },
+  "notes-author": { scene: noteAuthorScene, text: "選要顯示的發布人名稱。" },
+  "notes-pin": { scene: notePinScene, text: "打開置頂，這張會固定排在最前面。只有「重要／緊急」可以用。" },
+  "notes-status": { scene: noteStatusScene, text: "綁定期限：到期自動下架。永久顯示：一直留著。" },
+  "notes-quick": { scene: noteQuickScene, text: "一鍵設定截止日，不用自己選日期。" },
+  "notes-fld-title": { scene: noteFieldScene("標題", "週六回阿嬤家"), text: "寫一個簡短的標題，最多 30 字。" },
+  "notes-fld-content": { scene: noteFieldScene("內容", "想跟家人說的話…"), text: "寫想告訴家人的內容，最多 300 字。" },
+  "notes-fld-link": { scene: noteFieldScene("附加連結", "https://…"), text: "有網址要分享就貼這裡，沒有可以空白。" },
+  "notes-fld-time": { scene: noteFieldScene("發布日期", "2026-10-11"), text: "設定什麼時候開始顯示這張便利貼。" },
+  "notes-step-next": { scene: calPageScene(false), text: "填完這一頁，按「下一頁」；最後一頁按「發布」或「儲存變更」。" },
+  "notes-step-back": { scene: calPageScene(true), text: "回到上一頁修改；第一頁按「取消」會關閉視窗。" },
   "notes-sort-pinned": { scene: reorder('<i class="fa-solid fa-thumbtack"></i>'), text: "這是釘選，會自動往前排放。" },
   "notes-sort-date": { scene: reorder('<span class="sm-txt">最新</span>'), text: "最新發布的公告，會排在最前面。" },
   "notes-sort-expire": { scene: reorder('<span class="sm-txt">剩1天</span>'), text: "快到期的公告，會自動往前排放。" },
@@ -461,6 +494,9 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 @keyframes lcTick { 0%,30% { background: #fff; border-color: #94a3b8; color: transparent; } 40%,90% { background: #10b981; border-color: #10b981; color: #fff; } 100% { background: #fff; border-color: #94a3b8; color: transparent; } }
 .fly { position: absolute; left: 20px; top: 8px; font-size: 22px; animation: flyAway 3.6s ease-in-out infinite; }
 @keyframes flyAway { 0%,30% { opacity: 0; transform: translate(0, 10px); } 40% { opacity: 1; } 80%,100% { opacity: 0; transform: translate(190px, -14px) rotate(-10deg); } }
+.sw { position: absolute; right: 26px; top: 20px; width: 46px; height: 26px; border-radius: 13px; background: #cbd5e1; animation: swBg 3.6s ease-in-out infinite; } .sw i { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); animation: swKnob 3.6s ease-in-out infinite; }
+@keyframes swBg { 0%,30% { background: #cbd5e1; } 40%,90% { background: #f59e0b; } 100% { background: #cbd5e1; } }
+@keyframes swKnob { 0%,30% { transform: none; } 40%,90% { transform: translateX(20px); } 100% { transform: none; } }
 @keyframes tipPress { 0%,12%,24%,100% { transform: scale(1); } 18% { transform: scale(.92); } }
 `;
   document.head.appendChild(st);
