@@ -274,6 +274,40 @@ const noteStatusScene = `<div class="sc"><div style="position:absolute;left:24px
 const noteQuickScene = `<div class="sc"><div style="position:absolute;left:20px;right:20px;top:6px;text-align:center;font-size:12px;font-weight:900;position:absolute">截止日期：<span style="position:relative;display:inline-block;width:60px"><span class="num-a" style="position:absolute;left:0">10/11</span><span class="num-b" style="position:absolute;left:0">10/18</span></span></div><div style="position:absolute;left:10px;right:10px;top:36px;display:flex;gap:5px;justify-content:center"><span class="lc">隔天</span><span class="lc">3 天後</span><span class="lc sp-btn" style="background:#fef3c7;border-color:#f59e0b">1 週後</span><span class="lc">1 個月後</span></div>${finger("left:calc(50% + 4px);top:48px")}</div>`;
 const noteFieldScene = (label, txt) => `<div class="sc"><b style="position:absolute;left:30px;top:6px;font-size:11px">${label}</b>${tpi(txt)}</div>`;
 
+// ---------- 我的筆記（個人記事本）----------
+const memoSheet = (t) => `<div class="rsh rsh-up" style="height:80px"><div class="rsh-top"><b style="font-size:11px">${t}</b><span class="rsh-x">✕</span></div><i class="sb"></i><i class="sb" style="width:60%"></i><i class="sb"></i></div>`;
+const memoAddScene = `<div class="sc">
+  <span class="scm-btn" style="right:26px;top:2px;width:32px;height:32px;font-size:14px;border-radius:50%;background:#0284c7;border-color:#0284c7;color:#fff"><i class="fa-solid fa-pen"></i></span>
+  ${memoSheet("新增記事")}
+  ${finger("right:22px;top:12px")}
+</div>`;
+const memoMiniCard = (top, label, st = "") => `<div class="rc" style="top:${top}px;border-radius:10px;${st}"><b style="font-size:10px">${label}</b><i class="sb" style="width:60%"></i></div>`;
+const memoTabScene = `<div class="sc"><div style="position:absolute;left:14px;right:14px;top:4px;display:flex;gap:6px;justify-content:center"><span class="lc" style="background:#0284c7;border-color:#0284c7;color:#fff;animation:fmtA 3.6s ease-in-out infinite">全部</span><span class="lc lc-sel">家事</span><span class="lc">工作</span></div>
+  <div class="fmt fmt-a" style="top:34px;display:block;width:130px;margin-left:-65px">${memoMiniCard(0, "買菜清單").replace("top:0px", "position:relative;top:0;left:0;margin:0 0 4px")}${memoMiniCard(0, "開會重點").replace("top:0px", "position:relative;top:0;left:0;margin:0")}</div>
+  <div class="fmt fmt-b" style="top:34px;display:block;width:130px;margin-left:-65px">${memoMiniCard(0, "買菜清單").replace("top:0px", "position:relative;top:0;left:0;margin:0")}</div>
+  ${finger("left:calc(50% - 20px);top:14px")}
+</div>`;
+const memoCardScene = `<div class="sc">
+  <div class="rc scc-fade" style="top:22px;border-radius:12px"><b style="font-size:11px">買菜清單</b><i class="sb" style="width:70%"></i></div>
+  <div class="so-big" style="left:calc(50% - 76px);width:152px;top:2px;height:86px;background:#fffbeb;border-color:#f59e0b;color:#451a03;border-top-width:6px;border-radius:12px;padding:8px"><b style="font-size:11px">編輯記事</b><i class="sb"></i><i class="sb" style="width:70%"></i><i class="sb" style="width:50%"></i></div>
+  ${finger("left:calc(50% - 6px);top:40px")}
+</div>`;
+const memoCloseScene = `<div class="sc">
+  <div style="position:absolute;left:calc(50% - 70px);top:6px;width:140px;height:76px;border-radius:12px;border-top:6px solid #f59e0b;background:#fffbeb;box-shadow:0 4px 8px rgba(0,0,0,.2);padding:8px;animation:dlgGone 3.6s ease-in-out infinite"><b style="font-size:11px;color:#451a03">編輯記事</b><i class="sb"></i><i class="sb" style="width:70%"></i><span class="scm-btn" style="right:4px;top:4px;width:22px;height:22px;font-size:11px;animation:none">✕</span></div>
+  ${finger("left:calc(50% + 50px);top:6px")}
+</div>`;
+const memoPickScene = `<div class="sc"><div style="position:absolute;left:14px;right:14px;top:12px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center">${lchip("未分類", 0)}${lchip("家事", 2)}${lchip("工作", 0)}${lchip("旅遊", 0)}</div>${finger("left:calc(50% - 20px);top:22px")}</div>`;
+const memoAddCatScene = `<div class="sc">${tpi("旅遊")}<span class="tip-pill sp-btn" style="position:absolute;right:30px;top:2px;font-size:11px;padding:3px 10px;background:#0284c7;border-color:#0284c7;color:#fff">加入</span><div style="position:absolute;left:30px;top:68px"><span class="lc" style="animation:gtPop 3.6s ease-in-out infinite">✓ 旅遊</span></div>${finger("right:34px;top:8px")}</div>`;
+const memoSaveScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:30px;right:30px;top:6px;text-align:center;font-size:13px;padding:7px 0;background:#0284c7;border-color:#0284c7;color:#fff">儲存</span>
+  ${memoMiniCard(40, "買菜清單", "animation:gtPop 3.6s ease-in-out infinite")}
+  ${finger("left:calc(50% - 6px);top:18px")}
+</div>`;
+const memoNoteOkScene = `<div class="sc">
+  <div style="position:absolute;left:20px;right:20px;top:8px;padding:8px 10px;border-radius:8px;background:#fef9c3;border:1.5px solid #facc15;font-size:10px;font-weight:900;color:#854d0e;animation:dlgGone 3.6s ease-in-out infinite">⚠ 提示訊息 <span class="lc" style="padding:1px 8px">了解</span></div>
+  ${finger("right:46px;top:18px")}
+</div>`;
+
 const TIPS = {
   "cards-gear": { scene: panelScene(true), text: "按這裡打開系統設定。" },
   "cards-close": { scene: panelScene(false), text: "按這裡關閉設定視窗。" },
@@ -354,6 +388,16 @@ const TIPS = {
   "notes-fld-time": { scene: noteFieldScene("發布日期", "2026-10-11"), text: "設定什麼時候開始顯示這張便利貼。" },
   "notes-step-next": { scene: calPageScene(false), text: "填完這一頁，按「下一頁」；最後一頁按「發布」或「儲存變更」。" },
   "notes-step-back": { scene: calPageScene(true), text: "回到上一頁修改；第一頁按「取消」會關閉視窗。" },
+  "memo-add": { scene: memoAddScene, text: "按鉛筆，新增一則記事。" },
+  "memo-tab": { scene: memoTabScene, text: "按分類，只看那一類的記事；按「全部」看全部。" },
+  "memo-card": { scene: memoCardScene, text: "點一下記事，打開來看、修改或刪除。" },
+  "memo-close": { scene: memoCloseScene, text: "按 ✕，關閉視窗（沒按儲存的內容不會留下）。" },
+  "memo-pick": { scene: memoPickScene, text: "點一個分類，這則記事就歸到那一類。" },
+  "memo-addcat": { scene: memoAddCatScene, text: "輸入新分類名稱，按「加入」，就會多一個分類可選。" },
+  "memo-pin": { scene: notePinScene, text: "打勾置頂，這則記事會固定排在最前面。" },
+  "memo-del": { scene: calDelScene, text: "按一下，再按一次「再按一次刪除」才會真的刪除。" },
+  "memo-save": { scene: memoSaveScene, text: "寫好了按儲存，記事會出現在清單裡。標題一定要填。" },
+  "memo-note-ok": { scene: memoNoteOkScene, text: "按「了解」，這則提示就不再顯示。" },
   "notes-sort-pinned": { scene: reorder('<i class="fa-solid fa-thumbtack"></i>'), text: "這是釘選，會自動往前排放。" },
   "notes-sort-date": { scene: reorder('<span class="sm-txt">最新</span>'), text: "最新發布的公告，會排在最前面。" },
   "notes-sort-expire": { scene: reorder('<span class="sm-txt">剩1天</span>'), text: "快到期的公告，會自動往前排放。" },
@@ -497,6 +541,8 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 .sw { position: absolute; right: 26px; top: 20px; width: 46px; height: 26px; border-radius: 13px; background: #cbd5e1; animation: swBg 3.6s ease-in-out infinite; } .sw i { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); animation: swKnob 3.6s ease-in-out infinite; }
 @keyframes swBg { 0%,30% { background: #cbd5e1; } 40%,90% { background: #f59e0b; } 100% { background: #cbd5e1; } }
 @keyframes swKnob { 0%,30% { transform: none; } 40%,90% { transform: translateX(20px); } 100% { transform: none; } }
+.lc-sel { animation: lcSel 3.6s ease-in-out infinite; }
+@keyframes lcSel { 0%,30% { background: #f8fafc; border-color: #e2e8f0; color: #1e293b; } 40%,90% { background: #0284c7; border-color: #0284c7; color: #fff; } 100% { background: #f8fafc; border-color: #e2e8f0; color: #1e293b; } }
 @keyframes tipPress { 0%,12%,24%,100% { transform: scale(1); } 18% { transform: scale(.92); } }
 `;
   document.head.appendChild(st);

@@ -3,6 +3,7 @@
 import { memoApi, DEFAULT_CAT, catStyle } from "./data.js";
 import { state, on } from "../../core/store.js";
 import { isFirebaseConfigured } from "../../core/cloud.js";
+import { showTipHint, closeTips } from "../../core/tips.js";
 
 let memos = [];
 let root = null;
@@ -38,7 +39,7 @@ const setNote = (mode = currentMode()) => {
   const n = noteFor(mode);
   el.hidden = dismissed === n.text; // 按過「了解」的同一則提示不再顯示（提示內容改變才會再出現）
   el.className = `memo-sticky mb-3 text-sm font-bold leading-relaxed rounded-lg px-3 py-2 ${n.cls}`;
-  el.innerHTML = `<i class="${n.icon.includes(" ") ? n.icon : "fa-solid " + n.icon} mr-1"></i>${n.text} <button type="button" data-note-ok class="ml-1 px-2.5 py-0.5 rounded-full bg-white/80 border border-current text-xs font-black active:scale-95 transition">了解</button>`;
+  el.innerHTML = `<i class="${n.icon.includes(" ") ? n.icon : "fa-solid " + n.icon} mr-1"></i>${n.text} <button type="button" data-note-ok data-tip="memo-note-ok" class="ml-1 px-2.5 py-0.5 rounded-full bg-white/80 border border-current text-xs font-black active:scale-95 transition">了解</button>`;
   el.querySelector("[data-note-ok]").onclick = () => { dismissed = n.text; el.hidden = true; };
 };
 let dismissed = "";
@@ -57,12 +58,12 @@ function render() {
   if (filter !== "全部" && !usedCats().includes(filter)) filter = "全部";
   const list = visible();
   root.querySelector("[data-chips]").innerHTML = ["全部", ...usedCats()].map((c) =>
-    `<button data-cat="${esc(c)}" class="memo-tab${c === filter ? " on" : ""}">${esc(c)}</button>`).join("");
+    `<button data-cat="${esc(c)}" data-tip="memo-tab" class="memo-tab${c === filter ? " on" : ""}">${esc(c)}</button>`).join("");
   root.querySelector("[data-count]").textContent = `共 ${memos.length} 則`;
   root.querySelector("[data-list]").innerHTML = list.length ? list.map((m) => {
     const s = catStyle(m.category);
     return `
-    <button data-open="${m.id}" class="memo-card" style="--memo-accent:${s.accent}">
+    <button data-open="${m.id}" data-tip="memo-card" class="memo-card" style="--memo-accent:${s.accent}">
       <div class="flex items-center justify-between gap-2 mb-1.5">
         <span class="text-xs font-extrabold px-2.5 py-1 rounded-full ${s.cls}"><i class="fa-solid fa-tag"></i> ${esc(m.category || DEFAULT_CAT)}</span>
         <span class="text-xs font-medium text-slate-400">${m.pinned ? '<i class="fa-solid fa-thumbtack text-rose-500 mr-1"></i>' : ""}${fmt(m.updatedAt)}</span>
@@ -84,7 +85,7 @@ function openForm(m = null) {
   const cur = d.category || DEFAULT_CAT;
   const cats = [DEFAULT_CAT, ...usedCats()];
   if (!cats.includes(cur)) cats.push(cur);
-  const chip = (c) => `<label class="cursor-pointer"><input type="radio" name="category" value="${esc(c)}" class="sr-only peer" ${c === cur ? "checked" : ""}><span class="memo-pick">${esc(c)}</span></label>`;
+  const chip = (c) => `<label data-tip="memo-pick" class="cursor-pointer"><input type="radio" name="category" value="${esc(c)}" class="sr-only peer" ${c === cur ? "checked" : ""}><span class="memo-pick">${esc(c)}</span></label>`;
   const wrap = document.createElement("div");
   wrap.className = "fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-end sm:items-center justify-center";
   wrap.innerHTML = `
@@ -92,22 +93,22 @@ function openForm(m = null) {
       <span class="memo-paper-tape"></span>
       <div class="memo-row flex justify-between items-center">
         <h3 class="text-xl font-black memo-ink">${m ? "編輯記事" : "新增記事"}</h3>
-        <button type="button" data-close aria-label="關閉" class="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 memo-ink"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" data-close data-tip="memo-close" aria-label="關閉" class="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 memo-ink"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <input name="title" maxlength="40" value="${esc(d.title)}" placeholder="標題（必填）" aria-label="標題" class="memo-line-input memo-title memo-sep">
       <div class="memo-row memo-label">分類</div>
       <div class="memo-chips" data-catpick>${cats.map(chip).join("")}</div>
       <div class="memo-row memo-sep flex items-center gap-2">
         <input data-newcat maxlength="10" placeholder="＋ 新增分類" aria-label="新增分類" class="memo-line-input memo-newcat">
-        <button type="button" data-addcat class="memo-addcat">加入</button>
+        <button type="button" data-addcat data-tip="memo-addcat" class="memo-addcat">加入</button>
       </div>
       <div class="memo-row memo-label">內容 <span class="text-xs font-normal opacity-60">(選填)</span></div>
       <textarea name="content" rows="6" maxlength="2000" placeholder="想記些什麼…" aria-label="內容" class="memo-line-input memo-body">${esc(d.content)}</textarea>
-      <label class="memo-row flex items-center gap-2 font-bold memo-ink"><input type="checkbox" name="pinned" class="w-5 h-5" ${d.pinned ? "checked" : ""}> <i class="fa-solid fa-thumbtack text-rose-500"></i> 置頂</label>
+      <label data-tip="memo-pin" class="memo-row flex items-center gap-2 font-bold memo-ink"><input type="checkbox" name="pinned" class="w-5 h-5" ${d.pinned ? "checked" : ""}> <i class="fa-solid fa-thumbtack text-rose-500"></i> 置頂</label>
       <p data-err class="text-red-600 font-bold text-sm hidden memo-row"></p>
       <div class="flex gap-2 pt-3 pb-4">
-        ${m ? '<button type="button" data-del class="px-4 py-3 rounded-xl font-bold bg-red-100 text-red-700"><i class="fa-solid fa-trash"></i> 刪除</button>' : ""}
-        <button type="submit" class="flex-1 theme-bg-primary text-white py-3 rounded-xl font-bold text-base">儲存</button>
+        ${m ? '<button type="button" data-del data-tip="memo-del" class="px-4 py-3 rounded-xl font-bold bg-red-100 text-red-700"><i class="fa-solid fa-trash"></i> 刪除</button>' : ""}
+        <button type="submit" data-tip="memo-save" class="flex-1 theme-bg-primary text-white py-3 rounded-xl font-bold text-base">儲存</button>
       </div>
     </form>`;
   root.appendChild(wrap);
@@ -164,7 +165,7 @@ export default {
           <input data-search type="search" placeholder="搜尋標題或內容" class="memo-search">
         </div>
         <span data-count class="memo-count whitespace-nowrap"></span>
-        <button data-add aria-label="新增記事" class="memo-fab shrink-0 w-10 h-10 rounded-full theme-bg-primary text-white text-lg"><i class="fa-solid fa-pen"></i></button>
+        <button data-add data-tip="memo-add" aria-label="新增記事" class="memo-fab shrink-0 w-10 h-10 rounded-full theme-bg-primary text-white text-lg"><i class="fa-solid fa-pen"></i></button>
       </div>
       <div data-chips class="memo-tabs flex gap-1.5 overflow-x-auto no-scrollbar mb-4 pt-2"></div>
       <div data-list class="space-y-4"></div>`;
@@ -182,6 +183,7 @@ export default {
       const o = e.target.closest("[data-open]"); if (o) openForm(memos.find((x) => x.id === o.dataset.open));
     });
     reload();
+    showTipHint("memo");
   },
-  unmount() { alive = false; root?.remove(); root = null; },
+  unmount() { closeTips(); alive = false; root?.remove(); root = null; },
 };
