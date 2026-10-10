@@ -36,7 +36,7 @@ export const headerTemplate = `
                 <!-- Header Actions -->
                 <div class="flex items-center gap-2 ml-auto">
                     <!-- 家庭日曆頁專用：回到今天（顏色跟著主色調；其他頁隱藏） -->
-                    <button id="headerTodayBtn" data-action="calendar-today" class="hidden h-10 px-3 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all items-center gap-1.5 font-black text-sm theme-text-primary" title="回到今天">
+                    <button id="headerTodayBtn" data-action="calendar-today" data-tip="cal-today" class="hidden h-10 px-3 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all items-center gap-1.5 font-black text-sm theme-text-primary" title="回到今天">
                         <i class="fa-solid fa-calendar-day"></i> 今天
                     </button>
 

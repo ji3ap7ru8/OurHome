@@ -160,6 +160,52 @@ const remDlgCloseScene = `<div class="sc">
   ${finger("left:calc(50% - 6px);top:58px")}
 </div>`;
 
+// ---------- 家庭日曆的示範場景 ----------
+const calCells = (hl, extra = "") => `<div class="cg">${Array.from({ length: 21 }, (_, i) => `<span class="cgc${i === hl ? " cgc-on" : ""}"></span>`).join("")}${extra}</div>`;
+const calSheet = `<div class="rsh rsh-low rsh-up"><div class="rsh-top"><b style="font-size:11px">10/12 週日</b><span class="rsh-x">✕</span></div><i class="sb"></i><i class="sb" style="width:60%"></i></div>`;
+const calDayScene = `<div class="sc">${calCells(9)}${calSheet}${finger("left:calc(50% - 6px);top:26px")}</div>`;
+const calBarScene = `<div class="sc">${calCells(-1, '<span class="cgb"></span>')}${calSheet}${finger("left:calc(50% - 20px);top:24px")}</div>`;
+const calMonthScene = (next) => `<div class="sc">
+  <div class="cmo"><span class="cmo-b">‹</span><b class="cmo-t"><span class="num-a">${next ? "9月" : "11月"}</span><span class="num-b">10月</span></b><span class="cmo-b">›</span></div>
+  ${finger(`left:calc(50% + ${next ? 62 : -78}px);top:2px`)}
+</div>`;
+const calTodayScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:14px;top:30px;font-size:12px;padding:6px 12px;border-color:#0284c7;color:#0369a1">📅 今天</span>
+  ${calCells(3)}
+  <div class="cgt"><span class="cgc cgc-on"></span></div>
+  ${finger("left:44px;top:42px")}
+</div>`;
+const calSrcScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:18px;top:6px;font-size:12px;padding:6px 12px;border-color:#0284c7;color:#0369a1">📅 家庭日曆 ⌄</span>
+  <div class="scm-menu" style="left:18px;right:auto;top:42px;width:130px;transform-origin:0 0"><span>● 家庭日曆</span><span>● 爸爸的日曆</span></div>
+  ${finger("left:80px;top:16px")}
+</div>`;
+const calAddScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-56px;top:2px;font-size:12px;padding:7px 14px;background:#0f172a;border-color:#0f172a;color:#fff">＋ 新增行程</span>
+  <div class="so-big" style="top:34px;height:54px;background:#fff;border-color:#cbd5e1;color:#1e293b;border-top-width:2px;border-radius:12px"><b style="font-size:10px">新增行程</b><i class="sb"></i><i class="sb" style="width:60%"></i></div>
+  ${finger("left:calc(50% - 6px);top:12px")}
+</div>`;
+const calViewScene = `<div class="sc">
+  <div class="rc scc-fade" style="top:22px;border-left:4px solid #0284c7;border-radius:12px"><b style="font-size:11px">家族聚餐</b><i class="sb" style="width:50%"></i></div>
+  <div class="so-big" style="left:calc(50% - 76px);width:152px;top:2px;height:86px;background:#fff;border-color:#cbd5e1;color:#1e293b;border-top-width:6px;border-top-color:#0284c7;border-radius:14px;padding:8px"><b style="font-size:12px">家族聚餐</b><i class="sb"></i><i class="sb" style="width:70%"></i><i class="sb" style="width:50%"></i></div>
+  ${finger("left:calc(50% - 6px);top:40px")}
+</div>`;
+const calEditScene = `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:30px;top:4px;font-size:12px;padding:6px 14px;background:#0284c7;border-color:#0284c7;color:#fff">✎ 修改</span>
+  <div class="sp-new" style="right:30px;top:26px;width:120px;height:58px;background:#fff;border-color:#cbd5e1;border-top-width:2px;border-radius:12px;padding:8px"><i class="sb"></i><i class="sb"></i><i class="sb" style="width:60%"></i></div>
+  ${finger("left:60px;top:14px")}
+</div>`;
+const calDelScene = `<div class="sc">
+  <div class="rw" style="top:30px;animation:rwGone 3.6s ease-in-out infinite"><b style="flex:1;font-size:11px;font-weight:900;padding-left:6px">家族聚餐</b><span class="rw-a del-a">🗑</span><span class="rw-a del-b">再按一次刪除</span></div>
+  ${finger("right:22px;top:40px")}
+</div>`;
+const calCloseScene = remDlgCloseScene.replace("知道了", "關閉");
+const calPageScene = (back) => `<div class="sc">
+  <span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-44px;top:10px;font-size:12px;padding:7px 16px;background:#0284c7;border-color:#0284c7;color:#fff">${back ? "‹ 上一頁" : "下一頁 ›"}</span>
+  <div class="arr" style="margin:48px 40px 3px"><i${back ? ' style="animation-direction:reverse"' : ""}></i></div><b style="display:block;text-align:center;font-size:10px;color:#64748b">${back ? "回到前一步" : "第 1 步 → 第 2 步"}</b>
+  ${finger("left:calc(50% - 6px);top:20px")}
+</div>`;
+
 const TIPS = {
   "cards-gear": { scene: panelScene(true), text: "按這裡打開系統設定。" },
   "cards-close": { scene: panelScene(false), text: "按這裡關閉設定視窗。" },
@@ -200,6 +246,19 @@ const TIPS = {
   "cards-open": { scene: cardOpenScene, text: "點一下圖卡，顯示條碼。" },
   "cards-zoom": { scene: cardZoomScene, text: "點一下條碼會放大，再點一下轉成橫向，方便掃描。" },
   "cards-menu": { scene: cardMenuScene, text: "按這裡新增圖卡，或調整排序與大小。" },
+  "cal-day": { scene: calDayScene, text: "點日期，看當天的行程，也能在這裡新增。" },
+  "cal-bar": { scene: calBarScene, text: "點彩色長條，打開那一天的行程清單。" },
+  "cal-prev": { scene: calMonthScene(false), text: "看上一個月。" },
+  "cal-next": { scene: calMonthScene(true), text: "看下一個月。" },
+  "cal-today": { scene: calTodayScene, text: "一鍵回到今天所在的月份。" },
+  "cal-src": { scene: calSrcScene, text: "切換要看哪一本日曆：家庭日曆、Google 日曆，或全部合併。" },
+  "cal-add": { scene: calAddScene, text: "按這裡，新增一筆行程。" },
+  "cal-view": { scene: calViewScene, text: "點一下行程，看完整內容。" },
+  "cal-edit": { scene: calEditScene, text: "按這裡，修改這筆行程。" },
+  "cal-del": { scene: calDelScene, text: "按一下，再按一次「再按一次刪除」才會真的刪除。" },
+  "cal-close": { scene: calCloseScene, text: "按這裡，關閉視窗。" },
+  "cal-step-next": { scene: calPageScene(false), text: "填完這一頁，按這裡到下一頁；最後一頁按「儲存」。" },
+  "cal-step-prev": { scene: calPageScene(true), text: "回到上一頁修改；第一頁按「取消」會直接關閉。" },
   "notes-sort-pinned": { scene: reorder('<i class="fa-solid fa-thumbtack"></i>'), text: "這是釘選，會自動往前排放。" },
   "notes-sort-date": { scene: reorder('<span class="sm-txt">最新</span>'), text: "最新發布的公告，會排在最前面。" },
   "notes-sort-expire": { scene: reorder('<span class="sm-txt">剩1天</span>'), text: "快到期的公告，會自動往前排放。" },
@@ -320,6 +379,14 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 .tip-pill { display: inline-block; padding: 8px 16px; border-radius: 999px; background: #fff; border: 2px solid #f59e0b; font-weight: 900; font-size: 14px; }
 .tip-finger { position: absolute; font-size: 30px; line-height: 1; animation: tipFinger 3.6s ease-in-out infinite; pointer-events: none; }
 @keyframes tipFinger { 0%,25%,100% { transform: translate(8px, 22px); opacity: 0; } 8% { opacity: 1; } 15%,30% { transform: translate(8px, 2px); opacity: 1; } 38% { transform: translate(8px, 22px); opacity: 0; } }
+.cg { position: absolute; left: 50%; top: 14px; width: 154px; margin-left: -77px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cgc { height: 16px; border-radius: 4px; background: #fff; border: 1.5px solid #e2e8f0; }
+.cgc-on { background: #bae6fd; border-color: #0284c7; animation: gtOn 1.4s ease-in-out infinite; }
+.cgb { position: absolute; left: 22px; width: 66px; top: 22px; height: 7px; border-radius: 4px; background: #0284c7; }
+.cgt { position: absolute; left: 50%; top: 14px; width: 154px; margin-left: -77px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; pointer-events: none; animation: fmtB 3.6s ease-in-out infinite; } .cgt .cgc { grid-column: 4; grid-row: 1; margin-left: 0; }
+.cmo { position: absolute; left: 50%; top: 4px; width: 170px; margin-left: -85px; display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 14px; background: #0284c7; color: #fff; box-shadow: 0 3px 6px rgba(0,0,0,.18); }
+.cmo-b { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; }
+.cmo-t { position: relative; width: 56px; height: 24px; text-align: center; font-size: 18px; line-height: 24px; } .cmo-t span { position: absolute; inset: 0; }
 @keyframes tipPress { 0%,12%,24%,100% { transform: scale(1); } 18% { transform: scale(.92); } }
 `;
   document.head.appendChild(st);
@@ -370,7 +437,7 @@ function wire() {
     if (state.tips === false) return;
     const el = e.target.closest?.("[data-tip]");
     if (!el || !TIPS[el.dataset.tip]) return;
-    tgt = el; sx = e.clientX; sy = e.clientY;
+    swallow = false; tgt = el; sx = e.clientX; sy = e.clientY;
     cancel();
     timer = setTimeout(() => { timer = null; if (tgt && openPop(tgt)) { swallow = true; navigator.vibrate?.(15); } }, HOLD_MS);
   }, true);

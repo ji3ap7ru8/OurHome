@@ -4,6 +4,7 @@ import { COLOR_LIST, COLOR_MAP, DEFAULT_COLOR, WEEKDAYS, calendarApi, toLocalStr
 import { state, on } from "../../core/store.js";
 import { gcalApi } from "../../core/gcal.js";
 import { attachSheetResize } from "../../components/bottom-sheet.js";
+import { showTipHint, closeTips } from "../../core/tips.js";
 
 let root = null;
 let cur1 = new Date();       // 目前顯示的月份（mount 時會重設為本月 1 日）
@@ -78,12 +79,12 @@ function renderMonth() {
         while ((used[t] ||= Array(7).fill(false)).slice(c0, c1 + 1).some(Boolean)) t++;
         used[t].fill(true, c0, c1 + 1);
         const label = `${e.isMeeting ? "💻 " : ""}${e.title}`; // 手機每格很窄，色條只放標題，時間看當日詳情
-        return `<button data-evt="${esc(dKey(s < ws ? ws : s))}" class="cal-bar${s < ws ? " cl" : ""}${en > days[6] ? " cr" : ""}"
+        return `<button data-evt="${esc(dKey(s < ws ? ws : s))}" data-tip="cal-bar" class="cal-bar${s < ws ? " cl" : ""}${en > days[6] ? " cr" : ""}"
           style="grid-column:${c0 + 1}/span ${c1 - c0 + 1};grid-row:${t + 1};background:${color(e)}">${esc(label)}</button>`;
       }).join("");
 
     html += `<div class="cal-week">
-      <div class="cal-bg">${days.map((d) => `<div data-day="${dKey(d)}" class="cal-cell${d.getMonth() !== m ? " other" : ""}${sameDay(d, today) ? " today" : ""}"><span class="cal-num">${d.getDate()}</span></div>`).join("")}</div>
+      <div class="cal-bg">${days.map((d) => `<div data-day="${dKey(d)}" data-tip="cal-day" class="cal-cell${d.getMonth() !== m ? " other" : ""}${sameDay(d, today) ? " today" : ""}"><span class="cal-num">${d.getDate()}</span></div>`).join("")}</div>
       <div class="cal-bars">${bars}</div></div>`;
   }
   root.querySelector("[data-weeks]").innerHTML = html;
@@ -126,7 +127,7 @@ function renderSrc() {
   if (!root) return;
   const nm = document.querySelector("#headerCalSlot [data-src-name]");
   if (nm) nm.textContent = srcLabel();
-  const item = (id, label, sub, hex) => `<button data-src="${esc(id)}" class="cal-menu-item${source === id ? " on" : ""}"><span class="cal-dot" style="background:${hex}"></span><span class="cal-menu-txt"><b>${esc(label)}</b><small>${esc(sub)}</small></span>${source === id ? '<i class="fa-solid fa-check"></i>' : ""}</button>`;
+  const item = (id, label, sub, hex) => `<button data-src="${esc(id)}" data-tip="cal-src" class="cal-menu-item${source === id ? " on" : ""}"><span class="cal-dot" style="background:${hex}"></span><span class="cal-menu-txt"><b>${esc(label)}</b><small>${esc(sub)}</small></span>${source === id ? '<i class="fa-solid fa-check"></i>' : ""}</button>`;
   const list = gcals();
   root.querySelector("[data-src-menu]").innerHTML =
     list.map((c) => item(c.id, calLabel(c), c.name ? c.calId : "Google 日曆", calHex(c))).join("")
@@ -174,12 +175,12 @@ function openDay(dateStr) {
           <span class="text-lg font-black text-slate-800 dark:text-slate-100 tracking-wider">${m}/${d} 週${WEEKDAYS[day.getDay()]}</span>
           <span class="px-2 py-0.5 rounded-full theme-bg-primary text-white text-[10px] font-bold">${list.length ? `${list.length} 個行程` : "沒有行程"}</span>
         </div>
-        <button data-close aria-label="關閉" class="w-10 h-10 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <button data-close data-tip="cal-close" aria-label="關閉" class="w-10 h-10 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
     </div>
     <div class="cal-scroll px-5 py-3 space-y-3 no-scrollbar">${list.length ? list.map(card).join("") : `<div class="py-12 text-center text-slate-400 space-y-2"><i class="fa-regular fa-calendar-xmark text-3xl"></i><p class="text-xs font-bold">這天沒有行程</p></div>`}</div>
     <div class="p-4 border-t border-slate-200/60 dark:border-slate-800 shrink-0">
-      <button data-add class="w-full py-3 bg-slate-900 dark:bg-slate-100 dark:text-slate-900 hover:bg-slate-800 transition-all text-white rounded-2xl font-bold text-xs soft-shadow-md flex items-center justify-center gap-2"><i class="fa-solid fa-plus"></i><span>新增行程</span></button>
+      <button data-add data-tip="cal-add" class="w-full py-3 bg-slate-900 dark:bg-slate-100 dark:text-slate-900 hover:bg-slate-800 transition-all text-white rounded-2xl font-bold text-xs soft-shadow-md flex items-center justify-center gap-2"><i class="fa-solid fa-plus"></i><span>新增行程</span></button>
     </div>`);
   const addBtn = sheet.querySelector("[data-add]");
   if (addBtn) addBtn.onclick = () => { sheet.remove(); openForm(null, dateStr); };
@@ -222,7 +223,7 @@ function openDetail(e, daySheet) {
           <div class="text-lg font-black leading-tight">週${WEEKDAYS[s.getDay()]}</div>
           <div class="text-xs font-bold opacity-90">${s.getFullYear()} 年 · ${e.gcal ? esc(e.calName) : "App 內行程"}</div>
         </div>
-        <button data-close aria-label="關閉" class="cal-nav" style="margin-left:auto;flex:none;width:2.25rem;height:2.25rem"><i class="fa-solid fa-xmark"></i></button>
+        <button data-close data-tip="cal-close" aria-label="關閉" class="cal-nav" style="margin-left:auto;flex:none;width:2.25rem;height:2.25rem"><i class="fa-solid fa-xmark"></i></button>
       </div>
     </div>
     <div class="px-5 py-4 space-y-3 overflow-y-auto no-scrollbar" style="max-height:50vh;touch-action:pan-y;overscroll-behavior:contain">
@@ -234,9 +235,9 @@ function openDetail(e, daySheet) {
       ${e.readOnly ? `<p class="text-[11px] text-slate-400 font-bold">整天／重複行程請到 Google 日曆修改</p>` : ""}
     </div>
     <div class="px-4 pb-4 pt-2 flex gap-2">
-      ${e.readOnly ? "" : `<button data-edit class="flex-1 py-2.5 rounded-2xl font-bold text-xs theme-bg-primary text-white"><i class="fa-solid fa-pen"></i> 修改</button>
-      <button data-del class="flex-1 py-2.5 rounded-2xl font-bold text-xs bg-rose-100 text-rose-600"><i class="fa-solid fa-trash"></i> 刪除</button>`}
-      <button data-close class="flex-1 py-2.5 rounded-2xl font-bold text-xs bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100">關閉</button>
+      ${e.readOnly ? "" : `<button data-edit data-tip="cal-edit" class="flex-1 py-2.5 rounded-2xl font-bold text-xs theme-bg-primary text-white"><i class="fa-solid fa-pen"></i> 修改</button>
+      <button data-del data-tip="cal-del" class="flex-1 py-2.5 rounded-2xl font-bold text-xs bg-rose-100 text-rose-600"><i class="fa-solid fa-trash"></i> 刪除</button>`}
+      <button data-close data-tip="cal-close" class="flex-1 py-2.5 rounded-2xl font-bold text-xs bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100">關閉</button>
     </div>`, "pop");
   pop.classList.add("center");
   pop.addEventListener("click", (ev) => {
@@ -252,7 +253,7 @@ function card(e) {
   const t = sameDay(s, en) ? `${hm(s)} - ${hm(en)}` : `${s.getMonth() + 1}/${s.getDate()} ${hm(s)} ～ ${en.getMonth() + 1}/${en.getDate()} ${hm(en)}`;
   const c = color(e);
   // 只顯示標題與時間；位置、連結、內容、來源等細節點開後在詳情視窗看（點卡片的行為不變）
-  return `<div data-view="${esc(e.id)}" role="button" tabindex="0" class="notification-card bg-white dark:bg-slate-800 rounded-2xl pl-4 pr-3 py-3.5 soft-shadow-sm flex items-center gap-3 border-l-4 cursor-pointer active:scale-[.98] transition" style="border-left-color:${c}">
+  return `<div data-view="${esc(e.id)}" data-tip="cal-view" role="button" tabindex="0" class="notification-card bg-white dark:bg-slate-800 rounded-2xl pl-4 pr-3 py-3.5 soft-shadow-sm flex items-center gap-3 border-l-4 cursor-pointer active:scale-[.98] transition" style="border-left-color:${c}">
     <div class="flex-1 min-w-0">
       <h4 class="text-base font-black text-slate-800 dark:text-slate-100 break-words leading-snug">${esc(e.title)}</h4>
       <span class="inline-flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full text-xs font-bold text-slate-700 dark:text-slate-100" style="background:color-mix(in srgb, ${c} 16%, transparent)"><i class="fa-regular fa-clock" style="color:${c}"></i>${t}</span>
@@ -281,7 +282,7 @@ function openForm(ev = null, dateStr = "") {
             <div class="text-lg font-black leading-tight"><i class="fa-solid fa-calendar-plus"></i> ${ev ? "修改行程" : "新增行程"}</div>
             <div data-steptitle class="text-xs font-bold opacity-90 mt-0.5"></div>
           </div>
-          <button type="button" data-close aria-label="關閉" class="cal-nav" style="margin-left:auto;flex:none;width:2.25rem;height:2.25rem"><i class="fa-solid fa-xmark"></i></button>
+          <button type="button" data-close data-tip="cal-close" aria-label="關閉" class="cal-nav" style="margin-left:auto;flex:none;width:2.25rem;height:2.25rem"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="flex gap-1.5 mt-3 relative" style="z-index:1">${[0, 1, 2].map((n) => `<span data-dot="${n}" class="h-1.5 flex-1 rounded-full transition-colors"></span>`).join("")}</div>
       </div>
@@ -317,8 +318,8 @@ function openForm(ev = null, dateStr = "") {
         <p data-err class="text-rose-600 font-bold text-xs mt-3 hidden"></p>
       </div>
       <div class="p-4 border-t border-slate-200/60 dark:border-slate-800 flex gap-2">
-        <button type="button" data-prev class="px-5 py-3 rounded-2xl font-bold text-xs bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100 flex items-center gap-1.5"><i class="fa-solid fa-chevron-left"></i><span data-prevtxt>取消</span></button>
-        <button type="button" data-next class="flex-1 theme-bg-primary text-white py-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 soft-shadow-md"><span data-nexttxt>下一頁</span><i data-nexticon class="fa-solid fa-chevron-right"></i></button>
+        <button type="button" data-prev data-tip="cal-step-prev" class="px-5 py-3 rounded-2xl font-bold text-xs bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100 flex items-center gap-1.5"><i class="fa-solid fa-chevron-left"></i><span data-prevtxt>取消</span></button>
+        <button type="button" data-next data-tip="cal-step-next" class="flex-1 theme-bg-primary text-white py-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 soft-shadow-md"><span data-nexttxt>下一頁</span><i data-nexticon class="fa-solid fa-chevron-right"></i></button>
       </div>
     </form>`, "pop");
   sheet.classList.add("center");
@@ -439,12 +440,12 @@ export default {
         <div class="cal-rings" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <div class="cal-head">
           <div class="cal-head-main">
-            <button data-nav="-1" aria-label="上個月" class="cal-nav"><i class="fa-solid fa-chevron-left"></i></button>
+            <button data-nav="-1" data-tip="cal-prev" aria-label="上個月" class="cal-nav"><i class="fa-solid fa-chevron-left"></i></button>
             <div class="cal-mo">
               <b data-mnum></b><span class="cal-mo-unit">月</span>
               <span class="cal-mo-side"><em data-year></em><small data-mname></small></span>
             </div>
-            <button data-nav="1" aria-label="下個月" class="cal-nav"><i class="fa-solid fa-chevron-right"></i></button>
+            <button data-nav="1" data-tip="cal-next" aria-label="下個月" class="cal-nav"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
         </div>
         <div class="cal-wd">${WEEKDAYS.map((w, i) => `<div class="${i === 0 || i === 6 ? "text-rose-500" : ""}">${w}</div>`).join("")}</div>
@@ -452,13 +453,13 @@ export default {
           <div data-weeks></div>
           <div data-loading class="hidden absolute inset-0 bg-white/60 dark:bg-slate-900/60 flex items-center justify-center z-10"><div class="cal-spin"></div></div>
         </div>
-        <div class="cal-note"><i class="fa-regular fa-hand-pointer"></i><span data-count></span><span data-tip class="cal-note-tip">點日期查看／新增</span></div>
+        <div class="cal-note"><i class="fa-regular fa-hand-pointer"></i><span data-count></span><span class="cal-note-tip">點日期查看／新增</span></div>
       </div>`;
     el.appendChild(root);
     // 左上角（頁首）日曆切換按鈕 + 頁首「今天」
     const slot = document.getElementById("headerCalSlot");
     if (slot) {
-      slot.innerHTML = '<button data-src-btn aria-haspopup="listbox" aria-label="切換日曆" class="cal-src"><i class="fa-solid fa-calendar-days"></i><span data-src-name></span><i class="fa-solid fa-chevron-down cal-src-caret"></i></button>';
+      slot.innerHTML = '<button data-src-btn data-tip="cal-src" aria-haspopup="listbox" aria-label="切換日曆" class="cal-src"><i class="fa-solid fa-calendar-days"></i><span data-src-name></span><i class="fa-solid fa-chevron-down cal-src-caret"></i></button>';
       slot.onclick = (e) => { if (e.target.closest("[data-src-btn]")) root?.querySelector("[data-src-menu]").classList.toggle("hidden"); };
     }
     docClose = (e) => { if (!e.target.closest("[data-src-menu],#headerCalSlot")) root?.querySelector("[data-src-menu]")?.classList.add("hidden"); };
@@ -481,8 +482,10 @@ export default {
       if (key) openDay(key);
     });
     load();
+    showTipHint("calendar");
   },
   unmount() {
+    closeTips();
     reqSeq++; offCal?.(); offCal = null; offIds?.(); offIds = null; offApi?.(); offApi = null; offToday?.(); offToday = null;
     if (docClose) { document.removeEventListener("click", docClose, true); docClose = null; }
     const slot = document.getElementById("headerCalSlot");
