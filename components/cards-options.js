@@ -80,7 +80,7 @@ function renderFormat() {
 /* ---------- 排序方式 + 自訂編號 ---------- */
 function sortRow(r, sel) {
   return `
-    <button type="button" data-action="cards-sort" data-value="${r.id}" aria-pressed="${sel}" class="w-full flex items-center justify-between rounded-xl px-3 py-2.5 border text-left active:scale-[.98] transition ${sel ? "theme-border-primary theme-bg-light" : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40"}">
+    <button type="button" data-tip="cards-sort-${r.id}" data-action="cards-sort" data-value="${r.id}" aria-pressed="${sel}" class="w-full flex items-center justify-between rounded-xl px-3 py-2.5 border text-left active:scale-[.98] transition ${sel ? "theme-border-primary theme-bg-light" : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40"}">
       <span class="flex items-center gap-3 min-w-0">
         <i class="fa-solid ${r.icon} text-sm w-4 text-center ${sel ? "theme-text-primary" : "text-slate-400"}"></i>
         <span class="min-w-0">
@@ -100,21 +100,21 @@ function orderEditor() {
   const arrow = "w-8 h-8 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 flex items-center justify-center shrink-0 active:scale-90 transition";
   const rows = list.map((c, i) => `
     <div data-order-row="${esc(c.id)}" class="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40 px-2 py-1.5">
-      <select data-change="cards-order-num" data-id="${esc(c.id)}" aria-label="${esc(c.name)} 的編號" class="w-14 shrink-0 py-1.5 pl-2 pr-0 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm font-black text-center theme-text-primary">
+      <select data-tip="cards-order-num" data-change="cards-order-num" data-id="${esc(c.id)}" aria-label="${esc(c.name)} 的編號" class="w-14 shrink-0 py-1.5 pl-2 pr-0 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm font-black text-center theme-text-primary">
         ${nums.map((k) => `<option value="${k}"${k === i + 1 ? " selected" : ""}>${k}</option>`).join("")}
       </select>
       <span class="flex-1 min-w-0">
         <span class="text-xs font-bold text-slate-700 dark:text-slate-200 block truncate">${esc(c.name)}</span>
         <span class="text-[10px] text-slate-400 block truncate">${esc(c.kind)}</span>
       </span>
-      <button type="button" data-action="cards-order-up" data-id="${esc(c.id)}" ${i === 0 ? "disabled" : ""} aria-label="往前一位" class="${arrow} ${i === 0 ? "opacity-30" : ""}"><i class="fa-solid fa-chevron-up text-xs"></i></button>
-      <button type="button" data-action="cards-order-down" data-id="${esc(c.id)}" ${i === n - 1 ? "disabled" : ""} aria-label="往後一位" class="${arrow} ${i === n - 1 ? "opacity-30" : ""}"><i class="fa-solid fa-chevron-down text-xs"></i></button>
+      <button type="button" data-tip="cards-order-up" data-action="cards-order-up" data-id="${esc(c.id)}" ${i === 0 ? "disabled" : ""} aria-label="往前一位" class="${arrow} ${i === 0 ? "opacity-30" : ""}"><i class="fa-solid fa-chevron-up text-xs"></i></button>
+      <button type="button" data-tip="cards-order-down" data-action="cards-order-down" data-id="${esc(c.id)}" ${i === n - 1 ? "disabled" : ""} aria-label="往後一位" class="${arrow} ${i === n - 1 ? "opacity-30" : ""}"><i class="fa-solid fa-chevron-down text-xs"></i></button>
     </div>`).join("");
   return `
     <div class="pt-1 space-y-2">
       <p class="text-[10px] text-slate-400 leading-relaxed">點左邊的編號選新位置，其他圖卡會自動順延；也可以用 ▲▼ 一格一格移。</p>
       <div class="space-y-1.5">${rows}</div>
-      <button type="button" data-action="cards-order-reset" class="w-full py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 text-xs font-bold text-center active:scale-95 transition"><i class="fa-solid fa-rotate-left mr-1"></i>還原預設順序</button>
+      <button type="button" data-tip="cards-order-reset" data-action="cards-order-reset" class="w-full py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 text-xs font-bold text-center active:scale-95 transition"><i class="fa-solid fa-rotate-left mr-1"></i>還原預設順序</button>
     </div>`;
 }
 
@@ -149,8 +149,8 @@ function renderManage() {
         <span class="text-xs font-bold text-slate-700 dark:text-slate-200 block truncate">${esc(c.name)}</span>
         <span class="text-[10px] text-slate-400 block truncate">${esc(c.kind)}</span>
       </span>
-      <button type="button" data-action="cards-edit" data-id="${esc(c.id)}" aria-label="編輯 ${esc(c.name)}" class="${btn} w-8 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300"><i class="fa-solid fa-pen text-xs"></i></button>
-      <button type="button" data-action="cards-del" data-id="${esc(c.id)}" aria-label="刪除 ${esc(c.name)}" class="${btn} ${sure ? "px-2 bg-rose-600 border-rose-600 text-white text-[10px] font-bold" : "w-8 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-rose-500"}">${sure ? "再按一次刪除" : '<i class="fa-solid fa-trash text-xs"></i>'}</button>
+      <button type="button" data-tip="cards-edit" data-action="cards-edit" data-id="${esc(c.id)}" aria-label="編輯 ${esc(c.name)}" class="${btn} w-8 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300"><i class="fa-solid fa-pen text-xs"></i></button>
+      <button type="button" data-tip="cards-del" data-action="cards-del" data-id="${esc(c.id)}" aria-label="刪除 ${esc(c.name)}" class="${btn} ${sure ? "px-2 bg-rose-600 border-rose-600 text-white text-[10px] font-bold" : "w-8 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-rose-500"}">${sure ? "再按一次刪除" : '<i class="fa-solid fa-trash text-xs"></i>'}</button>
     </div>`;
   }).join("");
 }

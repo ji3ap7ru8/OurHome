@@ -72,7 +72,74 @@ const cardsFormatScene = `<div class="sc">
   <div class="fmt fmt-a">${[0,1,2,3].map(() => '<div class="fmt-t"><span class="scc-ic" style="width:18px;height:18px"></span></div>').join("")}</div>
   <div class="fmt fmt-b">${[0,1,2].map(() => '<div class="fmt-r"><span class="scc-ic" style="width:18px;height:18px"></span><i class="sb" style="flex:1;margin:0"></i></div>').join("")}</div>
 </div>`;
+// ---------- 生活圖卡設定視窗的示範場景 ----------
+const tile = (w, h, extra = "") => `<div class="gt" style="width:${w}px;height:${h}px;${extra}"><span class="scc-ic" style="width:${Math.round(w * .4)}px;height:${Math.round(w * .4)}px"></span></div>`;
+const popGrid = (n, cols, w, h) => `<div class="gtg" style="grid-template-columns:repeat(${cols},${w}px)">${Array.from({ length: n }, (_, i) => tile(w, h, `animation-delay:${(i * 0.18).toFixed(2)}s`)).join("")}</div>`;
+const popList = (n) => `<div class="gtl">${Array.from({ length: n }, (_, i) => `<div class="gt gl" style="animation-delay:${(i * 0.22).toFixed(2)}s"><span class="scc-ic" style="width:16px;height:16px"></span><i class="sb" style="flex:1;margin:0"></i></div>`).join("")}</div>`;
+const modeScene = (list) => `<div class="sc">${list ? popList(3) : popGrid(4, 2, 56, 38)}${finger("left:calc(50% + 40px);top:34px")}</div>`;
+const colsScene = (n) => `<div class="sc">${popGrid(n * 2, n, n === 2 ? 58 : 40, 34)}</div>`;
+const sizeScene = (t) => `<div class="sc" style="display:flex;align-items:flex-end;justify-content:center;gap:12px;padding-bottom:10px">
+  ${[["s", 28, "小"], ["m", 40, "中"], ["l", 54, "大"]].map(([k, s, l]) => `<div style="text-align:center"><div class="gt-s${k === t ? " gt-on" : ""}" style="width:${s}px;height:${s}px"><span class="scc-ic" style="width:${Math.round(s * .4)}px;height:${Math.round(s * .4)}px"></span></div><b style="font-size:11px">${l}</b></div>`).join("")}
+  ${finger(`left:calc(50% + ${t === "s" ? -42 : t === "m" ? -4 : 38}px);top:30px`)}
+</div>`;
+const rowsScene = (rows, extra = "") => `<div class="sc">${rows.map((r, i) => `<div class="rw" style="top:${6 + i * 28}px;--dy:${r.dy}px">${r.html}</div>`).join("")}${extra}</div>`;
+const rwBody = (num, name, tail = "") => `<b class="rw-n"${Array.isArray(num) ? ' style="position:relative"' : ""}>${Array.isArray(num) ? `<span class="num-a">${num[0]}</span><span class="num-b">${num[1]}</span>` : num}</b><span style="flex:1;font-size:11px;font-weight:900">${name}</span>${tail}`;
+const ARW = (c) => `<span class="rw-a">${c}</span>`;
+const orderNumScene = rowsScene([
+  { dy: 28, html: rwBody([1, 2], "圖卡甲") }, { dy: 28, html: rwBody([2, 3], "圖卡乙") },
+  { dy: -56, html: rwBody([3, 1], "圖卡丙") },
+], finger("left:36px;top:60px"));
+const orderUpScene = rowsScene([{ dy: 28, html: rwBody([1, 2], "圖卡甲", ARW("▼")) }, { dy: -28, html: rwBody([2, 1], "圖卡乙", ARW("▲")) }, { dy: 0, html: rwBody(3, "圖卡丙", ARW("")) }], finger("right:22px;top:36px"));
+const orderDownScene = rowsScene([{ dy: 28, html: rwBody([1, 2], "圖卡甲", ARW("▼")) }, { dy: -28, html: rwBody([2, 1], "圖卡乙", ARW("▲")) }, { dy: 0, html: rwBody(3, "圖卡丙", ARW("")) }], finger("right:6px;top:8px"));
+const orderResetScene = rowsScene([{ dy: 56, html: rwBody([1, 3], "圖卡丙") }, { dy: -28, html: rwBody([2, 1], "圖卡甲") }, { dy: -28, html: rwBody([3, 2], "圖卡乙") }], `<span class="rw-reset">↺</span>${finger("right:20px;top:46px")}`);
+const sortNameScene = `<div class="sc">
+  ${[["sn-a", "B"], ["sn-b", "C"], ["sn-c", "A"]].map(([c, l], i) => note(c, WHITE, `<b style="display:block;font-size:20px;text-align:center;margin-top:6px">${l}</b>${i === 2 ? '<span class="sm"><b style="font-size:11px">A</b><span class="sm-ring"></span></span>' : ""}`)).join("")}
+</div>`;
+const sortDefaultScene = `<div class="sc" style="text-align:center">
+  <div style="display:flex;justify-content:center;gap:12px;margin-top:10px">${["第1張", "第2張", "第3張"].map((t, i) => `<div class="gt" style="width:50px;height:44px;animation-delay:${(i * 0.5).toFixed(1)}s;flex-direction:column;gap:2px"><span class="scc-ic" style="width:18px;height:18px"></span><b style="font-size:10px">${t}</b></div>`).join("")}</div>
+  <div class="arr"><i></i></div><b style="font-size:10px;color:#64748b">先建立 → 後建立</b>
+</div>`;
+const panelScene = (open) => `<div class="sc">
+  <span class="scm-btn" style="right:14px;top:4px;width:30px;height:30px;font-size:14px;animation:none${open ? "" : ";opacity:.6"}">${open ? "⚙" : "✕"}</span>
+  <div class="pnl ${open ? "pnl-in" : "pnl-out"}"><b style="font-size:11px">${open ? "系統設定" : "生活圖卡設定"}</b><i class="sb"></i><i class="sb" style="width:60%"></i><i class="sb"></i></div>
+  ${finger(`right:10px;top:12px`)}
+</div>`;
+const editScene = `<div class="sc">
+  ${rowsScene([{ dy: 0, html: rwBody("", "我的圖卡", '<span class="rw-a" style="background:#e0f2fe">✎</span>') }]).replace('<div class="sc">', '').replace(/<\/div>$/, '')}
+  <div class="sp-new" style="right:24px;top:26px;width:110px;height:56px;background:#fff;border-color:#cbd5e1;border-top-width:2px;border-radius:12px;padding:8px"><i class="sb"></i><i class="sb"></i><i class="sb" style="width:60%"></i></div>
+  ${finger("left:116px;top:6px")}
+</div>`;
+const delScene = `<div class="sc">
+  <div class="rw" style="top:30px;animation:rwGone 3.6s ease-in-out infinite"><b style="flex:1;font-size:11px;font-weight:900;padding-left:6px">我的圖卡</b><span class="rw-a del-a">🗑</span><span class="rw-a del-b">確定刪除</span></div>
+  ${finger("right:22px;top:40px")}
+</div>`;
+const loginScene = (out) => `<div class="sc">
+  ${out ? "" : `<span class="tip-pill" style="position:absolute;left:30px;top:22px;font-size:12px;padding:8px 14px;animation:fmtA 3.6s ease-in-out infinite">G 使用 Google 帳號登入</span>`}
+  <div class="${out ? "" : "sp-new "}acct" style="${out ? "" : "right:auto;left:30px;top:18px;width:200px;"}"><span class="acct-av"></span><span style="flex:1"><i class="sb" style="width:60%;margin:0 0 4px"></i><i class="sb" style="width:85%;margin:0"></i></span></div>
+  ${out ? `<span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-60px;top:54px;background:#fff1f2;border-color:#fda4af;color:#e11d48;font-size:12px;padding:6px 18px">登出帳號</span>${finger("left:calc(50% + 10px);top:62px")}` : finger("left:100px;top:34px")}
+</div>`;
+
 const TIPS = {
+  "cards-gear": { scene: panelScene(true), text: "按這裡打開系統設定。" },
+  "cards-close": { scene: panelScene(false), text: "按這裡關閉設定視窗。" },
+  "cards-mode-card": { scene: modeScene(false), text: "圖卡：一張張方塊排開，一眼看到圖示。" },
+  "cards-mode-list": { scene: modeScene(true), text: "清單：一條一條由上往下排，名稱更清楚。" },
+  "cards-size-l": { scene: sizeScene("l"), text: "大：圖卡放大，長輩看更清楚。" },
+  "cards-size-m": { scene: sizeScene("m"), text: "中：預設大小。" },
+  "cards-size-s": { scene: sizeScene("s"), text: "小：圖卡縮小，一個畫面放更多張。" },
+  "cards-cols-2": { scene: colsScene(2), text: "每行 2 個：每張比較大。" },
+  "cards-cols-3": { scene: colsScene(3), text: "每行 3 個：每張比較小，一次看更多。" },
+  "cards-sort-default": { scene: sortDefaultScene, text: "預設：依建立先後排列，先建立的在前面。" },
+  "cards-sort-name": { scene: sortNameScene, text: "名稱：依名稱筆畫自動排列。" },
+  "cards-sort-custom": { scene: cardsSortScene, text: "自訂：自己訂編號，決定每張圖卡的位置。" },
+  "cards-order-num": { scene: orderNumScene, text: "點編號選新位置，其他圖卡會自動順延。" },
+  "cards-order-up": { scene: orderUpScene, text: "▲ 往前移一格。" },
+  "cards-order-down": { scene: orderDownScene, text: "▼ 往後移一格。" },
+  "cards-order-reset": { scene: orderResetScene, text: "恢復成預設的排列順序。" },
+  "cards-edit": { scene: editScene, text: "按鉛筆，修改這張圖卡的內容。" },
+  "cards-del": { scene: delScene, text: "按垃圾桶，再按一次「確定刪除」才會真的刪除。" },
+  "cards-login": { scene: loginScene(false), text: "登入後，設定會自動存到你的 Google 雲端硬碟，換手機也帶著走。" },
+  "cards-logout": { scene: loginScene(true), text: "登出帳號。在公共場所用完，記得登出。" },
   "cards-kind-bar": { scene: kindScene("fa-barcode", `<div style="${BAR};width:96px;height:36px"></div><b style="font-size:10px;letter-spacing:2px">/ABC1234</b>`), text: "會員、載具、條碼類，會畫成條碼，點開就能直接掃描。" },
   "cards-kind-phone": { scene: kindScene("fa-phone", '<b style="font-size:22px;letter-spacing:1px">02-1234-5678</b>'), text: "電話號碼用大字顯示，方便念給對方聽。" },
   "cards-kind-mail": { scene: kindScene("fa-envelope", '<b style="font-size:15px">name@example.com</b>'), text: "電子郵件用大字顯示，清楚好唸。" },
@@ -155,6 +222,31 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 .fmt-r { height: 22px; border-radius: 8px; background: #fff; border: 2px solid #e2e8f0; display: flex; align-items: center; gap: 6px; padding: 0 6px; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
 @keyframes fmtA { 0%,40% { opacity: 1; } 50%,90% { opacity: 0; } 100% { opacity: 1; } }
 @keyframes fmtB { 0%,40% { opacity: 0; } 50%,90% { opacity: 1; } 100% { opacity: 0; } }
+.gtg { position: absolute; left: 50%; top: 6px; transform: translateX(-50%); display: grid; gap: 6px; }
+.gtl { position: absolute; left: 50%; top: 6px; width: 150px; margin-left: -75px; display: flex; flex-direction: column; gap: 5px; }
+.gt { border-radius: 10px; background: #fff; border: 2px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,.12); display: flex; align-items: center; justify-content: center; opacity: 0; animation: gtPop 3.6s ease-in-out infinite; }
+.gt.gl { height: 22px; border-radius: 8px; padding: 0 6px; gap: 6px; justify-content: flex-start; }
+@keyframes gtPop { 0%,6% { opacity: 0; transform: scale(.4); } 18%,88% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(.4); } }
+.gt-s { border-radius: 10px; background: #fff; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,.12); margin: 0 auto 2px; }
+.gt-on { border-color: #0284c7; animation: gtOn 1.4s ease-in-out infinite; }
+@keyframes gtOn { 0%,100% { box-shadow: 0 0 0 0 rgba(2,132,199,.5); } 50% { box-shadow: 0 0 0 5px rgba(2,132,199,0); } }
+.rw { position: absolute; left: 18px; right: 18px; height: 24px; display: flex; align-items: center; gap: 6px; padding: 0 6px; border-radius: 8px; background: #fff; border: 2px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,.1); animation: rwMove 3.6s ease-in-out infinite; }
+@keyframes rwMove { 0%,25% { transform: translateY(0); } 45%,90% { transform: translateY(var(--dy, 0px)); } 100% { transform: translateY(0); } }
+.rw-n { width: 18px; height: 18px; border-radius: 5px; background: #e0f2fe; color: #0369a1; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+.rw-n span { position: absolute; }
+.num-a { animation: fmtA 3.6s ease-in-out infinite; } .num-b { animation: fmtB 3.6s ease-in-out infinite; }
+.rw-a { width: 18px; height: 18px; border-radius: 5px; background: #f1f5f9; font-size: 9px; display: flex; align-items: center; justify-content: center; }
+.rw-reset { position: absolute; right: 22px; top: 36px; width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; color: #0369a1; }
+.pnl { position: absolute; left: 30px; right: 30px; top: 22px; height: 64px; padding: 8px 10px; border-radius: 10px; background: #fff; border: 2px solid #e2e8f0; box-shadow: 0 4px 8px rgba(0,0,0,.15); }
+.pnl-in { animation: pnlIn 3.6s ease-in-out infinite; } .pnl-out { animation: pnlOut 3.6s ease-in-out infinite; }
+@keyframes pnlIn { 0%,36% { opacity: 0; transform: translateX(40px); } 52%,90% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateX(40px); } }
+@keyframes pnlOut { 0%,36% { opacity: 1; transform: none; } 52%,90% { opacity: 0; transform: translateX(40px); } 100% { opacity: 1; transform: none; } }
+@keyframes rwGone { 0%,55% { opacity: 1; transform: none; } 75%,92% { opacity: 0; transform: translateX(30px); } 100% { opacity: 1; transform: none; } }
+.del-a { background: #fee2e2; animation: fmtA 3.6s ease-in-out infinite; } .del-b { position: absolute; right: 6px; width: auto; padding: 0 6px; background: #e11d48; color: #fff; font-size: 9px; font-weight: 900; opacity: 0; animation: fmtB 3.6s ease-in-out infinite; }
+.arr { position: relative; margin: 8px 30px 3px; height: 4px; border-radius: 2px; background: #e2e8f0; overflow: hidden; } .arr i { position: absolute; left: 0; top: 0; bottom: 0; background: #0284c7; animation: arrGrow 3.6s ease-in-out infinite; }
+@keyframes arrGrow { 0% { width: 0; } 60%,90% { width: 100%; } 100% { width: 0; } }
+.acct { display: flex; align-items: center; gap: 8px; margin: 18px 30px 0; padding: 8px 10px; border-radius: 12px; background: #ecfdf5; border: 2px solid #a7f3d0; }
+.acct-av { width: 22px; height: 22px; border-radius: 50%; background: #10b981; flex-shrink: 0; }
 .tip-pill { display: inline-block; padding: 8px 16px; border-radius: 999px; background: #fff; border: 2px solid #f59e0b; font-weight: 900; font-size: 14px; }
 .tip-finger { position: absolute; font-size: 30px; line-height: 1; animation: tipFinger 3.6s ease-in-out infinite; pointer-events: none; }
 @keyframes tipFinger { 0%,25%,100% { transform: translate(8px, 22px); opacity: 0; } 8% { opacity: 1; } 15%,30% { transform: translate(8px, 2px); opacity: 1; } 38% { transform: translate(8px, 22px); opacity: 0; } }

@@ -10,10 +10,10 @@ export const cardsOptionsTemplate = `
                     <h1 class="text-base font-black text-slate-800 dark:text-slate-100 tracking-wider">生活圖卡設定</h1>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button data-action="open-settings" data-mode="all" title="系統設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-slate-300/70 theme-text-primary flex items-center justify-center transition-all active:scale-90">
+                    <button data-tip="cards-gear" data-action="open-settings" data-mode="all" title="系統設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-slate-300/70 theme-text-primary flex items-center justify-center transition-all active:scale-90">
                         <i class="fa-solid fa-gear text-base"></i>
                     </button>
-                    <button data-action="close-apps-options" title="關閉設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90">
+                    <button data-tip="cards-close" data-action="close-apps-options" title="關閉設定" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
@@ -42,21 +42,21 @@ export const cardsOptionsTemplate = `
                                         <i class="fa-solid fa-table-cells-large text-slate-400 text-sm w-4 text-center"></i>
                                         <span class="text-xs font-bold text-slate-700 dark:text-slate-200">瀏覽方式</span>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-2"><button type="button" data-action="cards-view" data-key="mode" data-value="card">圖卡</button><button type="button" data-action="cards-view" data-key="mode" data-value="list">清單</button></div>
+                                    <div class="grid grid-cols-2 gap-2"><button type="button" data-tip="cards-mode-card" data-action="cards-view" data-key="mode" data-value="card">圖卡</button><button type="button" data-tip="cards-mode-list" data-action="cards-view" data-key="mode" data-value="list">清單</button></div>
                                 </div>
                                 <div class="space-y-2">
                                     <div class="flex items-center gap-3">
                                         <i class="fa-solid fa-up-right-and-down-left-from-center text-slate-400 text-sm w-4 text-center"></i>
                                         <span class="text-xs font-bold text-slate-700 dark:text-slate-200">瀏覽大小</span>
                                     </div>
-                                    <div class="grid grid-cols-3 gap-2"><button type="button" data-action="cards-view" data-key="size" data-value="l">大</button><button type="button" data-action="cards-view" data-key="size" data-value="m">中</button><button type="button" data-action="cards-view" data-key="size" data-value="s">小</button></div>
+                                    <div class="grid grid-cols-3 gap-2"><button type="button" data-tip="cards-size-l" data-action="cards-view" data-key="size" data-value="l">大</button><button type="button" data-tip="cards-size-m" data-action="cards-view" data-key="size" data-value="m">中</button><button type="button" data-tip="cards-size-s" data-action="cards-view" data-key="size" data-value="s">小</button></div>
                                 </div>
                                 <div id="cardsOptCols" class="space-y-2 transition-opacity">
                                     <div class="flex items-center gap-3">
                                         <i class="fa-solid fa-table-columns text-slate-400 text-sm w-4 text-center"></i>
                                         <span class="text-xs font-bold text-slate-700 dark:text-slate-200">每行數量（清單模式不適用）</span>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-2"><button type="button" data-action="cards-view" data-key="cols" data-value="2">2 個</button><button type="button" data-action="cards-view" data-key="cols" data-value="3">3 個</button></div>
+                                    <div class="grid grid-cols-2 gap-2"><button type="button" data-tip="cards-cols-2" data-action="cards-view" data-key="cols" data-value="2">2 個</button><button type="button" data-tip="cards-cols-3" data-action="cards-view" data-key="cols" data-value="3">3 個</button></div>
                                 </div>
                             </div>
                         </div>
@@ -99,7 +99,7 @@ export const cardsOptionsTemplate = `
                     <div id="contentCManage" class="acc-body" data-accordion-body="cmanage">
                         <div class="acc-inner">
                             <div class="px-4 pb-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-3">
-                                <button type="button" data-action="cards-add" class="w-full py-3 rounded-xl border-2 border-dashed theme-border-primary theme-text-primary text-xs font-bold flex items-center justify-center gap-2 active:scale-95 transition"><i class="fa-solid fa-plus"></i><span>新增圖卡</span></button>
+                                <button type="button" data-tip="cards-manage" data-action="cards-add" class="w-full py-3 rounded-xl border-2 border-dashed theme-border-primary theme-text-primary text-xs font-bold flex items-center justify-center gap-2 active:scale-95 transition"><i class="fa-solid fa-plus"></i><span>新增圖卡</span></button>
                                 <div id="cardsManageList" class="space-y-1.5"></div>
                             </div>
                         </div>
@@ -109,7 +109,7 @@ export const cardsOptionsTemplate = `
                 <!-- 最底下：使用者。未登入 → 顯示登入（叫出登入頁）；已登入 → 顯示帳號與登出 -->
                 <div class="pt-2 space-y-2">
                     <p id="cardsDriveHint" class="text-[10px] text-slate-400 leading-relaxed text-center px-2"></p>
-                    <button id="cardsLoginBtn" type="button" data-action="open-login-from-settings" class="w-full py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-700 dark:text-slate-100 font-bold text-xs flex items-center justify-center gap-2.5 soft-shadow-sm active:scale-95 transition-all">
+                    <button id="cardsLoginBtn" data-tip="cards-login" type="button" data-action="open-login-from-settings" class="w-full py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-700 dark:text-slate-100 font-bold text-xs flex items-center justify-center gap-2.5 soft-shadow-sm active:scale-95 transition-all">
                         <i class="fa-brands fa-google text-sm"></i>
                         <span>使用 Google 帳號登入</span>
                     </button>
@@ -121,7 +121,7 @@ export const cardsOptionsTemplate = `
                                 <span id="cardsUserEmail" class="text-[10px] font-bold text-emerald-800/80 dark:text-emerald-300/80 truncate"></span>
                             </span>
                         </div>
-                        <button type="button" data-action="cards-logout" class="w-full py-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-300 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-95">
+                        <button type="button" data-tip="cards-logout" data-action="cards-logout" class="w-full py-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-300 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-95">
                             <i class="fa-solid fa-right-from-bracket"></i>
                             <span>登出帳號</span>
                         </button>
