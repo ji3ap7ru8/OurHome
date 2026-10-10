@@ -292,7 +292,7 @@ function pickerTiles() {
     const cls = selected
       ? "theme-border-primary theme-bg-light theme-text-primary"
       : "border-transparent bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-200";
-    return `<button type="button" data-pick="${k}" ${off ? "disabled" : ""}
+    return `<button type="button" data-tip="set-pick" data-tip-name="${f.name}" data-pick="${k}" ${off ? "disabled" : ""}
       class="relative flex flex-col items-center justify-center gap-1 py-3 rounded-2xl border-2 ${cls} ${off ? "opacity-40" : "active:scale-95"} transition-all">
       <i class="${f.icon} text-xl"></i>
       <span class="text-[11px] font-bold leading-tight">${f.name}</span>
@@ -321,7 +321,7 @@ function openShortcutPicker(index) {
          style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px))">
       <div class="flex items-center justify-between mb-1">
         <h3 class="text-base font-black text-slate-800 dark:text-slate-100">第 ${index + 1} 格快捷功能</h3>
-        <button type="button" data-close aria-label="關閉" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" data-tip="set-pick-close" data-close aria-label="關閉" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <p id="shortcutPickerHint" class="text-[11px] text-slate-400 mb-3">${HINT_TEXT}</p>
       <div id="shortcutPickerGrid" class="grid grid-cols-4 gap-2">${pickerTiles()}</div>

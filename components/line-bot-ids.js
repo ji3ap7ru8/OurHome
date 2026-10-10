@@ -88,13 +88,13 @@ function renderList() {
     const armed = armedId === x.id;
     if (editingId === x.id) return `
     <div class="rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-slate-700/40 p-2.5 space-y-2">
-      <label for="lineBotEditName" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 block">名稱<span class="text-[10px] font-medium text-slate-400 ml-1">（可不填，最多 20 字）</span></label>
+      <label for="lineBotEditName" data-tip="set-lbl-lname" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 block">名稱<span class="text-[10px] font-medium text-slate-400 ml-1">（可不填，最多 20 字）</span></label>
       <input id="lineBotEditName" type="text" maxlength="20" autocomplete="off" value="${esc(x.name)}" class="select-text w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 focus:outline-none theme-focus-border">
-      <label for="lineBotEditValue" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 block">User ID</label>
+      <label for="lineBotEditValue" data-tip="set-lbl-luid" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 block">User ID</label>
       <input id="lineBotEditValue" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" value="${esc(x.userId)}" class="select-text w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 focus:outline-none theme-focus-border">
       <div class="flex gap-2">
-        <button type="button" data-action="linebot-edit-cancel" class="flex-1 py-2 rounded-xl bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-100 text-xs font-bold active:scale-95 transition">取消</button>
-        <button type="button" data-action="linebot-edit-save" class="flex-1 py-2 rounded-xl theme-bg-primary text-white text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition"><i class="fa-solid fa-floppy-disk"></i> 儲存</button>
+        <button type="button" data-tip="set-line-ecancel" data-action="linebot-edit-cancel" class="flex-1 py-2 rounded-xl bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-100 text-xs font-bold active:scale-95 transition">取消</button>
+        <button type="button" data-tip="set-line-esave" data-action="linebot-edit-save" class="flex-1 py-2 rounded-xl theme-bg-primary text-white text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition"><i class="fa-solid fa-floppy-disk"></i> 儲存</button>
       </div>
     </div>`;
     return `
@@ -104,8 +104,8 @@ function renderList() {
         ${x.name ? `<span class="text-xs font-bold text-slate-700 dark:text-slate-200 block truncate">${esc(x.name)}</span>` : ""}
         <span class="${x.name ? "text-[10px] text-slate-400" : "text-xs font-bold text-slate-700 dark:text-slate-200"} block truncate select-text">${esc(x.userId)}</span>
       </span>
-      <button type="button" data-action="linebot-edit" data-id="${esc(x.id)}" aria-label="編輯這個 User ID" class="shrink-0 w-8 h-8 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 hover:text-emerald-600 rounded-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-pen text-xs"></i></button>
-      <button type="button" data-action="linebot-remove" data-id="${esc(x.id)}" aria-label="${armed ? "再按一次確定刪除" : "刪除這個 User ID"}" class="shrink-0 h-8 ${armed ? "px-3 bg-rose-500 text-white text-[11px] font-bold" : "w-8 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 hover:text-rose-500"} rounded-lg flex items-center justify-center active:scale-90 transition">${armed ? "再按一次刪除" : '<i class="fa-solid fa-trash-can text-xs"></i>'}</button>
+      <button type="button" data-tip="set-line-edit" data-action="linebot-edit" data-id="${esc(x.id)}" aria-label="編輯這個 User ID" class="shrink-0 w-8 h-8 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 hover:text-emerald-600 rounded-lg flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-pen text-xs"></i></button>
+      <button type="button" data-tip="set-line-del" data-action="linebot-remove" data-id="${esc(x.id)}" aria-label="${armed ? "再按一次確定刪除" : "刪除這個 User ID"}" class="shrink-0 h-8 ${armed ? "px-3 bg-rose-500 text-white text-[11px] font-bold" : "w-8 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 hover:text-rose-500"} rounded-lg flex items-center justify-center active:scale-90 transition">${armed ? "再按一次刪除" : '<i class="fa-solid fa-trash-can text-xs"></i>'}</button>
     </div>`;
   }).join("");
 }

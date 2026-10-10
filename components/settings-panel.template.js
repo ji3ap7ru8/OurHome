@@ -81,7 +81,7 @@ export const settingsPanelTemplate = `
                                 <i class="fa-solid fa-right-to-bracket text-sky-500 text-xs w-4 text-center"></i>
                                 <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200">自動登入（不登出）</span>
                             </div>
-                            <label class="relative inline-flex items-center gap-1.5 cursor-pointer" title="每次進入網頁自動登入">
+                            <label data-tip="set-autologin" class="relative inline-flex items-center gap-1.5 cursor-pointer" title="每次進入網頁自動登入">
                                 <input type="checkbox" id="autoLoginToggle" data-change="auto-login" class="sr-only peer">
                                 <div class="oh-switch"></div><span class="oh-switch-text" aria-hidden="true"></span>
                             </label>
@@ -90,7 +90,7 @@ export const settingsPanelTemplate = `
                     </div>
 
                     <!-- 立即同步：重新讀取 Google 雲端硬碟的設定，並重新連線兩個 Firebase 抓最新資料 -->
-                    <button id="syncNowBtn" data-action="sync-now" class="w-full py-2 rounded-lg theme-bg-primary text-white text-[11px] font-bold soft-shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-60 disabled:pointer-events-none">
+                    <button id="syncNowBtn" data-tip="set-sync" data-action="sync-now" class="w-full py-2 rounded-lg theme-bg-primary text-white text-[11px] font-bold soft-shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-60 disabled:pointer-events-none">
                         <i data-icon class="fa-solid fa-arrows-rotate"></i>
                         <span data-label>立即同步</span>
                     </button>
@@ -333,7 +333,7 @@ export const settingsPanelTemplate = `
 
                 <!-- 儲存位置 (預設收合)：我的筆記、記帳本各自選 不保存 / Google 雲端 / Firebase 私人端（components/cloud-settings.js 處理） -->
                 <div id="cardStorage" class="setting-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 soft-shadow-sm overflow-hidden transition-all">
-                    <button data-accordion-trigger="storage" aria-expanded="false" aria-controls="contentStorage" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                    <button data-tip="set-store" data-accordion-trigger="storage" aria-expanded="false" aria-controls="contentStorage" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl theme-bg-light theme-text-primary flex items-center justify-center text-base font-bold shrink-0">
                                 <i class="fa-solid fa-location-dot"></i>
@@ -351,25 +351,25 @@ export const settingsPanelTemplate = `
             <div class="space-y-1.5">
                 <div class="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-note-sticky text-xs text-orange-500"></i>我的筆記<span data-store-status="memos" class="ml-auto text-[10px] font-bold text-slate-400"></span></div>
                 <div class="grid grid-cols-4 gap-1">
-                <label class="cursor-pointer block">
+                <label data-tip="set-store-google" class="cursor-pointer block">
                     <input type="radio" name="store-memos" value="google" class="peer sr-only">
                     <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
                         <i class="fa-brands fa-google-drive text-sm"></i><span class="leading-tight">Google<br>雲端</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">安全</span>
                     </span>
                 </label>
-                <label class="cursor-pointer block">
+                <label data-tip="set-store-none" class="cursor-pointer block">
                     <input type="radio" name="store-memos" value="none" class="peer sr-only" checked>
                     <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
                         <i class="fa-solid fa-ban text-sm"></i><span class="leading-tight">不保存<br>&nbsp;</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">預設</span>
                     </span>
                 </label>
-                <label class="cursor-pointer block">
+                <label data-tip="set-store-server" class="cursor-pointer block">
                     <input type="radio" name="store-memos" value="server" class="peer sr-only">
                     <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
                         <i class="fa-solid fa-server text-sm"></i><span class="leading-tight">Firebase<br>伺服器</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">快速</span>
                     </span>
                 </label>
-                <label class="cursor-pointer block">
+                <label data-tip="set-store-private" class="cursor-pointer block">
                     <input type="radio" name="store-memos" value="private" class="peer sr-only">
                     <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
                         <i class="fa-solid fa-fire text-sm"></i><span class="leading-tight">Firebase<br>私人端</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">隱私高</span>
@@ -380,25 +380,25 @@ export const settingsPanelTemplate = `
             <div class="space-y-1.5">
                 <div class="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-book text-xs text-orange-500"></i>記帳本<span data-store-status="ledger" class="ml-auto text-[10px] font-bold text-slate-400"></span></div>
                 <div class="grid grid-cols-4 gap-1">
-                <label class="cursor-pointer block">
+                <label data-tip="set-store-google" class="cursor-pointer block">
                     <input type="radio" name="store-ledger" value="google" class="peer sr-only">
                     <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
                         <i class="fa-brands fa-google-drive text-sm"></i><span class="leading-tight">Google<br>雲端</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">安全</span>
                     </span>
                 </label>
-                <label class="cursor-pointer block">
+                <label data-tip="set-store-none" class="cursor-pointer block">
                     <input type="radio" name="store-ledger" value="none" class="peer sr-only" checked>
                     <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
                         <i class="fa-solid fa-ban text-sm"></i><span class="leading-tight">不保存<br>&nbsp;</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">預設</span>
                     </span>
                 </label>
-                <label class="cursor-pointer block">
+                <label data-tip="set-store-server" class="cursor-pointer block">
                     <input type="radio" name="store-ledger" value="server" class="peer sr-only">
                     <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
                         <i class="fa-solid fa-server text-sm"></i><span class="leading-tight">Firebase<br>伺服器</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">快速</span>
                     </span>
                 </label>
-                <label class="cursor-pointer block">
+                <label data-tip="set-store-private" class="cursor-pointer block">
                     <input type="radio" name="store-ledger" value="private" class="peer sr-only">
                     <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
                         <i class="fa-solid fa-fire text-sm"></i><span class="leading-tight">Firebase<br>私人端</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">隱私高</span>
@@ -408,7 +408,7 @@ export const settingsPanelTemplate = `
             </div>
             <p class="text-[10px] text-slate-400 leading-relaxed">選好後按下方〔儲存位置設定〕才會生效。「不保存」只留在目前畫面，關閉或重新整理就清除；「Google 雲端」要先登入，存在你的雲端硬碟隱藏資料夾；「Firebase 伺服器」使用家庭共用的伺服器資料庫（目前僅供選擇）；「Firebase 私人端」要先在下方「資料管理」設定並儲存私人端 firebaseConfig。</p>
 
-                                <button data-action="storage-save" class="w-full py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold soft-shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-1.5">
+                                <button data-tip="set-store-save" data-action="storage-save" class="w-full py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold soft-shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-1.5">
                                     <i class="fa-solid fa-floppy-disk"></i> 儲存位置設定
                                 </button>
                             </div>
@@ -418,7 +418,7 @@ export const settingsPanelTemplate = `
 
                 <!-- 3. 圖卡三：資料管理 (預設收合) -->
                 <div id="cardData" class="setting-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 soft-shadow-sm overflow-hidden transition-all">
-                    <button data-accordion-trigger="data" aria-expanded="false" aria-controls="contentData" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                    <button data-tip="set-data" data-accordion-trigger="data" aria-expanded="false" aria-controls="contentData" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl theme-bg-light theme-text-primary flex items-center justify-center text-base font-bold shrink-0">
                                 <i class="fa-solid fa-database"></i>
@@ -448,7 +448,7 @@ export const settingsPanelTemplate = `
                                 <div class="text-[11px] text-slate-500 dark:text-slate-400">
                                     需登入會員帳號方可使用雲端同步
                                 </div>
-                                <button data-action="open-login-from-settings" class="px-3 py-1.5 theme-bg-primary text-white text-xs font-bold rounded-xl soft-shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center gap-1">
+                                <button data-tip="set-login" data-action="open-login-from-settings" class="px-3 py-1.5 theme-bg-primary text-white text-xs font-bold rounded-xl soft-shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center gap-1">
                                     <i class="fa-solid fa-right-to-bracket text-xs"></i>
                                     <span>帳號登入</span>
                                 </button>
@@ -465,7 +465,7 @@ export const settingsPanelTemplate = `
                                             <span id="gdriveEmail" class="text-[10px] font-bold text-emerald-800/80 dark:text-emerald-300/80 truncate"></span>
                                         </div>
                                     </div>
-                                    <button data-action="logout" class="text-[10px] text-slate-400 hover:text-slate-600 underline">登出</button>
+                                    <button data-tip="set-logout" data-action="logout" class="text-[10px] text-slate-400 hover:text-slate-600 underline">登出</button>
                                 </div>
                             </div>
                         </div>
@@ -481,7 +481,7 @@ export const settingsPanelTemplate = `
 
                             <!-- 伺服器 Server 功能區塊：未登入預設上鎖；內容預設收合，避免直接顯示 config -->
                             <div class="bg-slate-50 dark:bg-slate-700/30 rounded-xl border border-slate-200/80 dark:border-slate-700">
-                                <button type="button" data-fold-trigger="fbServer" aria-expanded="false" class="w-full p-3 flex items-center justify-between gap-2 text-left">
+                                <button type="button" data-tip="set-fold" data-tip-name="firebaseConfig 伺服器" data-fold-trigger="fbServer" aria-expanded="false" class="w-full p-3 flex items-center justify-between gap-2 text-left">
                                     <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                                         <i class="fa-solid fa-server text-xs text-orange-500"></i>
                                         <span>firebaseConfig (伺服器 Server)</span>
@@ -505,7 +505,7 @@ export const settingsPanelTemplate = `
 
                             <!-- 私人端 Private：內容預設收合 -->
                             <div class="bg-slate-50 dark:bg-slate-700/30 rounded-xl border border-slate-200/80 dark:border-slate-700">
-                                <button type="button" data-fold-trigger="fbPrivate" aria-expanded="false" class="w-full p-3 flex items-center justify-between gap-2 text-left">
+                                <button type="button" data-tip="set-fold" data-tip-name="firebaseConfig 私人端" data-fold-trigger="fbPrivate" aria-expanded="false" class="w-full p-3 flex items-center justify-between gap-2 text-left">
                                     <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                                         <i class="fa-solid fa-user-shield text-xs text-orange-500"></i>
                                         <span>firebaseConfig (私人端 Private)</span>
@@ -522,7 +522,7 @@ export const settingsPanelTemplate = `
                                 </div>
                             </div>
 
-                            <button id="firebaseSaveBtn" data-action="fb-save" class="w-full py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold soft-shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-1.5">
+                            <button id="firebaseSaveBtn" data-tip="set-fb-save" data-action="fb-save" class="w-full py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold soft-shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-1.5">
                                 <i class="fa-solid fa-floppy-disk"></i> 儲存並同步
                             </button>
                         </div>
@@ -537,7 +537,7 @@ export const settingsPanelTemplate = `
                                 <span id="lineBotCount" class="text-[10px] font-medium text-slate-400"></span>
                             </div>
                             <div class="bg-slate-50 dark:bg-slate-700/30 rounded-xl border border-slate-200/80 dark:border-slate-700">
-                                <button type="button" data-fold-trigger="lineRelay" aria-expanded="false" class="w-full p-3 flex items-center justify-between gap-2 text-left">
+                                <button type="button" data-tip="set-fold" data-tip-name="Apps Script 中繼站" data-fold-trigger="lineRelay" aria-expanded="false" class="w-full p-3 flex items-center justify-between gap-2 text-left">
                                     <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                                         <i class="fa-solid fa-code text-xs text-emerald-500"></i>
                                         <span>Apps Script</span>
@@ -548,7 +548,7 @@ export const settingsPanelTemplate = `
                                     <div class="acc-inner">
                                         <div class="px-3 pb-3 space-y-3">
                                         <div class="space-y-2">
-                                            <label for="lineRelayUrl" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 block">中繼站 URL<span class="text-[10px] font-medium text-slate-400 ml-1">（Google Apps Script 網址）</span></label>
+                                            <label for="lineRelayUrl" data-tip="set-lbl-relay" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 block">中繼站 URL<span class="text-[10px] font-medium text-slate-400 ml-1">（Google Apps Script 網址）</span></label>
                                             <input id="lineRelayUrl" type="text" inputmode="url" data-lpignore="true" data-1p-ignore data-form-type="other" name="x-line-relay-url" enterkeyhint="done" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://script.google.com/macros/s/…/exec" class="select-text w-full min-w-0 px-3 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 focus:outline-none theme-focus-border">
                                             <p id="lineRelayUrlState" class="text-[10px] text-slate-400"></p>
                                         </div>
@@ -557,7 +557,7 @@ export const settingsPanelTemplate = `
                                 </div>
                             </div>
                             <div class="bg-slate-50 dark:bg-slate-700/30 rounded-xl border border-slate-200/80 dark:border-slate-700">
-                                <button type="button" data-fold-trigger="lineToken" aria-expanded="false" class="w-full p-3 flex items-center justify-between gap-2 text-left">
+                                <button type="button" data-tip="set-fold" data-tip-name="Bot Token" data-fold-trigger="lineToken" aria-expanded="false" class="w-full p-3 flex items-center justify-between gap-2 text-left">
                                     <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                                         <i class="fa-solid fa-key text-xs text-emerald-500"></i>
                                         <span>Bot Token</span>
@@ -568,10 +568,10 @@ export const settingsPanelTemplate = `
                                     <div class="acc-inner">
                                         <div class="px-3 pb-3 space-y-3">
                                         <div class="space-y-2">
-                                            <label for="lineBotToken" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 block">Bot Token<span class="text-[10px] font-medium text-slate-400 ml-1">（Channel access token）</span></label>
+                                            <label for="lineBotToken" data-tip="set-lbl-token" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 block">Bot Token<span class="text-[10px] font-medium text-slate-400 ml-1">（Channel access token）</span></label>
                                             <div class="flex items-center gap-2">
                                                 <input id="lineBotToken" type="text" data-mask="on" data-lpignore="true" data-1p-ignore data-form-type="other" name="x-line-bot-token" enterkeyhint="done" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="貼上 Bot Token" class="select-text flex-1 min-w-0 px-3 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 focus:outline-none theme-focus-border">
-                                                <button type="button" data-action="linebot-token-eye" aria-label="顯示或隱藏 Bot Token" class="shrink-0 w-10 h-10 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 flex items-center justify-center active:scale-90 transition"><i id="lineBotTokenEye" class="fa-solid fa-eye text-sm"></i></button>
+                                                <button type="button" data-tip="set-token-eye" data-action="linebot-token-eye" aria-label="顯示或隱藏 Bot Token" class="shrink-0 w-10 h-10 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 flex items-center justify-center active:scale-90 transition"><i id="lineBotTokenEye" class="fa-solid fa-eye text-sm"></i></button>
                                             </div>
                                             <p id="lineBotTokenState" class="text-[10px] text-slate-400"></p>
                                         </div>
@@ -580,7 +580,7 @@ export const settingsPanelTemplate = `
                                 </div>
                             </div>
                             <div class="bg-slate-50 dark:bg-slate-700/30 rounded-xl border border-slate-200/80 dark:border-slate-700">
-                                <button type="button" data-fold-trigger="lineTargets" aria-expanded="false" class="w-full p-3 flex items-center justify-between gap-2 text-left">
+                                <button type="button" data-tip="set-fold" data-tip-name="接收對象" data-fold-trigger="lineTargets" aria-expanded="false" class="w-full p-3 flex items-center justify-between gap-2 text-left">
                                     <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                                         <i class="fa-solid fa-user-group text-xs text-emerald-500"></i>
                                         <span>接收對象</span>
@@ -591,11 +591,11 @@ export const settingsPanelTemplate = `
                                     <div class="acc-inner">
                                         <div class="px-3 pb-3 space-y-3">
                                         <div class="space-y-2">
-                                            <label for="lineBotName" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 block">名稱<span class="text-[10px] font-medium text-slate-400 ml-1">（可不填，最多 20 字）</span></label>
+                                            <label for="lineBotName" data-tip="set-lbl-lname" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 block">名稱<span class="text-[10px] font-medium text-slate-400 ml-1">（可不填，最多 20 字）</span></label>
                                             <input id="lineBotName" type="text" maxlength="20" autocomplete="off" enterkeyhint="next" placeholder="例如：媽媽" class="select-text w-full px-3 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 focus:outline-none theme-focus-border">
-                                            <label for="lineBotValue" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 block pt-1">User ID</label>
+                                            <label for="lineBotValue" data-tip="set-lbl-luid" class="text-[11px] font-bold text-slate-700 dark:text-slate-200 block pt-1">User ID</label>
                                             <input id="lineBotValue" type="text" enterkeyhint="done" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="例如：U1234abcd…" class="select-text w-full px-3 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-700 dark:text-slate-200 focus:outline-none theme-focus-border">
-                                            <button type="button" data-action="linebot-add" class="w-full py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增 User ID</button>
+                                            <button type="button" data-tip="set-line-add" data-action="linebot-add" class="w-full py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition"><i class="fa-solid fa-plus"></i> 新增 User ID</button>
                                         </div>
                                         <div id="lineBotList" class="space-y-2"></div>
                                         <p class="text-[10px] text-slate-400 leading-relaxed">Bot Token 只有一組，底下的 User ID 可新增多個、數量不限；登入 Google 後會自動存到你的雲端硬碟，換手機也會帶著走。</p>
@@ -612,7 +612,7 @@ export const settingsPanelTemplate = `
 
                 <!-- 4. 圖卡四：備份還原 (預設收合) -->
                 <div id="cardBackup" class="setting-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 soft-shadow-sm overflow-hidden transition-all">
-                    <button data-accordion-trigger="backup" aria-expanded="false" aria-controls="contentBackup" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                    <button data-tip="set-backup" data-accordion-trigger="backup" aria-expanded="false" aria-controls="contentBackup" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl theme-bg-light theme-text-primary flex items-center justify-center text-base font-bold shrink-0">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
@@ -636,11 +636,11 @@ export const settingsPanelTemplate = `
                                     </div>
                                     <p class="text-[10px] text-slate-400 leading-relaxed">雲端硬碟的 default（預設參數）不能被使用者改寫，只有按「API 資料更新」才會用伺服器 Firestore 的 default 覆蓋進去；你自己的修改一律存在 settings。新使用者貼好伺服器 firebaseConfig 後按一次，就會載入預設參數。改到預設時，按「還原預設參數」可直接讀取雲端硬碟的 default。</p>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <button id="apiRefreshBtn" data-action="api-refresh" data-backup-btn class="py-2.5 px-1 rounded-xl theme-bg-light theme-text-primary border border-slate-200 dark:border-slate-600 font-bold text-xs soft-shadow-sm flex flex-col items-center justify-center gap-1 leading-tight transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
+                                        <button id="apiRefreshBtn" data-tip="set-api-refresh" data-action="api-refresh" data-backup-btn class="py-2.5 px-1 rounded-xl theme-bg-light theme-text-primary border border-slate-200 dark:border-slate-600 font-bold text-xs soft-shadow-sm flex flex-col items-center justify-center gap-1 leading-tight transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
                                             <i data-icon class="fa-solid fa-rotate"></i>
                                             <span data-label>API 資料更新</span>
                                         </button>
-                                        <button data-action="restore-defaults" data-backup-btn class="py-2.5 px-1 rounded-xl bg-slate-50 dark:bg-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs soft-shadow-sm flex flex-col items-center justify-center gap-1 leading-tight transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
+                                        <button data-tip="set-restore" data-action="restore-defaults" data-backup-btn class="py-2.5 px-1 rounded-xl bg-slate-50 dark:bg-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs soft-shadow-sm flex flex-col items-center justify-center gap-1 leading-tight transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
                                             <i class="fa-solid fa-rotate-left theme-text-primary"></i>
                                             <span>還原預設參數</span>
                                         </button>
@@ -657,11 +657,11 @@ export const settingsPanelTemplate = `
                                     </div>
                                     <p class="text-[10px] text-slate-400 leading-relaxed">設定檔平常存在雲端硬碟的隱藏資料夾，看不到檔案。匯出：把裡面的系統設定與 firebaseConfig 下載成 JSON 檔。匯入：選擇這種 JSON 檔，寫回雲端硬碟並重新連線。</p>
                                     <div class="grid grid-cols-2 gap-2">
-                                <button data-action="drive-export" data-backup-btn class="py-2.5 px-1 rounded-xl bg-slate-50 dark:bg-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs soft-shadow-sm flex flex-col items-center justify-center gap-1 leading-tight transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
+                                <button data-tip="set-drive-export" data-action="drive-export" data-backup-btn class="py-2.5 px-1 rounded-xl bg-slate-50 dark:bg-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs soft-shadow-sm flex flex-col items-center justify-center gap-1 leading-tight transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
                                     <i class="fa-solid fa-cloud-arrow-up theme-text-primary"></i>
                                     <span>匯出 Google 雲端硬碟</span>
                                 </button>
-                                <button data-action="drive-import" data-backup-btn class="py-2.5 px-1 rounded-xl bg-slate-50 dark:bg-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs soft-shadow-sm flex flex-col items-center justify-center gap-1 leading-tight transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
+                                <button data-tip="set-drive-import" data-action="drive-import" data-backup-btn class="py-2.5 px-1 rounded-xl bg-slate-50 dark:bg-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs soft-shadow-sm flex flex-col items-center justify-center gap-1 leading-tight transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
                                     <i class="fa-solid fa-cloud-arrow-down theme-text-primary"></i>
                                     <span>匯入 Google 雲端硬碟</span>
                                 </button>
@@ -679,11 +679,11 @@ export const settingsPanelTemplate = `
                                     </div>
                                     <p class="text-[10px] text-slate-400 leading-relaxed">下載或還原一份 JSON 備份檔，含系統設定與所有服務資料（包含個人記事與記帳），請只自己保管。</p>
                                     <div class="grid grid-cols-2 gap-2">
-                                <button data-action="bundle-export" data-backup-btn class="py-2.5 px-1 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 font-bold text-xs soft-shadow-sm flex flex-col items-center justify-center gap-1 leading-tight transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
+                                <button data-tip="set-bundle-export" data-action="bundle-export" data-backup-btn class="py-2.5 px-1 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 font-bold text-xs soft-shadow-sm flex flex-col items-center justify-center gap-1 leading-tight transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
                                     <i class="fa-solid fa-box-archive theme-text-primary"></i>
                                     <span>所有檔匯出</span>
                                 </button>
-                                <button data-action="bundle-import" data-backup-btn class="py-2.5 px-1 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 font-bold text-xs soft-shadow-sm flex flex-col items-center justify-center gap-1 leading-tight transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
+                                <button data-tip="set-bundle-import" data-action="bundle-import" data-backup-btn class="py-2.5 px-1 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 font-bold text-xs soft-shadow-sm flex flex-col items-center justify-center gap-1 leading-tight transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
                                     <i class="fa-solid fa-box-open theme-text-primary"></i>
                                     <span>所有檔匯入</span>
                                 </button>
@@ -697,7 +697,7 @@ export const settingsPanelTemplate = `
 
                 <!-- 管理員 (預設收合、預設上鎖)：要先登入 Google 帳號並輸入密碼才能解鎖；目前只有「最新提醒」，僅樣式、尚未接上功能 -->
                 <div id="cardAdmin" class="setting-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 soft-shadow-sm overflow-hidden transition-all">
-                    <button data-accordion-trigger="admin" aria-expanded="false" aria-controls="contentAdmin" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                    <button data-tip="set-admin" data-accordion-trigger="admin" aria-expanded="false" aria-controls="contentAdmin" class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-colors">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl theme-bg-light theme-text-primary flex items-center justify-center text-base font-bold shrink-0">
                                 <i class="fa-solid fa-user-gear"></i>
@@ -718,7 +718,7 @@ export const settingsPanelTemplate = `
                                     <div class="w-12 h-12 rounded-2xl theme-bg-light theme-text-primary flex items-center justify-center text-xl mx-auto"><i class="fa-solid fa-lock"></i></div>
                                     <p class="text-xs font-bold text-slate-700 dark:text-slate-200">管理員功能已上鎖</p>
                                     <p id="adminLockHint" class="text-[10px] text-slate-400 leading-relaxed">需先登入 Google 帳號，再輸入管理員密碼才能使用。</p>
-                                    <button id="adminVerifyBtn" data-action="admin-open-verify" class="px-6 py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold soft-shadow-sm hover:opacity-90 active:scale-95 transition-all inline-flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100">
+                                    <button id="adminVerifyBtn" data-tip="set-admin-verify" data-action="admin-open-verify" class="px-6 py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold soft-shadow-sm hover:opacity-90 active:scale-95 transition-all inline-flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100">
                                         <i class="fa-solid fa-key"></i> 驗證
                                     </button>
                                 </div>
@@ -727,12 +727,12 @@ export const settingsPanelTemplate = `
                                 <div id="adminUnlockedBar" class="hidden">
                                     <div class="flex items-center justify-between text-[10px] font-bold">
                                         <span class="text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-lock-open"></i> 已解鎖</span>
-                                        <button data-action="admin-lock" class="text-slate-400 hover:text-slate-600 underline">重新上鎖</button>
+                                        <button data-tip="set-admin-lock" data-action="admin-lock" class="text-slate-400 hover:text-slate-600 underline">重新上鎖</button>
                                     </div>
                                 </div>
 
                                 <!-- 解鎖後的功能入口：點「最新提醒」會從右側滑出編輯視窗（components/admin-reminder.js） -->
-                                <button id="adminContent" data-action="open-admin-reminder" class="hidden w-full p-3 bg-slate-50 dark:bg-slate-700/30 rounded-xl border border-slate-200/80 dark:border-slate-700 items-center justify-between gap-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors">
+                                <button id="adminContent" data-tip="set-admin-reminder" data-action="open-admin-reminder" class="hidden w-full p-3 bg-slate-50 dark:bg-slate-700/30 rounded-xl border border-slate-200/80 dark:border-slate-700 items-center justify-between gap-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors">
                                     <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                                         <i class="fa-solid fa-bell text-xs text-orange-500"></i>
                                         <span>最新提醒</span>
@@ -750,7 +750,7 @@ export const settingsPanelTemplate = `
 
                 <!-- 登出按鈕 (右側視窗最下方，僅在已登入 Google 帳號時顯示) -->
                 <div id="settingsLogoutBox" class="hidden pt-2 pb-4">
-                    <button data-action="logout" class="w-full py-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-300 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-95">
+                    <button data-tip="set-logout" data-action="logout" class="w-full py-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-300 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-95">
                         <i class="fa-solid fa-right-from-bracket"></i>
                         <span>登出帳號</span>
                     </button>

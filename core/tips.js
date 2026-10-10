@@ -359,6 +359,15 @@ const shortcutScene = `<div class="sc"><div class="scm-menu" style="left:calc(50
 const lobbyToggleScene = `<div class="sc"><div class="rw" style="top:6px;animation:none"><span class="scc-ic" style="width:16px;height:16px"></span><b style="flex:1;font-size:11px;font-weight:900">家庭公告</b><span class="swm"><i></i></span></div>${lobbyBlock("top:38px;left:calc(50% - 70px);width:140px;animation:gtPop 3.6s ease-in-out infinite;opacity:0")}${finger("right:28px;top:14px")}</div>`;
 const lobbyDetailScene = `<div class="sc"><div class="rw" style="top:6px;animation:none"><b class="rw-n">1</b><b style="flex:1;font-size:11px;font-weight:900">家庭公告</b><span class="rw-a" style="animation:tipPress 3.6s ease-in-out infinite">›</span></div>${lineDlg('<b style="font-size:10px">大廳要顯示哪些內容</b><i class="sb"></i><i class="sb" style="width:60%"></i>', "top:34px;height:54px")}${finger("right:26px;top:14px")}</div>`;
 
+// ---------- 系統設定 ----------
+const tglScene = (label, a, b) => `<div class="sc"><b style="position:absolute;left:24px;top:20px;font-size:12px">${label}</b><span class="sw"><i></i></span><b style="position:absolute;left:0;right:0;top:62px;text-align:center;font-size:10px;color:#64748b"><span class="num-a">${a}</span><span class="num-b" style="position:absolute;left:0;right:0">${b}</span></b>${finger("right:26px;top:26px")}</div>`;
+const pillToast = (pill, toast, spin = false) => `<div class="sc"><span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-60px;top:6px;font-size:12px;padding:7px 14px;background:#0284c7;border-color:#0284c7;color:#fff;white-space:nowrap">${spin ? '<span class="spin">⟳</span> ' : ""}${pill}</span><span class="rc-toast" style="top:52px;width:130px;margin-left:-65px">${toast}</span>${finger("left:calc(50% - 6px);top:16px")}</div>`;
+const storeScene = (icon, label) => `<div class="sc"><div style="position:absolute;left:20px;top:22px;width:70px">${memoMiniCard(0, "我的筆記").replace("top:0px", "position:relative;top:0;left:0;margin:0;width:70px")}</div><div class="arr" style="position:absolute;left:96px;width:40px;top:44px;margin:0"><i></i></div><div class="gt" style="position:absolute;right:20px;top:14px;width:76px;height:52px;flex-direction:column;gap:2px;animation-delay:.6s"><span style="font-size:20px">${icon}</span><b style="font-size:10px">${label}</b></div></div>`;
+const fileScene = (icon, label, up) => `<div class="sc"><div class="gt" style="position:absolute;left:calc(50% - 90px);top:16px;width:60px;height:56px;flex-direction:column;gap:2px;opacity:1;animation:none"><span style="font-size:18px">📄</span><b style="font-size:9px">備份檔</b></div><span class="fly" style="left:calc(50% - 20px);top:26px;font-size:20px;animation-name:${up ? "flyIn" : "flyAway2"}">${icon}</span><span class="tip-pill sp-btn" style="position:absolute;right:16px;top:30px;font-size:11px;padding:5px 10px;background:#fff">${label}</span>${finger("right:40px;top:40px")}</div>`;
+const lockScene = (unlock) => `<div class="sc"><span class="tip-pill sp-btn" style="position:absolute;left:50%;margin-left:-40px;top:8px;font-size:12px;padding:6px 18px;${unlock ? "background:#0284c7;border-color:#0284c7;color:#fff" : "background:#f1f5f9;border-color:#cbd5e1;color:#334155"}">${unlock ? "驗證" : "重新上鎖"}</span><div style="position:absolute;left:0;right:0;top:50px;text-align:center;font-size:28px"><span class="num-a">${unlock ? "🔒" : "🔓"}</span><span class="num-b" style="position:absolute;left:0;right:0">${unlock ? "🔓" : "🔒"}</span></div>${finger("left:calc(50% - 6px);top:18px")}</div>`;
+const eyeScene = `<div class="sc"><b style="position:absolute;left:30px;top:6px;font-size:11px">Bot Token</b><div class="tpi" style="right:62px"><span class="num-a">••••••••••</span><span class="num-b" style="position:absolute;left:12px">abc123xyz</span></div><span class="scm-btn" style="right:26px;top:30px;width:32px;height:34px;font-size:14px">👁</span>${finger("right:24px;top:40px")}</div>`;
+const pickTileScene = `<div class="sc"><div class="gtg" style="grid-template-columns:repeat(3,54px)">${["大廳", "計算機", "記帳本"].map((n, i) => `<div class="gt" style="width:54px;height:40px;flex-direction:column;animation-delay:${i * 0.15}s"><b style="font-size:10px">${n}</b></div>`).join("")}</div>${dockBar(1).replace("dkb", "dkb\" style=\"bottom:0;transform:scale(.8);transform-origin:50% 100%")}${finger("left:calc(50% - 40px);top:26px")}</div>`;
+
 const TIPS = {
   "cards-gear": { scene: panelScene(true), text: "按這裡打開系統設定。" },
   "cards-close": { scene: panelScene(false), text: "按這裡關閉設定視窗。" },
@@ -519,6 +528,49 @@ const TIPS = {
   "lobby-dclose": { scene: calCloseScene, text: "按 ✕，關閉這個小視窗。" },
   "lobby-card-pick": { scene: linePickScene, text: "點圖卡打勾，可以選好幾張，大廳就會顯示。" },
   "lobby-mode": { scene: noteAuthorScene, text: "點選項，決定大廳顯示哪些內容。" },
+  "set-sync": { scene: pillToast("立即同步", "已更新", true), text: "重新讀取 Google 雲端硬碟的設定，並重新連線取得最新資料。" },
+  "set-autologin": { scene: tglScene("自動登入", "開：下次進網頁自動登入", "關：每次都要自己登入"), text: "開啟後，這支手機每次進網頁都自動登入。公共場所請關閉。" },
+  "set-store": { scene: accScene.replace("管理應用", "儲存位置"), text: "展開：決定我的筆記、記帳本要存到哪裡。" },
+  "set-data": { scene: accScene.replace("管理應用", "資料管理"), text: "展開：Google 雲端硬碟與 Firebase 的連線設定。" },
+  "set-backup": { scene: accScene.replace("管理應用", "備份還原"), text: "展開：匯出、匯入備份，或還原預設參數。" },
+  "set-admin": { scene: accScene.replace("管理應用", "管理員"), text: "展開：管理員功能，要先登入並驗證才能用。" },
+  "set-store-google": { scene: storeScene("☁️", "Google 雲端"), text: "存到你自己的 Google 雲端硬碟，換手機也帶得走。" },
+  "set-store-none": { scene: storeScene("🚫", "不保存"), text: "不保存：只留在目前畫面，關閉或重新整理就清除。" },
+  "set-store-server": { scene: storeScene("🖥️", "家庭伺服器"), text: "存到家庭共用的 Firebase 伺服器，家人都能看到。" },
+  "set-store-private": { scene: storeScene("🔥", "私人端"), text: "存到你自己的 Firebase 私人端，只有你能看。" },
+  "set-store-save": { scene: pillToast("儲存位置設定", "已儲存"), text: "選好位置後，按這裡才會生效。" },
+  "set-login": { scene: loginScene(false), text: "登入 Google 帳號，才能使用雲端同步。" },
+  "set-logout": { scene: loginScene(true), text: "登出帳號。在公共場所用完，記得登出。" },
+  "set-fold": { scene: accScene.replace("管理應用", "設定"), text: "展開或收合「{name}」。" },
+  "set-fb-save": { scene: pillToast("儲存並同步", "已同步", true), text: "把 Firebase 設定存起來，並立刻重新連線。" },
+  "set-lbl-relay": { scene: noteFieldScene("中繼站 URL", "https://script.google…"), text: "貼上 Google Apps Script 的網址，LINE 訊息會透過它送出。" },
+  "set-lbl-token": { scene: noteFieldScene("Bot Token", "abc123…"), text: "貼上 LINE Bot 的 Channel access token，只有一組。" },
+  "set-token-eye": { scene: eyeScene, text: "顯示或隱藏 Bot Token，避免旁邊的人看到。" },
+  "set-lbl-lname": { scene: noteFieldScene("名稱", "媽媽"), text: "幫這個接收對象取名字，可不填。" },
+  "set-lbl-luid": { scene: noteFieldScene("User ID", "Uxxxxxxxx…"), text: "貼上對方的 LINE User ID。" },
+  "set-line-add": { scene: calIdAddScene, text: "按這裡新增接收對象，數量不限。" },
+  "set-line-edit": { scene: editScene, text: "按鉛筆，修改這個接收對象的名稱或 User ID。" },
+  "set-line-del": { scene: calDelScene, text: "按垃圾桶，再按一次「再按一次刪除」才會真的刪除。" },
+  "set-line-ecancel": { scene: calPageScene(true), text: "取消修改，內容維持原樣。" },
+  "set-line-esave": { scene: memoSaveScene, text: "儲存修改。" },
+  "set-api-refresh": { scene: pillToast("API 資料更新", "已更新", true), text: "用伺服器上最新的預設參數更新到你的雲端硬碟。" },
+  "set-restore": { scene: orderResetScene, text: "把設定還原成預設參數。" },
+  "set-drive-export": { scene: fileScene("⬇️", "匯出", false), text: "把雲端硬碟裡的系統設定下載成一個 JSON 檔。" },
+  "set-drive-import": { scene: fileScene("⬆️", "匯入", true), text: "選一個先前匯出的 JSON 檔，還原系統設定。" },
+  "set-bundle-export": { scene: fileScene("⬇️", "匯出", false), text: "下載含所有服務資料的完整備份檔，請自己保管。" },
+  "set-bundle-import": { scene: fileScene("⬆️", "匯入", true), text: "選完整備份檔，還原所有資料。" },
+  "set-admin-verify": { scene: lockScene(true), text: "輸入管理員密碼解鎖管理功能。" },
+  "set-admin-lock": { scene: lockScene(false), text: "用完記得重新上鎖。" },
+  "set-admin-reminder": { scene: panelScene(true).replace("系統設定", "最新提醒"), text: "打開「最新提醒」編輯視窗，發布新提醒給家人。" },
+  "set-pick": { scene: pickTileScene, text: "選「{name}」放到這一格。" },
+  "set-pick-close": { scene: calCloseScene, text: "按 ✕，關閉選單。" },
+  "adm-back": { scene: panelScene(false).replace("生活圖卡設定", "最新提醒"), text: "返回系統設定。" },
+  "adm-close": { scene: calCloseScene, text: "關閉所有設定視窗。" },
+  "adm-level": { scene: linePickScene, text: "選提醒等級：一般、重要、緊急，顏色不同。" },
+  "adm-clear": { scene: orderResetScene, text: "清除欄位，重新寫。" },
+  "adm-publish": { scene: pillToast("發布提醒", "已發布"), text: "發布提醒，家人會在「最新提醒」看到。" },
+  "adm-edit": { scene: editScene, text: "按鉛筆，修改這則提醒。" },
+  "adm-del": { scene: calDelScene, text: "按垃圾桶，刪除這則提醒。" },
   "notes-sort-pinned": { scene: reorder('<i class="fa-solid fa-thumbtack"></i>'), text: "這是釘選，會自動往前排放。" },
   "notes-sort-date": { scene: reorder('<span class="sm-txt">最新</span>'), text: "最新發布的公告，會排在最前面。" },
   "notes-sort-expire": { scene: reorder('<span class="sm-txt">剩1天</span>'), text: "快到期的公告，會自動往前排放。" },
@@ -685,6 +737,9 @@ body.tips-on [data-tip] { -webkit-touch-callout: none; -webkit-user-select: none
 .fz-up { animation: fzUp 3.6s ease-in-out infinite; } .fz-down { animation: fzDown 3.6s ease-in-out infinite; }
 @keyframes fzUp { 0%,30% { font-size: 20px; } 45%,90% { font-size: 38px; } 100% { font-size: 20px; } }
 @keyframes fzDown { 0%,30% { font-size: 38px; } 45%,90% { font-size: 20px; } 100% { font-size: 38px; } }
+.spin { display: inline-block; animation: spinA 1s linear infinite; } @keyframes spinA { to { transform: rotate(360deg); } }
+@keyframes flyAway2 { 0%,30% { opacity: 0; transform: translate(0, -6px); } 45% { opacity: 1; } 80%,100% { opacity: 0; transform: translate(0, 30px); } }
+@keyframes flyIn { 0%,30% { opacity: 0; transform: translate(0, 30px); } 45% { opacity: 1; } 80%,100% { opacity: 0; transform: translate(0, -6px); } }
 @keyframes tipPress { 0%,12%,24%,100% { transform: scale(1); } 18% { transform: scale(.92); } }
 `;
   document.head.appendChild(st);

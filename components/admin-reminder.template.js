@@ -1,6 +1,6 @@
 // 管理員「最新提醒」編輯視窗（右側滑出，版型與系統設定相同，疊在系統設定上面）。資料存在伺服器端 Firebase（reminders），發布後會顯示在「最新提醒」。
 const chip = (v, label, tone, checked = "") => `
-                        <label class="cursor-pointer">
+                        <label data-tip="adm-level" class="cursor-pointer">
                             <input type="radio" name="adminReminderLevel" value="${v}" class="peer sr-only"${checked}>
                             <span class="block py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[11px] font-bold text-center text-slate-500 dark:text-slate-300 transition-all ${tone}">${label}</span>
                         </label>`;
@@ -10,13 +10,13 @@ export const adminReminderTemplate = `
 
             <div class="pt-5 pb-3 px-5 border-b border-slate-200/60 dark:border-slate-800 flex items-center justify-between shrink-0 select-none">
                 <div class="flex items-center gap-2">
-                    <button data-action="close-admin-reminder" title="返回系統設定" class="w-9 h-9 -ml-2 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-800 text-slate-500 flex items-center justify-center transition-all active:scale-90">
+                    <button data-tip="adm-back" data-action="close-admin-reminder" title="返回系統設定" class="w-9 h-9 -ml-2 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-800 text-slate-500 flex items-center justify-center transition-all active:scale-90">
                         <i class="fa-solid fa-chevron-left text-sm"></i>
                     </button>
                     <i class="fa-solid fa-bell text-base theme-text-primary"></i>
                     <h1 class="text-base font-black text-slate-800 dark:text-slate-100 tracking-wider">最新提醒</h1>
                 </div>
-                <button data-action="close-all" title="關閉" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90">
+                <button data-tip="adm-close" data-action="close-all" title="關閉" class="w-9 h-9 rounded-full bg-slate-200/60 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all active:scale-90">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -37,8 +37,8 @@ export const adminReminderTemplate = `
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-2">
-                        <button type="button" data-action="reminder-clear" id="reminderClearBtn" class="col-span-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200 text-xs font-bold active:scale-95 transition-all">清除</button>
-                        <button type="button" data-action="reminder-publish" id="reminderPublishBtn" class="col-span-2 py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold soft-shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50">
+                        <button type="button" data-tip="adm-clear" data-action="reminder-clear" id="reminderClearBtn" class="col-span-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200 text-xs font-bold active:scale-95 transition-all">清除</button>
+                        <button type="button" data-tip="adm-publish" data-action="reminder-publish" id="reminderPublishBtn" class="col-span-2 py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold soft-shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50">
                             <i class="fa-solid fa-paper-plane"></i> <span id="reminderPublishLabel">發布提醒</span>
                         </button>
                     </div>

@@ -68,8 +68,8 @@ function renderList() {
         <h4 class="text-lg font-black text-slate-800 dark:text-slate-100 break-words leading-snug">${esc(r.title)}</h4>
         ${r.content ? `<p class="text-base text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line break-words line-clamp-3">${esc(r.content)}</p>` : ""}
         <div class="flex items-center justify-end gap-1 -mb-1">
-          <button type="button" data-action="reminder-edit" data-id="${esc(r.id)}" aria-label="編輯提醒" class="w-9 h-9 rounded-full text-slate-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-700 flex items-center justify-center"><i class="fa-solid fa-pen text-sm"></i></button>
-          <button type="button" data-action="reminder-delete" data-id="${esc(r.id)}" aria-label="刪除提醒" class="w-9 h-9 rounded-full text-slate-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-slate-700 flex items-center justify-center"><i class="fa-solid fa-trash-can text-sm"></i></button>
+          <button type="button" data-tip="adm-edit" data-action="reminder-edit" data-id="${esc(r.id)}" aria-label="編輯提醒" class="w-9 h-9 rounded-full text-slate-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-700 flex items-center justify-center"><i class="fa-solid fa-pen text-sm"></i></button>
+          <button type="button" data-tip="adm-del" data-action="reminder-delete" data-id="${esc(r.id)}" aria-label="刪除提醒" class="w-9 h-9 rounded-full text-slate-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-slate-700 flex items-center justify-center"><i class="fa-solid fa-trash-can text-sm"></i></button>
         </div>
       </div>`;
   }).join("");
