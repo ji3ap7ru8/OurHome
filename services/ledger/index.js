@@ -89,7 +89,7 @@ function render() {
           ${r.note ? `<span class="block text-sm font-medium text-slate-500 dark:text-slate-400 truncate">${esc(r.note)}</span>` : ""}</span>
         <span class="lg-amt ${r.type === "income" ? "lg-in" : "lg-out"}">${r.type === "income" ? "+" : "-"}${money(r.amount)}</span>
       </button>`; }).join("")}
-    </section>`).join("") : '<div class="lg-empty"><i class="fa-solid fa-book-open"></i><p>這個月還沒有帳目<br>按右下角「記一筆」開始記帳</p></div>';
+    </section>`).join("") : '<div class="lg-empty"><i class="fa-solid fa-book-open"></i><p>這個月還沒有帳目<br>按右上角「記一筆」開始記帳</p></div>';
 }
 
 function toast(msg, err = false) {
