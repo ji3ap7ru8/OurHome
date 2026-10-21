@@ -716,3 +716,7 @@ input:checked + .memo-pick { background: var(--primary-color); color: #fff; bord
 .lg-save { background: color-mix(in srgb, var(--primary-color) 82%, #fff); box-shadow: 0 6px 14px -8px var(--primary-color); }
 .lg-slot { border-color: color-mix(in srgb, var(--primary-color) 32%, transparent); }
 .dark .lg-sheet { background: color-mix(in srgb, var(--primary-dark) 18%, #0f172a); }
+
+/* 大廳「記帳本」區塊：沿用記帳頁的結餘卡，寬度鋪滿 */
+.lob-lg { margin: 0 !important; flex: none; width: 100%; scroll-snap-align: start; }
+.lob-lg .lg-cols b { font-size: 1.25rem; }

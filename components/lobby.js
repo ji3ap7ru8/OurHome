@@ -5,7 +5,7 @@
 //   - 各服務要挑哪幾筆、整理成什麼欄位：core/lobby-feed.js（可用 Node 測試）
 import { state, on } from "../core/store.js";
 import { showTipHint } from "../core/tips.js";
-import { lobbyOrdered, getMode, modeLabelOf, lobbyCards } from "../core/lobby-model.js";
+import { lobbyOrdered, getMode, modeLabelOf, lobbyCards, ledgerParts } from "../core/lobby-model.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
 import { noteItems, memoItems, calendarItems, calendarFetchRange, CAL_EMPTY, bowlItems, cardItems } from "../core/lobby-feed.js";
 import { notesApi, PALETTE as NOTE_PALETTE } from "../services/notes/data.js";
@@ -14,6 +14,8 @@ import { gcalApi } from "../core/gcal.js";
 import { memoApi, catStyle } from "../services/memo/data.js";
 import { bowlApi } from "../services/bowl/data.js";
 import { cardsApi, KINDS } from "../services/cards/data.js";
+import { ledgerApi } from "../services/ledger/data.js";
+import { summarize, monthKey } from "../services/ledger/engine.js";
 import { canEnterBowl } from "../core/bowl-emails.js";
 
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -63,6 +65,27 @@ const SECTIONS = {
           <span class="lob-memo-meta"><span class="truncate">${esc(m.category)}</span>${m.pinned ? '<i class="fa-solid fa-thumbtack text-rose-500"></i>' : ""}</span>
           <span class="lob-memo-title">${esc(m.title)}</span>
         </div>`).join("");
+    },
+  },
+  記帳: {
+    // 記帳本：跟記帳頁的「本月結餘」卡同樣式；依大廳設定顯示 本月結餘 / 收入 / 支出（全部 = 三個都顯示）。沒登入也能看（資料依「儲存位置」設定）
+    load: () => ledgerApi.list(),
+    build(raw, id) {
+      const parts = ledgerParts(getMode(id));
+      const sum = summarize(raw || [], monthKey());
+      const money = (n) => "$" + Number(n).toLocaleString("zh-TW", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      const flow = sum.income + sum.expense;
+      const inPct = flow ? Math.round((sum.income / flow) * 100) : 50;
+      const mm = monthKey().slice(5);
+      const top = parts.includes("balance")
+        ? `<div class="lg-sum-top"><div class="lg-label">本月結餘 <span class="lg-stamp">${mm}月</span></div>
+            <div class="lg-balance ${sum.balance < 0 ? "neg" : ""}">${sum.balance < 0 ? "-" : ""}${money(Math.abs(sum.balance))}</div>
+            ${parts.length === 3 ? `<div class="lg-ratio"><i style="width:${inPct}%"></i></div>` : ""}</div>` : "";
+      const cols = [];
+      if (parts.includes("income")) cols.push(`<div><span class="lg-label">${parts.includes("balance") ? "收入" : `本月收入 <span class="lg-stamp">${mm}月</span>`}</span><b class="lg-in">${money(sum.income)}</b></div>`);
+      if (parts.includes("expense")) cols.push(`<div><span class="lg-label">${parts.includes("balance") ? "支出" : `本月支出 <span class="lg-stamp">${mm}月</span>`}</span><b class="lg-out">${money(sum.expense)}</b></div>`);
+      const colsHtml = cols.length ? `<div class="lg-cols" style="grid-template-columns:repeat(${cols.length},1fr);${top ? "" : "border-top:0"}">${cols.join("")}</div>` : "";
+      return `<div class="lg-card lg-book lob-lg">${'<div class="lg-spine"></div>'}${top}${colsHtml}</div>`;
     },
   },
   家庭日曆: {

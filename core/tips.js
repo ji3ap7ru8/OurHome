@@ -890,9 +890,12 @@ on("tips:change", syncBody);
 syncBody();
 
 // ---------- 進入畫面時的淡淡提醒 ----------
+const HINT_KEY = "ourhome.tipHintSeen";
+const hintSeen = () => { try { return localStorage.getItem(HINT_KEY) === "1"; } catch { return false; } };
 export function showTipHint(id) {
-  if (state.tips === false || shown.has(id)) return;
+  if (state.tips === false || shown.has(id) || hintSeen()) return; // 整台裝置只提醒一次，之後不再跳出（想看說明仍可長按）
   shown.add(id);
+  try { localStorage.setItem(HINT_KEY, "1"); } catch { /* 無法儲存就算了 */ }
   injectStyle(); syncBody();
   const el = document.createElement("div");
   el.setAttribute("role", "note");

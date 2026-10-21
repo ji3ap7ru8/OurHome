@@ -12,16 +12,28 @@ export const LOBBY_MODES = {
   "家庭公告": [{ value: "expiring", label: "即將截止" }, { value: "latest", label: "最新發布" }],
   "家庭日曆": [{ value: "today", label: "今日" }, { value: "week", label: "未來7天" }, { value: "days14", label: "未來14天" }, { value: "month", label: "這個月" }],
   "換誰洗碗": [{ value: "today", label: "今日" }],
+  "記帳": [{ value: "all", label: "全部" }, { value: "balance", label: "本月結餘" }, { value: "income", label: "收入" }, { value: "expense", label: "支出" }], // 記帳本：全部（單選，含結餘/收入/支出）；本月結餘、收入、支出可複選，存成 "balance+income" 這樣的字串
   "個人記事本": [{ value: "all", label: "全部" }, { value: "pinned", label: "釘選" }], // 我的筆記：只顯示標題；全部 = 所有筆記、釘選 = 只放置頂的；另外每個分類各有一個選項（值 "cat:分類名"，選項由設定視窗依現有分類補上）
 };
 export const modeOptions = (id) => LOBBY_MODES[id] || [];
 // 我的筆記可以選某個分類（"cat:分類名"）：分類是動態的，只檢查格式
 export const isCatMode = (id, v) => id === "個人記事本" && typeof v === "string" && v.startsWith("cat:") && v.length > 4 && v.length <= 40;
-const validMode = (id, v) => modeOptions(id).some((o) => o.value === v) || isCatMode(id, v);
+const LEDGER_PARTS = ["balance", "income", "expense"];
+export const isLedgerMode = (id, v) => id === "記帳" && typeof v === "string" && v !== "all" && v.split("+").length > 0 && v.split("+").every((x, i, a) => LEDGER_PARTS.includes(x) && a.indexOf(x) === i);
+// 記帳本：把目前模式拆成要顯示的項目（all = 三個都顯示）
+export const ledgerParts = (v) => (v === "all" || !isLedgerMode("記帳", v) ? [...LEDGER_PARTS] : LEDGER_PARTS.filter((x) => v.split("+").includes(x)));
+// 記帳本複選：切換某一項；全部勾選或全部取消 = "all"
+export const ledgerToggle = (v, part) => {
+  if (part === "all") return "all";
+  const cur = v === "all" ? [] : ledgerParts(v);
+  const next = LEDGER_PARTS.filter((x) => (x === part ? !cur.includes(x) : cur.includes(x)));
+  return !next.length || next.length === LEDGER_PARTS.length ? "all" : next.join("+");
+};
+const validMode = (id, v) => modeOptions(id).some((o) => o.value === v) || isCatMode(id, v) || isLedgerMode(id, v);
 export const getMode = (id) => {
   const opts = modeOptions(id);
   const v = state.lobby.mode?.[id];
-  if (isCatMode(id, v)) return v;
+  if (isCatMode(id, v) || isLedgerMode(id, v)) return v;
   return opts.find((o) => o.value === v)?.value ?? opts[0]?.value ?? null;
 };
 // 生活圖卡：大廳要顯示哪幾張（可多選，空 = 都不顯示）。existing = 目前還存在的圖卡 id（依圖卡順序），已被刪掉的自動剔除
@@ -43,7 +55,7 @@ export function setMode(id, value) {
 }
 
 // 大廳區塊標題旁顯示的文字（顯示方式的名稱）
-export const modeLabelOf = (id) => { const v = getMode(id); return isCatMode(id, v) ? v.slice(4) : modeOptions(id).find((o) => o.value === v)?.label || ""; };
+export const modeLabelOf = (id) => { const v = getMode(id); if (isLedgerMode(id, v)) return ledgerParts(v).map((x) => modeOptions(id).find((o) => o.value === x).label).join("、"); return isCatMode(id, v) ? v.slice(4) : modeOptions(id).find((o) => o.value === v)?.label || ""; };
 
 export const isShown = (id) => state.lobby.shown.includes(id); // 預設全部關閉，要在「顯示管理」自己開
 

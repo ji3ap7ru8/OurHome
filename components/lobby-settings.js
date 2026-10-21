@@ -7,7 +7,7 @@ import { registerActions, registerChangeActions } from "../core/actions.js";
 import { cardsApi } from "../services/cards/data.js";
 import { memoApi } from "../services/memo/data.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
-import { lobbyCandidates, lobbyOrdered, isShown, setShown, moveLobby, resetLobbyOrder, modeOptions, getMode, setMode, lobbyCards, toggleLobbyCard } from "../core/lobby-model.js";
+import { lobbyCandidates, lobbyOrdered, isShown, setShown, moveLobby, resetLobbyOrder, modeOptions, getMode, setMode, ledgerParts, ledgerToggle, lobbyCards, toggleLobbyCard } from "../core/lobby-model.js";
 
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const $ = (id) => document.getElementById(id);
@@ -25,6 +25,7 @@ export function mountLobbySettings() {
     "lobby-detail": (el) => openDetail(el.dataset.id),
     "lobby-detail-close": () => closeDetail(),
     "lobby-card-toggle": (el) => { toggleLobbyCard(el.dataset.cardId, cardList.map((c) => c.id)); paintCards(); },
+    "lobby-ledger-pick": (el) => { setMode("記帳", ledgerToggle(getMode("記帳"), el.dataset.value)); paintLedger(); }, // 記帳本：全部單選、其餘可複選
     "lobby-mode-pick": (el) => { setMode(el.dataset.id, el.dataset.value); closeDetail(); },
     "lobby-order-reset": () => { if (confirm("要把大廳順序還原成跟「所有應用」相同嗎？")) resetLobbyOrder(); },
   });
@@ -130,6 +131,20 @@ async function loadCards() {
   paintCards();
 }
 
+// 記帳本：全部（單選）/ 本月結餘 / 收入 / 支出（可複選）
+function paintLedger() {
+  const body = document.getElementById("lobbyDetailBody");
+  if (!body) return;
+  const cur = getMode("記帳");
+  const parts = ledgerParts(cur);
+  body.innerHTML = '<p class="text-[10px] text-slate-400">大廳要顯示哪些內容（全部為單選，其他可複選）</p>' + modeOptions("記帳").map((o) => {
+    const on = o.value === "all" ? cur === "all" : cur !== "all" && parts.includes(o.value);
+    return `<button type="button" role="${o.value === "all" ? "radio" : "checkbox"}" aria-checked="${on}" data-tip="lobby-mode" data-action="lobby-ledger-pick" data-value="${esc(o.value)}" class="${CHOICE}">
+        <span class="flex-1 text-sm font-bold text-slate-700 dark:text-slate-200">${esc(o.label)}</span>${tick(on)}
+      </button>`;
+  }).join("");
+}
+
 function openDetail(id) {
   const a = lobbyOrdered().find((x) => x.id === id);
   if (!a || a.plugin) return;
@@ -162,6 +177,7 @@ function openDetail(id) {
   document.body.appendChild(box);
   fixAppIcons(box);
   if (isCards) loadCards();
+  if (id === "記帳") paintLedger();
   if (id === "個人記事本") loadMemoChoices(opts, choices); // 補上目前有的每個分類
 }
 
