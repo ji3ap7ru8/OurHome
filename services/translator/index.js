@@ -74,8 +74,7 @@ function liveCard() {
 }
 
 const bigBtns = () => `
-  <button data-tip="tr-big" data-big class="h-11 px-4 rounded-full theme-bg-light theme-text-primary font-bold"><i class="fa-solid fa-expand"></i> 全螢幕</button>
-  <button data-tip="tr-sign" data-sign class="h-11 px-4 rounded-full theme-bg-light theme-text-primary font-bold"><i class="fa-solid fa-rotate-right"></i> 告示牌</button>`;
+  <button data-tip="tr-big" data-big class="h-11 px-4 rounded-full theme-bg-light theme-text-primary font-bold"><i class="fa-solid fa-expand"></i> 全螢幕</button>`;
 
 function liveCurrent() {
   const last = live.items[live.items.length - 1];
@@ -112,13 +111,12 @@ function renderLive() {
     <div class="bg-white/95 dark:bg-slate-800/95 rounded-3xl soft-shadow-md p-5 border-2 theme-border-primary">
       <p class="text-xs font-extrabold theme-text-primary mb-2">${to.name}</p>
       <p class="text-2xl font-black text-slate-900 dark:text-white leading-relaxed break-words select-text ${dim ? "opacity-60" : ""}">${esc(tr) || "…"}</p>
-      <div class="flex flex-wrap gap-2 mt-4">${bigBtns()}</div>
     </div>` : "";
   setLiveStatus();
   updateBig();
 }
 
-const barBtn = "flex-1 min-w-0 h-14 rounded-2xl flex flex-col items-center justify-center gap-0.5 text-[0.8rem] font-black leading-none active:scale-95 transition";
+const barBtn = "flex-1 min-w-0 h-14 rounded-2xl flex flex-col items-center justify-center gap-0.5 text-[0.75rem] font-black leading-none active:scale-95 transition";
 const barGray = "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-100";
 
 // 即時翻譯時，懸浮在底部（取代快捷列）的操作列：圖示 + 文字
@@ -130,6 +128,7 @@ function renderBar() {
     : b("data-live-pause", listening ? "fa-pause" : "fa-play", listening ? "暫停" : "開始", listening ? "bg-rose-500 text-white" : "theme-bg-primary text-white") +
       b("data-live-end", "fa-stop", "結束", "bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900") +
       b("data-live-clear", "fa-eraser", "清除", barGray) +
+      b("data-live-fs", "fa-expand", "全螢幕", barGray) +
       b("data-live-speak", liveSpeak ? "fa-volume-high" : "fa-volume-xmark", liveSpeak ? "朗讀：開" : "朗讀：關", liveSpeak ? "theme-bg-light theme-text-primary" : barGray);
 }
 
@@ -155,6 +154,7 @@ function showBar(on) {
 
 function setLiveStatus() {
   renderBar();
+  updateBig();
   const t = root?.querySelector("[data-live-state]");
   if (t) t.textContent = speaking ? "● 朗讀中…" : listening ? "● 聆聽中" : SR ? "麥克風已暫停（可打字）" : "文字模式（可打字）";
 }
@@ -402,27 +402,42 @@ function fitBig() {
   if (!big) return;
   const w = window.innerWidth, h = window.innerHeight;
   const o = big.el;
-  if (!big.sign) { Object.assign(o.style, { width: "", height: "", transform: "", transformOrigin: "", top: "", left: "" }); return; }
-  Object.assign(o.style, { top: "0", left: "0", width: h + "px", height: w + "px", transformOrigin: "top left", transform: big.dir > 0 ? "rotate(90deg) translateY(-100%)" : "rotate(-90deg) translateX(-100%)" });
+  if (!big.rot) { Object.assign(o.style, { width: "", height: "", transform: "", transformOrigin: "", top: "", left: "" }); return; }
+  Object.assign(o.style, { top: "0", left: "0", width: h + "px", height: w + "px", transformOrigin: "top left", transform: big.rot > 0 ? "rotate(90deg) translateY(-100%)" : "rotate(-90deg) translateX(-100%)" });
 }
 
 function updateBig() {
   if (!big) return;
   const { src, tr } = bigContent();
-  const k = big.sign ? 0.85 : 1;
+  const mb = big.el.querySelector("[data-big-mic]");
+  if (mb) {
+    mb.className = `h-11 px-4 rounded-full font-black text-sm ${listening ? "bg-rose-500 text-white" : "theme-bg-primary text-white"}`;
+    mb.innerHTML = listening ? `<i class="fa-solid fa-pause"></i> 暫停` : `<i class="fa-solid fa-play"></i> 開始`;
+  }
+  const k = big.rot ? 0.85 : 1;
   big.el.querySelector("[data-big-src]").innerHTML = `<p class="font-bold text-slate-500 dark:text-slate-300 text-center break-words leading-snug" style="font-size:${bigSize(src.length, 2.4 * k)}">${esc(src) || "…"}</p>`;
   big.el.querySelector("[data-big-tr]").innerHTML = `<p class="font-black text-slate-900 dark:text-white text-center break-words leading-snug" style="font-size:${bigSize(tr.length, 3.8 * k)}">${esc(tr) || "…"}</p>`;
 }
 
-function closeBig() {
-  window.removeEventListener("resize", fitBig);
-  big?.el.remove();
-  big = null;
+// 全螢幕時隱藏所有底部快捷（原本的快捷列與即時翻譯操作列）；關閉後恢復
+function hideDocks(hide) {
+  document.querySelectorAll(".dock-wrap").forEach((d) => {
+    const isBar = d === live.bar;
+    d.style.display = hide ? "none" : isBar ? "" : live.on ? "none" : "";
+  });
 }
 
-function openBig(sign) {
+function closeBig() {
+  if (!big) return;
+  window.removeEventListener("resize", fitBig);
+  big.el.remove();
+  big = null;
+  hideDocks(false);
+}
+
+function openBig() {
   const { tr } = bigContent();
-  if (!tr && !(live.on && live.draft)) return toast("目前還沒有翻譯結果");
+  if (!tr && !live.on) return toast("目前還沒有翻譯結果");
   closeBig();
   const o = document.createElement("div");
   o.className = "fixed inset-0 z-[60] bg-white dark:bg-slate-900 flex flex-col";
@@ -430,16 +445,19 @@ function openBig(sign) {
     <div data-big-src class="flex-1 min-h-0 overflow-y-auto flex items-center justify-center p-5"></div>
     <div class="h-1.5 shrink-0 theme-bg-primary mx-4 rounded-full"></div>
     <div data-big-tr class="flex-1 min-h-0 overflow-y-auto flex items-center justify-center p-5"></div>
+    ${live.on ? `<div class="absolute top-3 left-3"><button data-big-mic class="h-11 px-4 rounded-full font-black text-sm"></button></div>` : ""}
     <div class="absolute top-3 right-3 flex gap-2">
-      ${sign ? `<button data-big-flip class="h-11 px-4 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100 font-black text-sm"><i class="fa-solid fa-rotate"></i> 翻轉</button>` : ""}
+      <button data-big-rot class="h-11 px-4 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100 font-black text-sm"><i class="fa-solid fa-rotate-right"></i> 旋轉</button>
       <button data-big-close class="h-11 px-4 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100 font-black text-sm"><i class="fa-solid fa-xmark"></i> 關閉</button>
     </div>`;
   o.onclick = (e) => {
-    if (e.target.closest("[data-big-flip]")) { big.dir = -big.dir; return fitBig(); }
+    if (e.target.closest("[data-big-rot]")) { big.rot = big.rot === 0 ? 1 : big.rot === 1 ? -1 : 0; fitBig(); return updateBig(); }
+    if (e.target.closest("[data-big-mic]")) return togglePause();
     if (e.target.closest("[data-big-close]") || !live.on) closeBig(); // 一般模式點畫面任何地方即關閉；即時翻譯只能按「關閉」避免誤觸
   };
   root.appendChild(o);
-  big = { el: o, sign: !!sign, dir: 1 };
+  big = { el: o, rot: 0 };
+  hideDocks(true);
   window.addEventListener("resize", fitBig);
   fitBig();
   updateBig();
@@ -471,6 +489,11 @@ function toast(msg, ms = 1800) {
   setTimeout(() => t.remove(), ms);
 }
 
+function togglePause() {
+  if (!SR) return toast("此瀏覽器不支援語音辨識，請直接打字");
+  if (listening || live.rec) { live.paused = true; stopRec(); setLiveStatus(); } else { live.paused = false; startLive(); }
+}
+
 function onClick(e) {
   const q = (s) => e.target.closest(s);
   if (q("[data-go]")) return translate();
@@ -478,8 +501,7 @@ function onClick(e) {
   if (q("[data-clear]")) { stopAll(); st.text = ""; st.result = ""; st.status = "idle"; st.offline = false; render(); return root.querySelector("[data-text]")?.focus(); }
   if (q("[data-speak]")) return speak();
   if (q("[data-copy]")) return copy();
-  if (q("[data-big]")) return openBig(false);
-  if (q("[data-sign]")) return openBig(true);
+  if (q("[data-big]")) return openBig();
   if (q("[data-mic]")) return toggleMic();
   if (q("[data-live-clear]")) { live.items = []; live.interim = ""; live.interimTr = ""; return renderLive(); }
   if (q("[data-live-speak]")) { liveSpeak = !liveSpeak; if (!liveSpeak && canSpeak) window.speechSynthesis.cancel(); return setLiveStatus(); }
@@ -488,7 +510,8 @@ function onClick(e) {
   if (q("[data-live-exit]")) return setLive(false);
   if (q("[data-live-copyall]")) { st.result = live.items.map((i) => `${i.src}\n${i.tr}`).join("\n\n"); return copy(); }
   if (q("[data-live-send]")) return commitDraft();
-  if (q("[data-live-pause]")) { if (!SR) return toast("此瀏覽器不支援語音辨識，請直接打字"); if (listening || live.rec) { live.paused = true; stopRec(); setLiveStatus(); } else { live.paused = false; startLive(); } return; }
+  if (q("[data-live-pause]")) return togglePause();
+  if (q("[data-live-fs]")) return openBig();
 }
 
 // 打字即時翻譯：停頓約 0.45 秒就翻；Enter / 送出 = 這一句完成，存入統整並清空輸入框
