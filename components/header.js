@@ -24,8 +24,12 @@ function renderRoute(id) {
   const cal = id === "家庭日曆"; // 家庭日曆頁：不顯示大頭貼 / 名稱 / 信箱，個人化（調色盤）換成 ︙ ID設定
   const bowl = id === "換誰洗碗";
   const memo = id === "個人記事本"; // 我的筆記頁：不顯示大頭貼 / 名稱 / 信箱，左側改放「我的筆記」標題，右側多一個儲存位置下拉選單 // 換誰洗碗頁：不顯示大頭貼 / 名稱 / 信箱，個人化（調色盤）換成 ︙ 換誰洗碗設定
-  document.getElementById("headerUser")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo);
-  document.getElementById("headerPaletteBtn")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo);
+  const ledger = id === "記帳"; // 記帳本頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「記帳本」標題
+  document.getElementById("headerUser")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger);
+  document.getElementById("headerPaletteBtn")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger);
+  const lt = document.getElementById("headerLedgerTitle");
+  lt?.classList.toggle("hidden", !ledger);
+  lt?.classList.toggle("flex", ledger);
   const mt = document.getElementById("headerMemoTitle");
   mt?.classList.toggle("hidden", !memo);
   mt?.classList.toggle("flex", memo);

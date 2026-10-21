@@ -27,6 +27,9 @@ export const headerTemplate = `
                 <!-- 我的筆記頁專用：左側標題（其他頁隱藏） -->
                 <h2 id="headerMemoTitle" class="hidden items-center gap-2 text-lg shrink-0 font-black leading-tight text-slate-900 dark:text-slate-100"><i class="fa-solid fa-book-open theme-text-primary"></i><span>我的筆記</span></h2>
 
+                <!-- 記帳本頁專用：左側標題（其他頁隱藏） -->
+                <h2 id="headerLedgerTitle" class="hidden items-center gap-2 text-2xl shrink-0 font-black leading-tight text-slate-800 dark:text-slate-100"><i class="fa-solid fa-wallet theme-text-primary"></i><span>記帳本</span></h2>
+
                 <!-- 家庭日曆頁專用：左側日曆切換按鈕（由 services/calendar 放進來；其他頁隱藏） -->
                 <div id="headerCalSlot" class="hidden items-center flex-1 min-w-0 pr-2"></div>
 

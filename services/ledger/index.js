@@ -144,9 +144,7 @@ export default {
     root.className = "px-3.5 pb-6";
     const guest = !ctx?.state?.isLoggedIn;
     root.innerHTML = `
-      <div class="flex items-center justify-between py-3 px-1">
-        <h2 class="text-2xl font-black text-slate-800 dark:text-slate-100"><i class="fa-solid fa-wallet theme-text-primary"></i> 記帳本</h2>
-      </div>
+      <div class="h-1"></div>
       <p class="mx-1 mb-3 text-xs font-bold leading-relaxed rounded-xl px-3 py-2 ${(ctx?.state?.storage?.ledger || "none") === "none" ? "bg-amber-100 text-amber-900" : "bg-emerald-100 text-emerald-900"}">
         <i class="fa-solid ${(ctx?.state?.storage?.ledger || "none") === "none" ? "fa-user-secret" : "fa-cloud-arrow-up"}"></i> ${storageNote(ctx?.state?.storage?.ledger, guest, "帳目")}</p>
       <div class="flex items-center justify-between gap-2 px-1 mb-3">

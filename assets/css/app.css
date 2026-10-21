@@ -572,3 +572,28 @@ input:checked + .memo-pick { background: var(--primary-color); color: #fff; bord
 .lob-memo-meta { display: flex; align-items: center; gap: .35rem; height: 1.6rem; line-height: 1.6rem; font-size: .7rem; font-weight: 800; color: var(--memo-accent, #64748b); }
 .lob-memo-title { display: block; height: 1.6rem; line-height: 1.6rem; font-size: .95rem; font-weight: 900; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dark .lob-memo { color: #f1f5f9; background-color: #1e293b; border-color: #334155; border-left-color: var(--memo-accent, #64748b); }
+
+
+/* ===== 記帳本頁：帳簿風背景（方格帳本紙 + 欄位線 + 硬幣圓環；顏色全由主色調推算，跟著主題色與深淺色變化） ===== */
+#appContainer[data-view="ledger"] #bgShapes { opacity: 0 !important; }
+#appContainer[data-view="ledger"] > .overflow-y-auto {
+    --lg-bg: color-mix(in srgb, var(--primary-light) 45%, #f8fafc);
+    --lg-minor: color-mix(in srgb, var(--primary-color) 11%, transparent);
+    --lg-major: color-mix(in srgb, var(--primary-color) 22%, transparent);
+    --lg-ring: color-mix(in srgb, var(--primary-color) 20%, transparent);
+    background-color: var(--lg-bg) !important;
+    background-image:
+        radial-gradient(circle at 100% 0%, transparent 0 4.6rem, var(--lg-ring) 4.65rem 5.1rem, transparent 5.15rem 6.2rem, var(--lg-ring) 6.25rem 6.5rem, transparent 6.55rem),
+        radial-gradient(circle at 0% 78%, transparent 0 3.2rem, var(--lg-ring) 3.25rem 3.7rem, transparent 3.75rem),
+        linear-gradient(90deg, var(--lg-major) 0 1px, transparent 1px),
+        linear-gradient(0deg, var(--lg-major) 0 1px, transparent 1px),
+        linear-gradient(90deg, var(--lg-minor) 0 1px, transparent 1px),
+        linear-gradient(0deg, var(--lg-minor) 0 1px, transparent 1px) !important;
+    background-size: 100% 100%, 100% 100%, 110px 110px, 110px 110px, 22px 22px, 22px 22px !important;
+}
+#appContainer.dark[data-view="ledger"] > .overflow-y-auto {
+    --lg-bg: color-mix(in srgb, var(--primary-dark) 14%, #0f172a);
+    --lg-minor: rgba(255, 255, 255, .035);
+    --lg-major: rgba(255, 255, 255, .07);
+    --lg-ring: color-mix(in srgb, var(--primary-color) 26%, transparent);
+}
