@@ -1,5 +1,5 @@
-// 「儲存位置：Google 雲端」的資料後端：我的筆記、記帳本一起存在 appDataFolder 的同一個 JSON 檔（ourhome-data.json），
-// 格式 { memos: [...], ledger: [...] }。兩個資料集共用同一個檔案，所以寫入一律整份寫回（共用延遲、共用佇列）。
+// 「儲存位置：Google 雲端」的資料後端：我的筆記、記帳本、值班表、帳密庫一起存在 appDataFolder 的同一個 JSON 檔（ourhome-data.json），
+// 格式 { memos, ledger, duty, vault }（各為資料陣列）。兩個資料集共用同一個檔案，所以寫入一律整份寫回（共用延遲、共用佇列）。
 // 資料改動後稍等一下（合併連續操作）再寫；寫失敗時記成「待補存」，使用者下一次點擊畫面時在點擊動作內換 token 補存
 // （跟系統設定的存檔方式相同，避免瀏覽器擋住換 token 的彈窗）。
 import { CLOUD } from "./config.js";
@@ -19,7 +19,7 @@ let pending = false;       // 有資料還沒寫成功
 let describe = (e) => String(e?.message || e);
 let label = "資料";
 
-const payload = () => ({ app: "OurHome", type: "data", version: 2, savedAt: new Date().toISOString(), memos: [], ledger: [], ...store });
+const payload = () => ({ app: "OurHome", type: "data", version: 2, savedAt: new Date().toISOString(), memos: [], ledger: [], duty: [], vault: [], ...store });
 
 // token 過期（401）時換新 token 重試一次
 async function put(token) {

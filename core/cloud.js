@@ -9,7 +9,7 @@
 //   4. 儲存位置（設定 → 資料管理）：我的筆記、記帳本各自選 不保存（預設）/ Google 雲端硬碟 / Firebase 私人端
 //        → 選擇存在系統設定（state.storage）；Google 雲端 = appDataFolder 的 ourhome-data-<名稱>.json
 //
-//   私人端分區：資料放 user_data/<暱稱>/<memos|ledger>。
+//   私人端分區：資料放 user_data/<暱稱>/<memos|ledger|duty>。
 //     訪客（沒登入）：暱稱隨機產生；私人端存「全部」＝系統設定（user_data/<暱稱>/settings/main）＋我的筆記、記帳本
 //     已登入：設定存 Google 雲端硬碟，私人端只存 我的筆記、記帳本（儲存位置選「Firebase 私人端」）
 //
@@ -111,7 +111,8 @@ function applySettings(s) {
     if (typeof s.dockVisible === "boolean") { state.dockVisible = s.dockVisible; emit("dock:change", [...state.shortcuts]); } // 快捷列開關（舊設定檔沒有這欄時不動）
     if (s.storage && typeof s.storage === "object") {
       const ok = (v) => (v === "google" || v === "private" || v === "server" ? v : "none");
-      state.storage = { memos: ok(s.storage.memos), ledger: ok(s.storage.ledger) };
+      const okV = (v) => (v === "google" ? v : "none"); // 帳密庫：只能 Google 雲端 / 不保存
+      state.storage = { memos: ok(s.storage.memos), ledger: ok(s.storage.ledger), duty: ok(s.storage.duty), vault: okV(s.storage.vault) };
       emit("storage:sync", { ...state.storage });
     }
     applyLineBotIds(s.lineBotIds, s.lineBotToken, s.lineRelayUrl); // LINE Bot：Token 與接收對象（舊設定檔沒有這欄時不動）
@@ -139,7 +140,8 @@ const configForUi = () => ({ server: cfg.firebaseServer, private: cfg.firebasePr
 // 可選儲存位置的資料集（我的筆記、記帳本）只有「選了 Firebase 私人端」才跟著私人端連線；其他資料集照原本的 scope
 const reposOf = (scope) => allRepos().filter((r) => (r.choosable ? state.storage[r.name] === scope : r.scope === scope));
 const choosables = () => allRepos().filter((r) => r.choosable);
-const STORE_LABEL = { memos: "我的筆記", ledger: "記帳本" };
+const STORE_LABEL = { memos: "我的筆記", ledger: "記帳本", duty: "值班表", vault: "帳密庫" };
+const VAULT_LOCK_MSG = "配合帳密安全性，該服務只能儲存至個人雲端內"; // 帳密庫不可存 Firebase 伺服器 / 私人端
 
 // 把某個資料集切到指定儲存位置。carry = 從「不保存」切走時，是否把畫面上已有的資料一起帶過去
 // Firestore 分區名稱：伺服器＝使用者信箱（小寫）；私人端＝暱稱（見 core/nickname.js 的 privateKey）
@@ -173,6 +175,7 @@ async function setRepoMode(r, want, carry) {
 async function applyStorage(my = session) {
   for (const r of choosables()) {
     const want = state.storage[r.name] || "none";
+    if (r.name === "vault" && (want === "server" || want === "private")) { state.storage[r.name] = "none"; continue; }
     if (want === "google" && !(state.isLoggedIn && isCloudMode())) { state.storage[r.name] = "none"; continue; }
     try { await setRepoMode(r, want, false); }
     catch (e) { if (my === session) { showToast(`${STORE_LABEL[r.name]}無法連到${want === "google" ? " Google 雲端" : "私人端"}：${friendlyError(e)}`, 5000); state.storage[r.name] = "none"; } }
@@ -196,6 +199,7 @@ async function commitStorage(sel) {
     const want = sel[r.name] || "none";
     if (want === state.storage[r.name] && r.mode() === want) continue;
     const label = STORE_LABEL[r.name];
+    if (r.name === "vault" && (want === "server" || want === "private")) { msgs.push(`${label}：${VAULT_LOCK_MSG}`); continue; }
     if (want === "google" && !(state.isLoggedIn && isCloudMode())) { msgs.push(`${label}：Google 雲端要先登入帳號`); continue; }
     if (want === "private" && !conns.private) { msgs.push(`${label}：私人端還沒連線，請先貼上 firebaseConfig`); continue; }
     if (want === "server" && !conns.server) { msgs.push(`${label}：${isFirebaseConfigured("server") ? "請先登入Google並等伺服器連線完成" : "未設定伺服器，請先到系統設定貼上 firebaseConfig"}`); continue; }
@@ -270,7 +274,7 @@ async function guestLoad(my) {
   }
   guestKey = key;
   guestSync = true;
-  if (!found) { state.storage = { memos: "private", ledger: "private" }; emit("storage:sync", { ...state.storage }); } // 新暱稱：預設資料也存私人端
+  if (!found) { state.storage = { memos: "private", ledger: "private", duty: "private", vault: "none" }; emit("storage:sync", { ...state.storage }); } // 新暱稱：預設資料也存私人端
   // 新暱稱：訪客先前在畫面上輸入的（還沒保存的）筆記 / 帳目一併帶進私人端
   const keep = [];
   if (!found) for (const r of choosables()) if (r.mode() === "none") keep.push([r, await r.list()]);
@@ -329,7 +333,7 @@ export async function afterLogin(accessToken) {
   const my = ++session;
   guestSync = false; guestDirty = false; clearTimeout(guestTimer); // 登入：訪客的私人端設定同步到此結束（設定改存 Google 雲端硬碟）
   choosables().forEach((r) => { if (r.mode() === "private") r.unbind(); }); // 訪客暱稱分區的資料換成帳號暱稱分區，由 applyStorage 重新綁
-  state.storage = { memos: "none", ledger: "none" };
+  state.storage = { memos: "none", ledger: "none", duty: "none", vault: "none" };
   const guestPrivate = cfg.firebasePrivate; // 未登入時已經貼好的私人端設定：雲端硬碟沒有的話就沿用
   cfg = BLANK(); fileId = null; driveLoaded = false;
   setStatus("drive", "loading");
@@ -393,7 +397,7 @@ export async function afterLogout(onStep = () => {}) {
   choosables().forEach((r) => r.unbind()); // 含 Google 雲端模式：資料不留在共用裝置上
   resetDriveData();
   state.readReminders = {}; emit("reminders:read", {}); // 已讀紀錄不留在共用手機上
-  state.storage = { memos: "none", ledger: "none" };
+  state.storage = { memos: "none", ledger: "none", duty: "none", vault: "none" };
   emit("storage:sync", { ...state.storage });
   clearToken(); forgetAccount(); resetAutoLogin(); pending = false;
   document.removeEventListener?.("click", flushOnTap, true);

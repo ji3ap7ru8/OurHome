@@ -24,7 +24,7 @@ export const state = {
   menuView: { mode: "card", size: "m", cols: 2 }, // 菜單頁瀏覽格式（同生活圖卡；登入後隨系統設定存雲端）
   menuSort: { sort: "default", order: [] }, // 菜單排序：default/name/custom、自訂編號順序（菜單 id 陣列）
   readReminders: {}, // 最新提醒已讀：{ 提醒編號: 已讀當下的發布時間 }（提醒被編輯、時間更新後會再次顯示未讀）。登入後存在伺服器 Firestore（reminder_reads/<信箱>，每人一份）
-  storage: { memos: "none", ledger: "none" }, // 資料儲存位置：none 不保存（預設，只在畫面記憶體）/ google Google 雲端硬碟 / private Firebase 私人端。登入後隨系統設定存 Google 雲端硬碟
+  storage: { memos: "none", ledger: "none", duty: "none", vault: "none" }, // 資料儲存位置：none 不保存（預設，只在畫面記憶體）/ google Google 雲端硬碟 / private Firebase 私人端。登入後隨系統設定存 Google 雲端硬碟
   calendarIds: [], // 家庭日曆 ID設定：Google 日曆 ID 清單 [{ id, name, calId }]，數量不限；登入後隨系統設定存 Google 雲端硬碟
   lineRelayUrl: "", // 系統設定 LINE Bot 的中繼站 URL（Google Apps Script 網頁應用程式網址）；隨系統設定存雲端
   lineBotToken: "", // 系統設定 LINE Bot 的 Bot Token（Channel access token）；登入後隨系統設定存 Google 雲端硬碟，登出即清除

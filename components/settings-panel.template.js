@@ -351,7 +351,7 @@ export const settingsPanelTemplate = `
                             </div>
                             <div>
                                 <h3 class="text-xs font-bold text-slate-800 dark:text-slate-100">儲存位置</h3>
-                                <p class="text-[10px] text-slate-400 dark:text-slate-400 mt-0.5">我的筆記、記帳本要存到哪裡</p>
+                                <p class="text-[10px] text-slate-400 dark:text-slate-400 mt-0.5">我的筆記、記帳本、值班表、帳密庫要存到哪裡</p>
                             </div>
                         </div>
                         <i class="fa-solid fa-chevron-down text-xs text-slate-400 acc-arrow"></i>
@@ -417,7 +417,65 @@ export const settingsPanelTemplate = `
                 </label>
                 </div>
             </div>
-            <p class="text-[10px] text-slate-400 leading-relaxed">選好後按下方〔儲存位置設定〕才會生效。「不保存」只留在目前畫面，關閉或重新整理就清除；「Google 雲端」要先登入，存在你的雲端硬碟隱藏資料夾；「Firebase 伺服器」使用家庭共用的伺服器資料庫（目前僅供選擇）；「Firebase 私人端」要先在下方「資料管理」設定並儲存私人端 firebaseConfig。</p>
+            <div class="space-y-1.5">
+                <div class="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-calendar-check text-xs text-orange-500"></i>值班表<span data-store-status="duty" class="ml-auto text-[10px] font-bold text-slate-400"></span></div>
+                <div class="grid grid-cols-4 gap-1">
+                <label data-tip="set-store-google" class="cursor-pointer block">
+                    <input type="radio" name="store-duty" value="google" class="peer sr-only">
+                    <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
+                        <i class="fa-brands fa-google-drive text-sm"></i><span class="leading-tight">Google<br>雲端</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">安全</span>
+                    </span>
+                </label>
+                <label data-tip="set-store-none" class="cursor-pointer block">
+                    <input type="radio" name="store-duty" value="none" class="peer sr-only" checked>
+                    <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
+                        <i class="fa-solid fa-ban text-sm"></i><span class="leading-tight">不保存<br>&nbsp;</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">預設</span>
+                    </span>
+                </label>
+                <label data-tip="set-store-server" class="cursor-pointer block">
+                    <input type="radio" name="store-duty" value="server" class="peer sr-only">
+                    <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
+                        <i class="fa-solid fa-server text-sm"></i><span class="leading-tight">Firebase<br>伺服器</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">快速</span>
+                    </span>
+                </label>
+                <label data-tip="set-store-private" class="cursor-pointer block">
+                    <input type="radio" name="store-duty" value="private" class="peer sr-only">
+                    <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
+                        <i class="fa-solid fa-fire text-sm"></i><span class="leading-tight">Firebase<br>私人端</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">隱私高</span>
+                    </span>
+                </label>
+                </div>
+            </div>
+            <div class="space-y-1.5">
+                <div class="text-[11px] font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5"><i class="fa-solid fa-key text-xs text-orange-500"></i>帳密庫<span data-store-status="vault" class="ml-auto text-[10px] font-bold text-slate-400"></span></div>
+                <div class="grid grid-cols-4 gap-1">
+                <label data-tip="set-store-google" class="cursor-pointer block">
+                    <input type="radio" name="store-vault" value="google" class="peer sr-only">
+                    <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
+                        <i class="fa-brands fa-google-drive text-sm"></i><span class="leading-tight">Google<br>雲端</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">安全</span>
+                    </span>
+                </label>
+                <label data-tip="set-store-none" class="cursor-pointer block">
+                    <input type="radio" name="store-vault" value="none" class="peer sr-only" checked>
+                    <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
+                        <i class="fa-solid fa-ban text-sm"></i><span class="leading-tight">不保存<br>&nbsp;</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">預設</span>
+                    </span>
+                </label>
+                <label data-tip="set-store-locked" data-store-locked="1" class="cursor-not-allowed block opacity-50">
+                    <input type="radio" name="store-vault" value="server" class="peer sr-only" disabled>
+                    <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
+                        <i class="fa-solid fa-lock text-sm"></i><span class="leading-tight">Firebase<br>伺服器</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">已鎖定</span>
+                    </span>
+                </label>
+                <label data-tip="set-store-locked" data-store-locked="1" class="cursor-not-allowed block opacity-50">
+                    <input type="radio" name="store-vault" value="private" class="peer sr-only" disabled>
+                    <span class="flex flex-col items-center justify-start gap-0.5 h-full py-1.5 px-0.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-[9px] font-bold text-slate-500 dark:text-slate-300 text-center leading-tight transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-300 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400">
+                        <i class="fa-solid fa-lock text-sm"></i><span class="leading-tight">Firebase<br>私人端</span><span class="text-[8px] font-bold px-1 py-px rounded-full bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300">已鎖定</span>
+                    </span>
+                </label>
+                </div>
+            </div>
+            <p class="text-[10px] text-slate-400 leading-relaxed">選好後按下方〔儲存位置設定〕才會生效。「不保存」只留在目前畫面，關閉或重新整理就清除；「Google 雲端」要先登入，存在你的雲端硬碟隱藏資料夾；「Firebase 伺服器」使用家庭共用的伺服器資料庫（目前僅供選擇）；「Firebase 私人端」要先在下方「資料管理」設定並儲存私人端 firebaseConfig。帳密庫因帳密安全性，只能選「Google 雲端」或「不保存」。</p>
 
                                 <button data-tip="set-store-save" data-action="storage-save" class="w-full py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold soft-shadow-sm hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-1.5">
                                     <i class="fa-solid fa-floppy-disk"></i> 儲存位置設定

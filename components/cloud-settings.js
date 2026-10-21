@@ -1,6 +1,7 @@
 // 設定視窗的雲端區塊：連線狀態徽章（含「同步中…」）、firebaseConfig 輸入框、備份還原按鈕。
 // 實際連線與讀寫都在 core/cloud.js，這裡只負責畫面與按鈕。
 import { state, on } from "../core/store.js";
+import { showToast } from "../core/toast.js";
 import { registerActions } from "../core/actions.js";
 import { saveFirebaseConfigs, exportDriveConfig, importDriveConfigFile, syncNow, refreshApiData, restoreDefaults, exportBundle, importBundleFile } from "../core/cloud.js";
 import { configToText } from "../core/fbconfig.js";
@@ -90,8 +91,8 @@ function paintInputs() {
   $("firebasePrivateInput").placeholder = "貼上私人 firebaseConfig...";
 }
 
-// ---- 儲存位置（我的筆記 / 記帳本）----
-const STORE_KEYS = ["memos", "ledger"];
+// ---- 儲存位置（我的筆記 / 記帳本 / 值班表 / 帳密庫）----
+const STORE_KEYS = ["memos", "ledger", "duty", "vault"];
 const radios = (key) => document.querySelectorAll(`input[name="store-${key}"]`);
 const picked = (key) => document.querySelector(`input[name="store-${key}"]:checked`)?.value || "none";
 const MODE_TEXT = { none: "不保存", google: "Google 雲端", server: "Firebase 伺服器", private: "Firebase 私人端" };
@@ -110,10 +111,12 @@ function paintStorage() {
   const canGoogle = state.isLoggedIn && state.cloud.mode === "google";
   STORE_KEYS.forEach((k) => {
     radios(k).forEach((r) => {
-      const off = r.value === "google" && !canGoogle;
+      const locked = !!r.parentElement.dataset.storeLocked; // 帳密庫的伺服器 / 私人端：永遠上鎖
+      const off = locked || (r.value === "google" && !canGoogle);
       r.disabled = off;
       r.nextElementSibling?.classList.toggle("opacity-40", off);
       r.parentElement.classList.toggle("cursor-not-allowed", off);
+      if (locked) r.checked = false;
       if (off && r.checked) {
         r.checked = false;
         const fb = [...radios(k)].find((x) => x.value === (state.storage[k] === "google" ? "none" : state.storage[k] || "none"));
@@ -189,15 +192,17 @@ export function mountCloudSettings() {
       server: $("firebaseServerInput").disabled ? null : $("firebaseServerInput").value, // 未登入時伺服器框上鎖，略過
       private: $("firebasePrivateInput").value,
     }),
-    // 儲存位置卡片的〔儲存位置設定〕：只套用 我的筆記 / 記帳本 的儲存位置
+    // 儲存位置卡片的〔儲存位置設定〕：套用 我的筆記 / 記帳本 / 值班表 / 帳密庫 的儲存位置
     "storage-save": async () => {
-      await saveFirebaseConfigs({}, { memos: picked("memos"), ledger: picked("ledger") });
+      await saveFirebaseConfigs({}, { memos: picked("memos"), ledger: picked("ledger"), duty: picked("duty"), vault: picked("vault") });
       paintStorageChoice(); // 沒套用成功的選項（例如私人端沒連上）退回目前實際的儲存位置
     },
     "bundle-export": () => exportBundle(),
     "bundle-import": () => pickJson(importBundleFile),
   });
 
+  // 帳密庫上鎖的選項：點了只顯示說明，不能選
+  document.addEventListener("click", (e) => { if (e.target.closest?.("[data-store-locked]")) showToast("配合帳密安全性，該服務只能儲存至個人雲端內", 4000); });
   on("cloud:change", paintAll);
   on("auth:change", () => { paintAll(); paintStorageChoice(); });
   on("storage:sync", paintStorageChoice);

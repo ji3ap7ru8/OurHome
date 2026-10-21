@@ -1,5 +1,6 @@
 // 值班表 — 目前只有樣式（範例資料），還沒有實際功能；之後再決定要排什麼班、怎麼提醒。
 import { closeTips } from "../../core/tips.js";
+import "./data.js"; // 登記資料集，「系統設定 → 儲存位置」才看得到它
 
 let root = null;
 
