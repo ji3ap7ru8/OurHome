@@ -18,7 +18,7 @@ export const state = {
   theme: { mode: "light", colorName: "晨曦藍", fontScale: FONT_SCALE.default },
   appsView: { mode: "card", size: "m", cols: 2 }, // 所有應用頁瀏覽格式：card/list、l/m/s、2/3/4（登入後隨系統設定存 Google 雲端硬碟）
   apps: { sort: "default", order: [], plugins: [], disabled: [] }, // 所有應用頁：排序方式（default/name/custom）、自訂編號順序（id 陣列）、擴充插件（{id,url,name}）、停用的應用（id 陣列，預設空＝全部啟用）。登入後隨系統設定存到雲端硬碟
-  lobby: { shown: [], order: [], mode: {}, cards: [] }, // 大廳設定：shown 大廳要顯示的服務 id（預設空＝全部關閉）、order 大廳自己的服務順序（空＝跟「所有應用」排序相同）、mode 各服務在大廳的顯示方式（沒設定＝用預設）、cards 大廳要顯示的生活圖卡 id（空＝都不顯示）；登入後隨系統設定存 Google 雲端硬碟
+  lobby: { shown: [], order: [], mode: {}, cards: [], menus: [] }, // 大廳設定：shown 大廳要顯示的服務 id（預設空＝全部關閉）、order 大廳自己的服務順序（空＝跟「所有應用」排序相同）、mode 各服務在大廳的顯示方式（沒設定＝用預設）、cards 大廳要顯示的生活圖卡 id（空＝都不顯示）；登入後隨系統設定存 Google 雲端硬碟
   cardsView: { mode: "card", size: "m", cols: 2 }, // 生活圖卡頁瀏覽格式：card/list、l/m/s、2/3（登入後隨系統設定存 Google 雲端硬碟）
   cardsSort: { sort: "default", order: [] }, // 生活圖卡排序：default/name/custom、自訂編號順序（圖卡 id 陣列）
   readReminders: {}, // 最新提醒已讀：{ 提醒編號: 已讀當下的發布時間 }（提醒被編輯、時間更新後會再次顯示未讀）。登入後存在伺服器 Firestore（reminder_reads/<信箱>，每人一份）

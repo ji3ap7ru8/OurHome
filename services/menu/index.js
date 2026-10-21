@@ -2,6 +2,7 @@
 // 點卡片 → 放大看菜單圖片；新增從頂部列「新增」，編輯 / 刪除在每張卡右上角的 ✎。
 import { menuApi } from "./data.js";
 import { on } from "../../core/store.js";
+import { takeOpenMenu } from "../../core/lobby-model.js";
 import { showTipHint, closeTips } from "../../core/tips.js";
 
 let items = [];
@@ -9,6 +10,7 @@ let loaded = false;
 let root = null;
 let off = null;
 let offEv = [];
+let want = null; // 從大廳點進來要直接放大的菜單 id
 let fs = { scale: 1, rotated: false, dist: 0, multi: false };
 
 const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -62,6 +64,7 @@ async function refresh() {
   try { items = await menuApi.list(); } catch (e) { toast(e.message || "讀取失敗"); }
   loaded = true;
   render();
+  if (want) { const id = want; want = null; const m = items.find((x) => x.id === id); if (m) openFullscreen(m); }
 }
 async function run(fn) {
   try { await fn(); await refresh(); return true; }
@@ -154,6 +157,7 @@ export default {
       const o = e.target.closest("[data-open]");
       if (o) { const m = items.find((x) => x.id === o.dataset.open); if (m) openFullscreen(m); }
     });
+    want = takeOpenMenu();
     loaded = false; items = [];
     render();
     refresh();

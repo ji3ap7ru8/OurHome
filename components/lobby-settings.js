@@ -5,9 +5,10 @@
 import { on, state } from "../core/store.js";
 import { registerActions, registerChangeActions } from "../core/actions.js";
 import { cardsApi } from "../services/cards/data.js";
+import { menuApi } from "../services/menu/data.js";
 import { memoApi } from "../services/memo/data.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
-import { lobbyCandidates, lobbyOrdered, isShown, setShown, moveLobby, resetLobbyOrder, modeOptions, getMode, setMode, ledgerParts, ledgerToggle, lobbyCards, toggleLobbyCard } from "../core/lobby-model.js";
+import { lobbyCandidates, lobbyOrdered, isShown, setShown, moveLobby, resetLobbyOrder, modeOptions, getMode, setMode, ledgerParts, ledgerToggle, lobbyCards, toggleLobbyCard, lobbyMenus, toggleLobbyMenu } from "../core/lobby-model.js";
 
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const $ = (id) => document.getElementById(id);
@@ -25,6 +26,7 @@ export function mountLobbySettings() {
     "lobby-detail": (el) => openDetail(el.dataset.id),
     "lobby-detail-close": () => closeDetail(),
     "lobby-card-toggle": (el) => { toggleLobbyCard(el.dataset.cardId, cardList.map((c) => c.id)); paintCards(); },
+    "lobby-menu-toggle": (el) => { toggleLobbyMenu(el.dataset.menuId, menuList.map((c) => c.id)); paintMenus(); },
     "lobby-ledger-pick": (el) => { setMode("記帳", ledgerToggle(getMode("記帳"), el.dataset.value)); paintLedger(); }, // 記帳本：全部單選、其餘可複選
     "lobby-mode-pick": (el) => { setMode(el.dataset.id, el.dataset.value); closeDetail(); },
     "lobby-order-reset": () => { if (confirm("要把大廳順序還原成跟「所有應用」相同嗎？")) resetLobbyOrder(); },
@@ -105,7 +107,8 @@ function renderOrder() {
 
 // 點「>」：小視窗選這個服務在大廳要怎麼顯示；沒有選項的服務先顯示「暫時沒有可設定的項目」
 let cardList = []; // 生活圖卡視窗目前讀到的圖卡 [{ id, name }]
-function closeDetail() { document.getElementById("lobbyDetail")?.remove(); cardList = []; }
+let menuList = []; // 菜單視窗目前讀到的菜單 [{ id, name }]
+function closeDetail() { document.getElementById("lobbyDetail")?.remove(); cardList = []; menuList = []; }
 
 const CHOICE = "w-full flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/40 px-3 py-2.5 text-left active:scale-[.98] transition";
 const tick = (on) => `<i class="fa-solid ${on ? "fa-circle-check theme-text-primary" : "fa-circle text-slate-300 dark:text-slate-600"} text-sm shrink-0"></i>`;
@@ -145,6 +148,27 @@ function paintLedger() {
   }).join("");
 }
 
+// 菜單：列出已新增的菜單名稱，可多選要在大廳顯示哪幾份
+function paintMenus() {
+  const body = document.getElementById("lobbyDetailBody");
+  if (!body) return;
+  const on = new Set(lobbyMenus());
+  body.innerHTML = menuList.length
+    ? `<p class="text-[10px] text-slate-400">選擇大廳要顯示的菜單（可多選）</p>
+      <div class="space-y-1.5 max-h-[50vh] overflow-y-auto">${menuList.map((c) => `
+      <button type="button" role="checkbox" aria-checked="${on.has(c.id)}" data-tip="lobby-card-pick" data-action="lobby-menu-toggle" data-menu-id="${esc(c.id)}" class="${CHOICE}">
+        <span class="flex-1 min-w-0 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">${esc(c.name || "（未命名）")}</span>${tick(on.has(c.id))}
+      </button>`).join("")}</div>`
+    : '<p class="text-[11px] text-slate-400 text-center py-3">還沒有新增任何菜單，請先到「菜單」新增。</p>';
+}
+async function loadMenus() {
+  const body = document.getElementById("lobbyDetailBody");
+  if (body) body.innerHTML = '<p class="text-[11px] text-slate-400 text-center py-3">讀取菜單中…</p>';
+  try { menuList = (await menuApi.list()).map((c) => ({ id: c.id, name: c.name })); }
+  catch { menuList = []; if (document.getElementById("lobbyDetailBody")) document.getElementById("lobbyDetailBody").innerHTML = '<p class="text-[11px] text-slate-400 text-center py-3">讀取菜單失敗，請確認已登入並連線。</p>'; return; }
+  paintMenus();
+}
+
 function openDetail(id) {
   const a = lobbyOrdered().find((x) => x.id === id);
   if (!a || a.plugin) return;
@@ -158,7 +182,7 @@ function openDetail(id) {
       </button>`).join("");
   const body = opts.length
     ? choices(opts)
-    : isCards ? "" : '<p class="text-[11px] text-slate-400 text-center py-3">這個服務暫時沒有可設定的項目。</p>';
+    : isCards || id === "菜單" ? "" : '<p class="text-[11px] text-slate-400 text-center py-3">這個服務暫時沒有可設定的項目。</p>';
   const box = document.createElement("div");
   box.id = "lobbyDetail";
   box.className = MODAL;
@@ -177,6 +201,7 @@ function openDetail(id) {
   document.body.appendChild(box);
   fixAppIcons(box);
   if (isCards) loadCards();
+  if (id === "菜單") loadMenus();
   if (id === "記帳") paintLedger();
   if (id === "個人記事本") loadMemoChoices(opts, choices); // 補上目前有的每個分類
 }

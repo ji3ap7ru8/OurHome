@@ -5,7 +5,7 @@
 import { state, emit } from "./store.js";
 import { orderedApps, defaultApps } from "./apps-model.js";
 
-const commit = (extra) => emit("lobby:change", { shown: [...state.lobby.shown], order: [...state.lobby.order], mode: { ...state.lobby.mode }, cards: [...state.lobby.cards], ...extra });
+const commit = (extra) => emit("lobby:change", { shown: [...state.lobby.shown], order: [...state.lobby.order], mode: { ...state.lobby.mode }, cards: [...state.lobby.cards], menus: [...state.lobby.menus], ...extra });
 
 // 各服務在大廳的顯示方式（第一個選項是預設）。沒有列在這裡的服務 = 暫時沒有選項，只保留「>」
 export const LOBBY_MODES = {
@@ -46,6 +46,21 @@ export function toggleLobbyCard(id, existing) {
   commit();
   return true;
 }
+
+// 菜單：大廳要顯示哪幾份（可多選，空 = 都不顯示），做法同生活圖卡
+export const lobbyMenus = () => [...state.lobby.menus];
+export function toggleLobbyMenu(id, existing) {
+  if (!existing.includes(id)) return false;
+  const on = new Set(state.lobby.menus.filter((x) => existing.includes(x)));
+  on.has(id) ? on.delete(id) : on.add(id);
+  state.lobby.menus = existing.filter((x) => on.has(x));
+  commit();
+  return true;
+}
+// 大廳點菜單 → 進入菜單頁後直接打開那一份
+let menuWanted = null;
+export const requestOpenMenu = (id) => { menuWanted = id || null; };
+export const takeOpenMenu = () => { const v = menuWanted; menuWanted = null; return v; };
 
 export function setMode(id, value) {
   if (!validMode(id, value) || getMode(id) === value) return false;
@@ -112,7 +127,7 @@ export function resetLobbyOrder() {
 }
 
 /* ---------- 存取雲端硬碟設定 ---------- */
-export const snapshotLobby = () => ({ shown: [...state.lobby.shown], order: [...state.lobby.order], mode: { ...state.lobby.mode }, cards: [...state.lobby.cards] });
+export const snapshotLobby = () => ({ shown: [...state.lobby.shown], order: [...state.lobby.order], mode: { ...state.lobby.mode }, cards: [...state.lobby.cards], menus: [...state.lobby.menus] });
 
 // 套用雲端讀到的設定：欄位一律檢查，不認得的 id 直接略過（舊設定檔沒有 lobby 時不動）
 export function applyLobby(s) {
@@ -134,6 +149,9 @@ export function applyLobby(s) {
   const cards = [];
   for (const id of Array.isArray(s.cards) ? s.cards : []) if (typeof id === "string" && id && id.length < 200 && !cards.includes(id) && cards.length < 200) cards.push(id); // 圖卡 id 是動態的，這裡只檢查格式
   state.lobby.cards = cards;
+  const menus = [];
+  for (const id of Array.isArray(s.menus) ? s.menus : []) if (typeof id === "string" && id && id.length < 200 && !menus.includes(id) && menus.length < 200) menus.push(id);
+  state.lobby.menus = menus;
   commit();
 }
 
@@ -142,5 +160,6 @@ export function resetLobby() {
   state.lobby.order = [];
   state.lobby.mode = {};
   state.lobby.cards = [];
+  state.lobby.menus = [];
   commit();
 }

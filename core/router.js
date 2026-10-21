@@ -6,6 +6,7 @@ import { renderApps } from "../components/apps.js";
 import { isEnabled } from "./apps-model.js";
 import { showToast } from "./toast.js";
 import { requestOpenCard } from "./cards-model.js";
+import { requestOpenMenu } from "./lobby-model.js";
 
 const services = new Map();
 let active = null;
@@ -16,7 +17,9 @@ export function initRouter() {
   registerActions({
     nav: (el) => {
       requestOpenCard(el.dataset.openCard); // 大廳的圖卡小卡：進入生活圖卡後直接打開那一張（其他按鈕沒有 data-open-card）
+      requestOpenMenu(el.dataset.openMenu); // 大廳的菜單小卡：進入菜單後直接放大那一份
       navigate(el.dataset.feature);
+      requestOpenMenu(null);
       requestOpenCard(null); // 沒進得去（例如訪客被鎖住）就不要留到下次
     },
   });

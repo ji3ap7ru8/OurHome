@@ -5,7 +5,7 @@
 //   - 各服務要挑哪幾筆、整理成什麼欄位：core/lobby-feed.js（可用 Node 測試）
 import { state, on } from "../core/store.js";
 import { showTipHint } from "../core/tips.js";
-import { lobbyOrdered, getMode, modeLabelOf, lobbyCards, ledgerParts } from "../core/lobby-model.js";
+import { lobbyOrdered, getMode, modeLabelOf, lobbyCards, lobbyMenus, ledgerParts } from "../core/lobby-model.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
 import { noteItems, memoItems, calendarItems, calendarFetchRange, CAL_EMPTY, bowlItems, cardItems } from "../core/lobby-feed.js";
 import { notesApi, PALETTE as NOTE_PALETTE } from "../services/notes/data.js";
@@ -13,6 +13,7 @@ import { calendarApi, COLOR_MAP, DEFAULT_COLOR } from "../services/calendar/data
 import { gcalApi } from "../core/gcal.js";
 import { memoApi, catStyle } from "../services/memo/data.js";
 import { bowlApi } from "../services/bowl/data.js";
+import { menuApi } from "../services/menu/data.js";
 import { cardsApi, KINDS } from "../services/cards/data.js";
 import { ledgerApi } from "../services/ledger/data.js";
 import { summarize, monthKey } from "../services/ledger/engine.js";
@@ -141,6 +142,25 @@ const SECTIONS = {
       return `<div class="${box} flex items-stretch gap-2">${cell(items[0])}<span class="w-px bg-slate-200 dark:bg-slate-700 my-1"></span>${cell(items[1])}</div>`;
     },
   },
+  菜單: {
+    login: true,
+    load: () => menuApi.list(),
+    build(raw, id) {
+      if (!lobbyMenus().length) return msg("還沒選擇要顯示的菜單（大廳設定 → 大廳排序 → 菜單 ›）");
+      const pick = new Set(lobbyMenus());
+      const items = (Array.isArray(raw) ? raw : []).filter((m) => pick.has(m.id));
+      if (!items.length) return msg("選擇的菜單已不存在，請重新選擇");
+      return items.map((m) => {
+        const fb = "fa-solid fa-bowl-food text-sm theme-text-primary";
+        const u = safeImg(m.iconUrl);
+        const icon = u ? `<img data-icon data-fb="${esc(fb)}" src="${esc(u)}" alt="" referrerpolicy="no-referrer" class="w-full h-full object-contain">` : `<i class="${fb}"></i>`;
+        return `<button type="button" ${nav(id)} data-open-menu="${esc(m.id)}" data-tip="lobby-card" class="${BIG} flex items-center gap-3 active:scale-95 transition">
+          <span class="w-12 h-12 rounded-xl theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${icon}</span>
+          <span class="min-w-0 text-base font-black text-slate-800 dark:text-slate-100 truncate">${esc(m.name)}</span>
+        </button>`;
+      }).join("");
+    },
+  },
   生活圖卡: {
     login: true,
     load: () => cardsApi.list(),
@@ -166,11 +186,11 @@ let raw = {};      // 這次進大廳讀回來的原始資料（改大廳設定�
 let seq = 0;       // 每次重畫 +1：舊的非同步結果不會蓋掉新畫面
 let wired = false;
 
-const modeLabel = (a) => (a.id === "生活圖卡" ? `已選 ${lobbyCards().length} 張` : modeLabelOf(a.id));
+const modeLabel = (a) => (a.id === "生活圖卡" ? `已選 ${lobbyCards().length} 張` : a.id === "菜單" ? `已選 ${lobbyMenus().length} 份` : modeLabelOf(a.id));
 
 function shell(a) {
   // 除了「生活圖卡」（小卡直接打開那張圖卡），其餘服務點區塊任何地方都跳到該服務頁
-  const whole = a.id === "生活圖卡" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
+  const whole = a.id === "生活圖卡" || a.id === "菜單" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
   return `<section id="lobbySec-${esc(a.id)}" ${whole} class="glass-card rounded-3xl py-3${whole ? " cursor-pointer" : ""}">
     <button type="button" ${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" class="w-full flex items-center gap-2 px-4 text-left">
       <span class="w-7 h-7 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-xs")}</span>
