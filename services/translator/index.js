@@ -16,6 +16,8 @@ let listening = false;
 // 即時翻譯：持續聆聽、邊說邊翻，語音辨識中斷時自動接續
 let live = { on: false, items: [], interim: "", interimTr: "", rec: null, timer: null, iseq: 0, restarts: 0 };
 let offLive = null;
+let liveSpeak = false; // 即時翻譯：自動朗讀譯文（預設關）
+let speaking = 0;
 
 const SR = typeof window !== "undefined" ? window.SpeechRecognition || window.webkitSpeechRecognition : null;
 const canSpeak = typeof window !== "undefined" && "speechSynthesis" in window;
@@ -50,32 +52,71 @@ function render() {
 
 function liveCard() {
   return `<div class="bg-white/95 dark:bg-slate-800/95 rounded-3xl soft-shadow-md p-4 mb-3">
-    <div class="flex items-center gap-2 mb-2">
-      <span data-live-dot class="w-3 h-3 rounded-full ${listening ? "bg-rose-500 animate-pulse" : "bg-slate-300"}"></span>
-      <span data-live-state class="text-sm font-black text-slate-600 dark:text-slate-200">${listening ? "聆聽中，請直接說話…" : SR ? "已暫停" : "此瀏覽器不支援語音辨識"}</span>
-      <button data-live-clear aria-label="清除紀錄" class="ml-auto w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200 active:scale-90 transition"><i class="fa-solid fa-xmark"></i></button>
-      ${SR ? `<button data-live-pause aria-label="${listening ? "暫停" : "繼續"}" class="h-10 px-4 rounded-full theme-bg-primary text-white font-black active:scale-95 transition"><i class="fa-solid ${listening ? "fa-pause" : "fa-microphone"}"></i> ${listening ? "暫停" : "繼續"}</button>` : ""}
+    <div data-live-src class="min-h-[6rem] max-h-[26vh] overflow-y-auto text-xl font-semibold text-slate-800 dark:text-slate-100 break-words select-text"></div>
+    <div class="flex items-center gap-2 mt-2">
+      <button data-live-pause aria-label="暫停或繼續" class="w-12 h-12 rounded-full text-lg active:scale-90 transition"></button>
+      <button data-live-clear aria-label="清除" class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200 active:scale-90 transition"><i class="fa-solid fa-xmark"></i></button>
+      <button data-live-speak aria-pressed="${liveSpeak}" class="h-12 px-4 rounded-full font-black text-sm active:scale-95 transition"></button>
+      <span data-live-state class="ml-auto text-xs font-bold text-slate-400"></span>
     </div>
-    <div data-live-log class="max-h-[52vh] overflow-y-auto space-y-3 select-text"></div>
   </div>`;
 }
 
 function renderLive() {
-  const box = root?.querySelector("[data-live-log]");
-  if (!box) return;
-  const row = (src, tr, dim) => `<div class="${dim ? "opacity-60" : ""}"><p class="text-sm font-semibold text-slate-500 dark:text-slate-400 break-words">${esc(src)}</p><p class="text-xl font-black text-slate-900 dark:text-white leading-snug break-words">${esc(tr) || "…"}</p></div>`;
-  box.innerHTML = live.items.map((i) => row(i.src, i.tr)).join("") + (live.interim ? row(live.interim, live.interimTr, true) : "") ||
-    `<p class="text-slate-400 font-semibold py-6 text-center">說話後，原文與翻譯會即時出現在這裡</p>`;
-  box.scrollTop = box.scrollHeight;
+  if (!root) return;
+  const srcBox = root.querySelector("[data-live-src]");
+  const box = root.querySelector("[data-result-box]");
+  if (!srcBox || !box) return;
+  const to = langOf(st.to);
+  const srcFin = live.items.map((i) => i.src).join(" ");
+  const trFin = live.items.map((i) => i.tr).filter(Boolean).join(" ");
+  srcBox.innerHTML = srcFin || live.interim
+    ? `${esc(srcFin)}${live.interim ? ` <span class="opacity-50">${esc(live.interim)}</span>` : ""}`
+    : `<span class="text-slate-400">${SR ? "開始說話，原文會顯示在這裡…" : "此瀏覽器不支援語音辨識"}</span>`;
+  srcBox.scrollTop = srcBox.scrollHeight;
+  const hasTr = trFin || live.interimTr;
+  box.innerHTML = hasTr ? `
+    <div class="bg-white/95 dark:bg-slate-800/95 rounded-3xl soft-shadow-md p-5 border-2 theme-border-primary">
+      <p class="text-xs font-extrabold theme-text-primary mb-2">${to.name}</p>
+      <div data-live-tr class="max-h-[34vh] overflow-y-auto"><p class="text-2xl font-black text-slate-900 dark:text-white leading-relaxed break-words select-text">${esc(trFin)}${live.interimTr ? ` <span class="opacity-50">${esc(live.interimTr)}</span>` : ""}</p></div>
+      <div class="flex flex-wrap gap-2 mt-4">
+        <button data-live-copy class="h-11 px-4 rounded-full theme-bg-light theme-text-primary font-bold"><i class="fa-regular fa-copy"></i> 複製</button>
+      </div>
+    </div>` : "";
+  const tr = box.querySelector("[data-live-tr]");
+  if (tr) tr.scrollTop = tr.scrollHeight;
+  setLiveStatus();
 }
 
 function setLiveStatus() {
-  const d = root?.querySelector("[data-live-dot]");
-  if (d) d.className = `w-3 h-3 rounded-full ${listening ? "bg-rose-500 animate-pulse" : "bg-slate-300"}`;
+  const p = root?.querySelector("[data-live-pause]");
+  if (p) {
+    p.className = `w-12 h-12 rounded-full text-lg active:scale-90 transition ${listening ? "bg-rose-500 text-white animate-pulse" : "theme-bg-light theme-text-primary"}`;
+    p.innerHTML = `<i class="fa-solid ${listening ? "fa-microphone" : "fa-microphone-slash"}"></i>`;
+  }
+  const sp = root?.querySelector("[data-live-speak]");
+  if (sp) {
+    sp.className = `h-12 px-4 rounded-full font-black text-sm active:scale-95 transition ${liveSpeak ? "theme-bg-primary text-white" : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200"}`;
+    sp.innerHTML = `<i class="fa-solid ${liveSpeak ? "fa-volume-high" : "fa-volume-xmark"}"></i> 朗讀${liveSpeak ? "開" : "關"}`;
+  }
   const t = root?.querySelector("[data-live-state]");
-  if (t) t.textContent = listening ? "聆聽中，請直接說話…" : "已暫停";
-  const b = root?.querySelector("[data-live-pause]");
-  if (b) b.innerHTML = listening ? `<i class="fa-solid fa-pause"></i> 暫停` : `<i class="fa-solid fa-microphone"></i> 繼續`;
+  if (t) t.textContent = !SR ? "" : speaking ? "朗讀中…" : listening ? "聆聽中" : "已暫停";
+}
+
+// 朗讀譯文：朗讀時暫停聆聽，避免麥克風把喇叭聲又聽進去；念完自動接續
+function speakLive(text) {
+  if (!liveSpeak || !canSpeak || !text || !langOf(st.to).speech) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = langOf(st.to).speech;
+  u.rate = 0.95;
+  u.onstart = () => { speaking++; stopRec(); setLiveStatus(); };
+  const done = () => {
+    speaking = Math.max(0, speaking - 1);
+    if (!speaking && live.on && !live.paused) startLive();
+    setLiveStatus();
+  };
+  u.onend = done; u.onerror = done;
+  window.speechSynthesis.speak(u);
 }
 
 async function liveTranslate(text, from) {
@@ -105,7 +146,7 @@ function startLive() {
           live.items.push(item);
           if (live.items.length > 40) live.items.shift();
           const from = liveFrom();
-          liveTranslate(said, from).then((t) => { item.tr = t; }).catch(() => { item.tr = "（翻譯失敗）"; }).finally(() => live.on && renderLive());
+          liveTranslate(said, from).then((t) => { item.tr = t; speakLive(t); }).catch(() => { item.tr = "（翻譯失敗）"; }).finally(() => live.on && renderLive());
         }
       } else if (said) {
         live.interim = said;
@@ -146,7 +187,7 @@ function setLive(v) {
   clearTimeout(live.timer);
   live.iseq++;
   if (v) { stopAll(); live.items = []; live.interim = ""; live.interimTr = ""; holdAwake("translator-live"); }
-  else { stopRec(); releaseAwake("translator-live"); live.interim = ""; live.interimTr = ""; }
+  else { stopRec(); speaking = 0; if (canSpeak) window.speechSynthesis.cancel(); releaseAwake("translator-live"); live.interim = ""; live.interimTr = ""; }
   emit("translator:live-set", live.on);
   if (!root) return;
   render();
@@ -195,6 +236,7 @@ function stopAll() {
   rec?.abort?.();
   rec = null;
   listening = false;
+  speaking = 0;
   if (canSpeak) window.speechSynthesis.cancel();
 }
 
@@ -308,6 +350,8 @@ function onClick(e) {
   if (q("[data-big]")) return showBig();
   if (q("[data-mic]")) return toggleMic();
   if (q("[data-live-clear]")) { live.items = []; live.interim = ""; live.interimTr = ""; return renderLive(); }
+  if (q("[data-live-speak]")) { liveSpeak = !liveSpeak; if (!liveSpeak && canSpeak) { window.speechSynthesis.cancel(); } return setLiveStatus(); }
+  if (q("[data-live-copy]")) { st.result = live.items.map((i) => i.tr).filter(Boolean).join(" "); return copy(); }
   if (q("[data-live-pause]")) { if (listening || live.rec) { live.paused = true; stopRec(); setLiveStatus(); } else { live.paused = false; startLive(); } return; }
 }
 
