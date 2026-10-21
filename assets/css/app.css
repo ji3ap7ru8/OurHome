@@ -603,6 +603,9 @@ input:checked + .memo-pick { background: var(--primary-color); color: #fff; bord
 .lg-note { margin: 0 .25rem .75rem; font-size: .72rem; font-weight: 800; line-height: 1.5; padding: .45rem .75rem; border-radius: .75rem; border: 1px dashed; }
 .lg-note.warn { background: #fef3c7cc; color: #78350f; border-color: #f59e0b88; }
 .lg-note.ok { background: #d1fae5cc; color: #064e3b; border-color: #10b98188; }
+.lg-note.info { background: #e0f2fecc; color: #0c4a6e; border-color: #0ea5e988; }
+.lg-note-ok { margin-left: .25rem; padding: .05rem .6rem; border-radius: 999px; background: #fffc; border: 1px solid currentColor; font-size: .72rem; font-weight: 900; }
+.lg-note[hidden] { display: none; }
 .lg-monthbar { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin: 0 .25rem .75rem; }
 .lg-monthbar [data-month] { font-size: 1.05rem; font-weight: 900; padding: .35rem 1.1rem; border-radius: 999px; color: var(--primary-dark); background: #fffe; border: 1.5px solid var(--primary-color); }
 .dark .lg-monthbar [data-month] { background: #1e293bee; color: #e2e8f0; }

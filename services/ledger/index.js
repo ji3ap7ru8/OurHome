@@ -1,7 +1,8 @@
 // 記帳本 — Stage 6：收支輸入、分類、月統計圖表 UI；資料只存在記憶體。
 // 訪客可用（不設 requiresLogin）：計劃案第三節「僅暫存體驗」。
 import { showTipHint, closeTips } from "../../core/tips.js";
-import { storageNote } from "../../core/storage-note.js";
+import { state, on } from "../../core/store.js";
+import { isFirebaseConfigured } from "../../core/cloud.js";
 import { ledgerApi } from "./data.js";
 import { catsOf, catInfo, ymd, monthKey, shiftMonth, parseAmount, summarize, byCategory, groupByDay } from "./engine.js";
 
@@ -10,6 +11,34 @@ let root = null;
 let alive = false;
 let month = monthKey();
 let chartType = "expense";
+let noteListening = false;
+let dismissed = "";
+
+// 依「系統設定 > 儲存位置 > 記帳本」的設定顯示對應說明（邏輯同「我的筆記」）
+const STORE_NOTE = {
+  none: { icon: "fa-user-secret", cls: "warn", text: "目前儲存位置為「不保存」，只會暫存資料，重整網頁將會清除。（可到 設定 > 儲存位置 變更）" },
+  google: { icon: "fa-brands fa-google-drive", cls: "info", text: "新增帳目將儲存至個人雲端硬碟中，資料如過大將佔用個人雲端空間需注意。" },
+  server: { icon: "fa-server", cls: "ok", text: "新增帳目將儲存至伺服器中，依使用者帳號分區存放。" },
+  private: { icon: "fa-lock", cls: "ok", text: "新增帳目將儲存至私人端中，隱密性極高。" },
+};
+const noteFor = (mode) => {
+  const warn = (text) => ({ icon: "fa-triangle-exclamation", cls: "warn", text });
+  if (mode === "private" && !isFirebaseConfigured("private")) return warn("未設定私人端，只會暫存資料，重整網頁將會清除。");
+  if (mode === "google" && !state.isLoggedIn) return warn("請先登入Google再新增帳目，否則只會暫存資料，重整網頁將會清除。");
+  if (mode === "server") {
+    if (!isFirebaseConfigured("server")) return warn("未設定伺服器，只會暫存資料，重整網頁將會清除。");
+    if (!state.isLoggedIn) return warn("請先登入Google再新增帳目，否則只會暫存資料，重整網頁將會清除。");
+  }
+  return STORE_NOTE[mode] || STORE_NOTE.none;
+};
+const setNote = () => {
+  const el = root?.querySelector("[data-note]"); if (!el) return;
+  const n = noteFor(state.storage?.ledger || "none");
+  el.hidden = dismissed === n.text; // 按過「了解」的同一則提示不再顯示（內容改變才會再出現）
+  el.className = `lg-note ${n.cls}`;
+  el.innerHTML = `<i class="${n.icon.includes(" ") ? n.icon : "fa-solid " + n.icon} mr-1"></i>${n.text} <button type="button" data-note-ok data-tip="ledger-note-ok" class="lg-note-ok">了解</button>`;
+  el.querySelector("[data-note-ok]").onclick = () => { dismissed = n.text; el.hidden = true; };
+};
 
 const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const money = (n) => "$" + Number(n).toLocaleString("zh-TW", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
@@ -149,11 +178,9 @@ export default {
     showTipHint("ledger");
     root = document.createElement("div");
     root.className = "px-3.5 pb-6";
-    const guest = !ctx?.state?.isLoggedIn;
-    const sn = (ctx?.state?.storage?.ledger || "none") === "none";
     root.innerHTML = `
       <div class="h-1"></div>
-      <p class="lg-note ${sn ? "warn" : "ok"}"><i class="fa-solid ${sn ? "fa-user-secret" : "fa-cloud-arrow-up"}"></i> ${storageNote(ctx?.state?.storage?.ledger, guest, "帳目")}</p>
+      <p data-note></p>
       <div class="lg-monthbar">
         <button data-tip="ledger-prev" data-prev aria-label="上個月" class="cal-nav"><i class="fa-solid fa-chevron-left"></i></button>
         <span data-month></span>
@@ -170,6 +197,11 @@ export default {
         <button data-tip="ledger-add" data-add aria-label="記一筆" class="lg-fab"><i class="fa-solid fa-plus"></i> 記一筆</button>
       </div>`;
     el.appendChild(root);
+    setNote();
+    if (!noteListening) { noteListening = true;
+      on("data:change", (e) => { if (alive && e?.name === "ledger") reload(); }); // 切換儲存位置 / 雲端資料更新後重新讀取
+      for (const ev of ["auth:change", "cloud:change", "storage:sync", "storage:change"]) on(ev, () => { if (alive) setNote(); });
+    }
     root.querySelector("[data-prev]").onclick = () => { month = shiftMonth(month, -1); render(); };
     root.querySelector("[data-next]").onclick = () => { if (month < monthKey()) { month = shiftMonth(month, 1); render(); } };
     root.querySelector("[data-add]").onclick = () => openForm();
