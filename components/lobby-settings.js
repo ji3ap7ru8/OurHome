@@ -9,7 +9,7 @@ import { menuApi } from "../services/menu/data.js";
 import { memoApi } from "../services/memo/data.js";
 import { showToast } from "../core/toast.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
-import { lobbyCandidates, lobbyOrdered, isShown, setShown, moveLobby, resetLobbyOrder, modeOptions, getMode, setMode, ledgerParts, ledgerToggle, lobbyCards, toggleLobbyCard, lobbyMenusAll, toggleLobbyMenu, isLocked, LOCKED_MSG } from "../core/lobby-model.js";
+import { lobbyCandidates, lobbyOrdered, isShown, setShown, moveLobby, resetLobbyOrder, modeOptions, getMode, setMode, ledgerParts, ledgerToggle, lobbyCards, toggleLobbyCard, lobbyMenus, lobbyMenusAll, toggleLobbyMenu, isLocked, LOCKED_MSG } from "../core/lobby-model.js";
 
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const $ = (id) => document.getElementById(id);
