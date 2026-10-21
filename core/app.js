@@ -28,6 +28,7 @@ import stopwatch from "../services/stopwatch/index.js";
 import memo from "../services/memo/index.js";
 import ledger from "../services/ledger/index.js";
 import bowl from "../services/bowl/index.js";
+import menu from "../services/menu/index.js";
 
 export function bootstrap() {
   initActions(document);
@@ -65,6 +66,7 @@ export function bootstrap() {
   registerService(memo);
   registerService(ledger);
   registerService(bowl);
+  registerService(menu);
   initRouter();
   navigate("大廳");
 

@@ -38,7 +38,7 @@ export function navigate(id = "大廳") {
   active = null;
   outlet.innerHTML = "";
   state.route = id;
-  document.getElementById("appContainer")?.setAttribute("data-view", id === "應用程式" ? "apps" : id === "家庭公告" ? "notes" : id === "家庭日曆" ? "calendar" : id === "生活圖卡" ? "cards" : id === "換誰洗碗" ? "bowl" : id === "個人記事本" ? "memo" : id === "記帳" ? "ledger" : "");
+  document.getElementById("appContainer")?.setAttribute("data-view", id === "應用程式" ? "apps" : id === "家庭公告" ? "notes" : id === "家庭日曆" ? "calendar" : id === "生活圖卡" || id === "菜單" ? "cards" : id === "換誰洗碗" ? "bowl" : id === "個人記事本" ? "memo" : id === "記帳" ? "ledger" : "");
   emit("route:change", id);
 
   const svc = services.get(id);

@@ -87,6 +87,7 @@ services/                   服務模組（每個服務一個資料夾，介面�
 |---|---|
 | `notes` | 家庭公告 |
 | `cards` | 生活圖卡 |
+| `menus` | 菜單（名稱 + 圖示連結 + 菜單圖片連結；規則需比照 `cards` 允許家人讀寫） |
 | `calendar` | 家庭日曆的 App 內行程（沒有新增 Google 日曆時使用） |
 | `bowl_members`、`bowl_days`、`bowl_settings` | 換誰洗碗 |
 | `reminders`、`reminder_reads/<信箱>` | 最新提醒、每人各一份已讀紀錄 |

@@ -27,6 +27,9 @@ export const headerTemplate = `
                 <!-- 我的筆記頁專用：左側標題（其他頁隱藏） -->
                 <h2 id="headerMemoTitle" class="hidden items-center gap-2 text-lg shrink-0 font-black leading-tight text-slate-900 dark:text-slate-100"><i class="fa-solid fa-book-open theme-text-primary"></i><span>我的筆記</span></h2>
 
+                <!-- 菜單頁專用：左側標題（其他頁隱藏） -->
+                <h2 id="headerMenuTitle" class="hidden items-center gap-2 text-2xl shrink-0 font-black leading-tight text-slate-800 dark:text-slate-100"><i class="fa-solid fa-bowl-food theme-text-primary"></i><span>菜單</span></h2>
+
                 <!-- 記帳本頁專用：左側標題（其他頁隱藏） -->
                 <h2 id="headerLedgerTitle" class="hidden items-center gap-2 text-2xl shrink-0 font-black leading-tight text-slate-800 dark:text-slate-100"><i class="fa-solid fa-wallet theme-text-primary"></i><span>記帳本</span></h2>
 
@@ -46,6 +49,11 @@ export const headerTemplate = `
                     <!-- 換誰洗碗頁專用：覆蓋儲存（先刪除伺服器上整份換誰洗碗資料，再存入目前資料；其他頁隱藏） -->
                     <button id="headerBowlSaveBtn" data-action="bowl-overwrite" class="hidden h-10 px-2.5 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all items-center gap-1 font-black text-[0.8rem] theme-text-primary" title="覆蓋儲存" aria-label="覆蓋儲存">
                         <i class="fa-solid fa-cloud-arrow-up"></i> 覆蓋儲存
+                    </button>
+
+                    <!-- 菜單頁專用：新增菜單（顏色跟著主色調；其他頁隱藏） -->
+                    <button id="headerMenuAddBtn" data-action="menu-add" data-tip="menu-add" class="hidden h-10 px-3.5 rounded-2xl theme-bg-primary text-white soft-shadow-sm hover:scale-105 active:scale-95 transition-all items-center gap-1.5 font-black text-sm" title="新增菜單" aria-label="新增菜單">
+                        <i class="fa-solid fa-plus"></i> 新增
                     </button>
 
                     <!-- 記帳本頁專用：記一筆（顏色跟著主色調；其他頁隱藏） -->

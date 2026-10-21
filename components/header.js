@@ -8,7 +8,7 @@ import { openCalendarId } from "../core/overlay.js";
 
 export function mountHeader(mountEl) {
   mountEl.innerHTML = headerTemplate;
-  registerActions({ "open-calendar-id": () => openCalendarId(), "calendar-today": () => emit("calendar:today"), "bowl-overwrite": () => emit("bowl:overwrite"), "ledger-add": () => emit("ledger:add") }); // 家庭日曆的 ︙ ID設定、回到今天
+  registerActions({ "open-calendar-id": () => openCalendarId(), "calendar-today": () => emit("calendar:today"), "bowl-overwrite": () => emit("bowl:overwrite"), "ledger-add": () => emit("ledger:add"), "menu-add": () => emit("menu:add") }); // 家庭日曆的 ︙ ID設定、回到今天
   on("auth:change", renderAccount);
   on("nickname:change", () => renderAccount({ isLoggedIn: state.isLoggedIn, account: state.account }));
   on("route:change", renderRoute);
@@ -24,9 +24,17 @@ function renderRoute(id) {
   const cal = id === "家庭日曆"; // 家庭日曆頁：不顯示大頭貼 / 名稱 / 信箱，個人化（調色盤）換成 ︙ ID設定
   const bowl = id === "換誰洗碗";
   const memo = id === "個人記事本"; // 我的筆記頁：不顯示大頭貼 / 名稱 / 信箱，左側改放「我的筆記」標題，右側多一個儲存位置下拉選單 // 換誰洗碗頁：不顯示大頭貼 / 名稱 / 信箱，個人化（調色盤）換成 ︙ 換誰洗碗設定
+  const menu = id === "菜單";
   const ledger = id === "記帳"; // 記帳本頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「記帳本」標題
-  document.getElementById("headerUser")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger);
-  document.getElementById("headerPaletteBtn")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger);
+  document.getElementById("headerUser")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu);
+  document.getElementById("headerPaletteBtn")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu);
+  const mn = id === "菜單"; // 菜單頁：左側改放「菜單」標題，右側多一個「新增」
+  const mt2 = document.getElementById("headerMenuTitle");
+  mt2?.classList.toggle("hidden", !mn);
+  mt2?.classList.toggle("flex", mn);
+  const ma = document.getElementById("headerMenuAddBtn");
+  ma?.classList.toggle("hidden", !mn);
+  ma?.classList.toggle("flex", mn);
   const lt = document.getElementById("headerLedgerTitle");
   lt?.classList.toggle("hidden", !ledger);
   lt?.classList.toggle("flex", ledger);

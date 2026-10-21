@@ -9,6 +9,7 @@ export const availableFeatures = [
   { id: "個人記事本", name: "我的筆記", icon: "fa-solid fa-book-open",   action: "service" },
   { id: "家庭日曆", name: "家庭日曆", icon: "fa-solid fa-calendar-days",  action: "service" },
   { id: "記帳",     name: "記帳本", icon: "fa-solid fa-wallet",         action: "service" },
+  { id: "菜單",     name: "菜單",     icon: "fa-solid fa-bowl-food",      action: "service" },
   { id: "換誰洗碗", name: "換誰洗碗", icon: "fa-solid fa-utensils",       action: "service" },
   { id: "計算機",   name: "計算機",   icon: "fa-solid fa-calculator",     action: "service" },
   { id: "翻譯機",   name: "翻譯機",   icon: "fa-solid fa-language",       action: "service" },
