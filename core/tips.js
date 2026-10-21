@@ -636,7 +636,8 @@ const TIPS = {
   "tr-google": { scene: tapScene("用 Google 翻譯開啟"), text: "在新分頁用 Google 翻譯網頁開啟。" },
   "tr-speak": { scene: tapScene("🔊 朗讀"), text: "用聲音把翻譯結果唸出來。" },
   "tr-copy": { scene: pillToast("📋 複製", "已複製"), text: "複製翻譯結果，可以貼到 LINE 等地方。" },
-  "tr-big": { scene: tapScene("⛶ 放大給對方看"), text: "把譯文放得很大，直接給對方看；點一下畫面就關閉。" },
+  "tr-big": { scene: tapScene("⛶ 全螢幕"), text: "全螢幕顯示：中間一條分隔線，上面原文、下面翻譯，直接給對方看。" },
+  "tr-sign": { scene: tapScene("↻ 告示牌"), text: "手機轉成橫向的全螢幕告示牌：中間分隔線，上面原文、下面翻譯，可按「翻轉」換方向。" },
   "tr-x": { scene: calCloseScene, text: "按 ✕（或點畫面任何地方），關閉放大畫面。" },
   // ---- 計算機 ----
   "calc-key": { scene: tapScene("7"), text: "點一下，輸入「{name}」。" },
