@@ -14,7 +14,7 @@ let ctrl = null;        // 取消進行中的請求
 let rec = null;         // 語音辨識實例
 let listening = false;
 // 即時翻譯：持續聆聽、邊說邊翻，語音辨識中斷時自動接續
-let live = { on: false, items: [], interim: "", interimTr: "", rec: null, timer: null, iseq: 0, restarts: 0 };
+let live = { on: false, items: [], interim: "", interimTr: "", rec: null, timer: null, iseq: 0, restarts: 0, draft: "", draftTr: "", dtimer: null, dseq: 0 };
 let offLive = null;
 let liveSpeak = false; // 即時翻譯：自動朗讀譯文（預設關）
 let speaking = 0;
@@ -65,7 +65,11 @@ function liveCard() {
       <span data-live-state class="text-xs font-bold text-slate-400"></span>
       <span class="text-xs font-bold text-slate-400">${langOf(liveFrom()).name}</span>
     </div>
-    <div data-live-src class="min-h-[5.5rem] max-h-[24vh] overflow-y-auto text-xl font-semibold text-slate-800 dark:text-slate-100 break-words select-text"></div>
+    <div data-live-src class="min-h-[3.5rem] max-h-[18vh] overflow-y-auto text-xl font-semibold text-slate-800 dark:text-slate-100 break-words select-text"></div>
+    <div class="flex items-end gap-2 mt-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+      <textarea data-live-input rows="2" maxlength="${MAX_CHARS}" placeholder="也可以直接打字，邊打邊翻譯（Enter 送出）" class="flex-1 min-w-0 bg-transparent resize-none outline-none text-lg font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 select-text">${esc(live.draft)}</textarea>
+      <button data-live-send class="h-11 px-4 rounded-2xl theme-bg-primary text-white font-black text-sm flex items-center gap-1.5 active:scale-95 transition shrink-0"><i class="fa-solid fa-paper-plane"></i> 送出</button>
+    </div>
   </div>`;
 }
 
@@ -84,15 +88,18 @@ function renderLive() {
   }
   // 只顯示「最新一句」：新的一句開始說，就清掉上一句（完整紀錄保留到「結束」時統整）
   const last = live.items[live.items.length - 1];
-  const src = live.interim || last?.src || "";
-  const tr = live.interim ? live.interimTr : last?.tr || "";
-  srcBox.innerHTML = src
-    ? `${esc(src)}`
-    : `<span class="text-slate-400">${SR ? "開始說話，原文會顯示在這裡…" : "此瀏覽器不支援語音辨識"}</span>`;
+  const vsrc = live.interim || last?.src || "";
+  srcBox.innerHTML = vsrc
+    ? `<span class="text-xs font-black theme-text-primary mr-1">🎤</span>${esc(vsrc)}`
+    : `<span class="text-slate-400 text-base">${SR && !live.paused ? "開始說話，原文會顯示在這裡…" : "目前未使用麥克風，可在下方直接打字"}</span>`;
+  const typing = !!live.draft.trim();
+  const src = typing ? live.draft : vsrc;
+  const tr = typing ? live.draftTr : live.interim ? live.interimTr : last?.tr || "";
+  const dim = typing ? true : !!live.interim;
   box.innerHTML = src ? `
     <div class="bg-white/95 dark:bg-slate-800/95 rounded-3xl soft-shadow-md p-5 border-2 theme-border-primary">
       <p class="text-xs font-extrabold theme-text-primary mb-2">${to.name}</p>
-      <p class="text-2xl font-black text-slate-900 dark:text-white leading-relaxed break-words select-text ${live.interim ? "opacity-60" : ""}">${esc(tr) || "…"}</p>
+      <p class="text-2xl font-black text-slate-900 dark:text-white leading-relaxed break-words select-text ${dim ? "opacity-60" : ""}">${esc(tr) || "…"}</p>
     </div>` : "";
   setLiveStatus();
 }
@@ -135,7 +142,7 @@ function showBar(on) {
 function setLiveStatus() {
   renderBar();
   const t = root?.querySelector("[data-live-state]");
-  if (t) t.textContent = !SR ? "" : speaking ? "● 朗讀中…" : listening ? "● 聆聽中" : "已暫停";
+  if (t) t.textContent = speaking ? "● 朗讀中…" : listening ? "● 聆聽中" : SR ? "麥克風已暫停（可打字）" : "文字模式（可打字）";
 }
 
 // 朗讀譯文：朗讀時暫停聆聽，避免麥克風把喇叭聲又聽進去；念完自動接續
@@ -216,7 +223,7 @@ function startLive() {
   };
   rc.onerror = (e) => {
     const m = micErrMsg(e.error);
-    if (m) { toast(m, 4500); setLive(false); }
+    if (m) { toast(m + "。仍可直接打字翻譯", 5000); live.paused = true; stopRec(); setLiveStatus(); }
   };
   rc.onend = () => { // 瀏覽器會自動結束辨識（靜音、時間上限）：只要開關還開著就接續
     listening = false;
@@ -237,20 +244,20 @@ function stopRec() {
 }
 
 function setLive(v) {
-  if (v && !SR) toast("此瀏覽器不支援語音辨識，請改用 Chrome / Safari");
-  v = !!v && !!SR;
+  v = !!v;
   live.on = v; live.paused = false; live.summary = false;
-  clearTimeout(live.timer);
-  live.iseq++;
+  clearTimeout(live.timer); clearTimeout(live.dtimer);
+  live.iseq++; live.dseq++; live.draft = ""; live.draftTr = "";
   if (v) { stopAll(); live.items = []; live.interim = ""; live.interimTr = ""; holdAwake("translator-live"); }
   else { stopRec(); speaking = 0; if (canSpeak) window.speechSynthesis.cancel(); releaseAwake("translator-live"); live.interim = ""; live.interimTr = ""; }
   emit("translator:live-set", live.on);
   showBar(live.on);
   if (!root) return;
   render();
-  if (v) checkMic().then((m) => {
+  if (v && !SR) { live.paused = true; toast("此瀏覽器不支援語音辨識，可直接打字即時翻譯", 3500); setLiveStatus(); }
+  else if (v) checkMic().then((m) => {
     if (!live.on) return;
-    if (m) { toast(m, 4500); return setLive(false); }
+    if (m) { toast(m + "。仍可直接打字翻譯", 5000); live.paused = true; return setLiveStatus(); }
     startLive();
   });
 }
@@ -412,14 +419,45 @@ function onClick(e) {
   if (q("[data-mic]")) return toggleMic();
   if (q("[data-live-clear]")) { live.items = []; live.interim = ""; live.interimTr = ""; return renderLive(); }
   if (q("[data-live-speak]")) { liveSpeak = !liveSpeak; if (!liveSpeak && canSpeak) window.speechSynthesis.cancel(); return setLiveStatus(); }
-  if (q("[data-live-end]")) { live.paused = true; clearTimeout(live.timer); live.iseq++; stopRec(); speaking = 0; if (canSpeak) window.speechSynthesis.cancel(); live.interim = ""; live.interimTr = ""; live.summary = true; return render(); }
+  if (q("[data-live-end]")) { commitDraft(true); live.paused = true; clearTimeout(live.timer); live.iseq++; stopRec(); speaking = 0; if (canSpeak) window.speechSynthesis.cancel(); live.interim = ""; live.interimTr = ""; live.summary = true; return render(); }
   if (q("[data-live-restart]")) { live.summary = false; live.paused = false; live.items = []; render(); return startLive(); }
   if (q("[data-live-exit]")) return setLive(false);
   if (q("[data-live-copyall]")) { st.result = live.items.map((i) => `${i.src}\n${i.tr}`).join("\n\n"); return copy(); }
-  if (q("[data-live-pause]")) { if (listening || live.rec) { live.paused = true; stopRec(); setLiveStatus(); } else { live.paused = false; startLive(); } return; }
+  if (q("[data-live-send]")) return commitDraft();
+  if (q("[data-live-pause]")) { if (!SR) return toast("此瀏覽器不支援語音辨識，請直接打字"); if (listening || live.rec) { live.paused = true; stopRec(); setLiveStatus(); } else { live.paused = false; startLive(); } return; }
+}
+
+// 打字即時翻譯：停頓約 0.45 秒就翻；Enter / 送出 = 這一句完成，存入統整並清空輸入框
+function onLiveInput(e) {
+  live.draft = e.target.value;
+  clearTimeout(live.dtimer);
+  const my = ++live.dseq;
+  const text = live.draft.trim();
+  if (!text) { live.draftTr = ""; return renderLive(); }
+  renderLive();
+  live.dtimer = setTimeout(async () => {
+    try { const t = await liveTranslate(text, liveFrom()); if (my === live.dseq && live.on) { live.draftTr = t; renderLive(); } }
+    catch { if (my === live.dseq && live.on) { live.draftTr = "（翻譯失敗）"; renderLive(); } }
+  }, 450);
+}
+
+function commitDraft(silent) {
+  const text = live.draft.trim();
+  if (!text) { if (!silent) toast("請先輸入文字"); return; }
+  clearTimeout(live.dtimer);
+  live.dseq++;
+  const item = { src: text, tr: "" };
+  live.items.push(item);
+  if (live.items.length > 40) live.items.shift();
+  live.draft = ""; live.draftTr = "";
+  const ta = root?.querySelector("[data-live-input]");
+  if (ta) { ta.value = ""; if (!silent) ta.focus(); }
+  liveTranslate(text, liveFrom()).then((t) => { item.tr = t; speakLive(t); }).catch(() => { item.tr = "（翻譯失敗）"; }).finally(() => live.on && renderLive());
+  renderLive();
 }
 
 function onInput(e) {
+  if (e.target.matches("[data-live-input]")) return onLiveInput(e);
   if (!e.target.matches("[data-text]")) return;
   st.text = e.target.value;
   const c = root.querySelector("[data-count]");
@@ -432,6 +470,7 @@ function onChange(e) {
 }
 
 function onKeydown(e) {
+  if (e.target.matches?.("[data-live-input]") && e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); return commitDraft(); }
   if (e.target.matches?.("[data-text]") && e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); translate(); }
 }
 
@@ -441,7 +480,7 @@ export default {
   mount(el) {
     root = el;
     showTipHint("translator");
-    live = { on: false, items: [], interim: "", interimTr: "", rec: null, timer: null, iseq: 0, restarts: 0, paused: false, summary: false };
+    live = { on: false, items: [], interim: "", interimTr: "", rec: null, timer: null, iseq: 0, restarts: 0, paused: false, summary: false, draft: "", draftTr: "", dtimer: null, dseq: 0 };
     emit("translator:live-set", false); // 每次進入翻譯機，即時翻譯預設關閉
     offLive = on("translator:live", setLive);
     if (st.status === "loading") st.status = "idle";
@@ -454,7 +493,7 @@ export default {
   unmount() {
     closeTips();
     offLive?.(); offLive = null;
-    clearTimeout(live.timer);
+    clearTimeout(live.timer); clearTimeout(live.dtimer);
     stopRec(); live.on = false; showBar(false); releaseAwake("translator-live");
     emit("translator:live-set", false);
     stopAll();
