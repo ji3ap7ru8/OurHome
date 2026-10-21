@@ -7,8 +7,9 @@ import { registerActions, registerChangeActions } from "../core/actions.js";
 import { cardsApi } from "../services/cards/data.js";
 import { menuApi } from "../services/menu/data.js";
 import { memoApi } from "../services/memo/data.js";
+import { showToast } from "../core/toast.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
-import { lobbyCandidates, lobbyOrdered, isShown, setShown, moveLobby, resetLobbyOrder, modeOptions, getMode, setMode, ledgerParts, ledgerToggle, lobbyCards, toggleLobbyCard, lobbyMenus, toggleLobbyMenu } from "../core/lobby-model.js";
+import { lobbyCandidates, lobbyOrdered, isShown, setShown, moveLobby, resetLobbyOrder, modeOptions, getMode, setMode, ledgerParts, ledgerToggle, lobbyCards, toggleLobbyCard, lobbyMenusAll, toggleLobbyMenu, isLocked, LOCKED_MSG } from "../core/lobby-model.js";
 
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const $ = (id) => document.getElementById(id);
@@ -23,6 +24,7 @@ let focusId = null; // 剛被移動的服務：重畫後捲到它的位置
 export function mountLobbySettings() {
   registerActions({
     "lobby-toggle": (el) => setShown(el.dataset.id, !isShown(el.dataset.id)),
+    "lobby-locked": () => showToast(LOCKED_MSG + "（請先到系統設定 → 儲存位置，把帳密庫設為 Google 雲端）", 4500),
     "lobby-detail": (el) => openDetail(el.dataset.id),
     "lobby-detail-close": () => closeDetail(),
     "lobby-card-toggle": (el) => { toggleLobbyCard(el.dataset.cardId, cardList.map((c) => c.id)); paintCards(); },
@@ -35,6 +37,7 @@ export function mountLobbySettings() {
     "lobby-order-num": (el) => { focusId = el.dataset.id; if (!moveLobby(el.dataset.id, el.value)) renderOrder(); },
   });
   on("lobby:change", renderAll);
+  on("storage:sync", renderAll); // 帳密庫的鎖定狀態跟著儲存位置
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDetail(); });
   on("apps:change", renderAll); // 啟用/停用、所有應用排序、插件改變 → 兩張卡片跟著更新
   renderAll();
@@ -61,6 +64,13 @@ function renderShow() {
     box.innerHTML = list.length
       ? list.map((a) => {
           const on = isShown(a.id);
+          if (isLocked(a.id)) return `
+    <button type="button" role="switch" aria-checked="false" aria-disabled="true" data-tip="lobby-locked" data-action="lobby-locked" class="w-full text-left ${ROW} opacity-70 active:scale-[.98] transition">
+      <span class="w-8 h-8 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-sm")}</span>
+      <span class="flex-1 min-w-0 text-xs font-bold text-slate-700 dark:text-slate-200 truncate">${esc(a.name)}</span>
+      <i class="fa-solid fa-lock text-slate-400 text-sm shrink-0"></i>
+      <span class="relative inline-block w-9 h-5 rounded-full shrink-0 bg-slate-300 dark:bg-slate-600"><span class="absolute top-[2px] left-[2px] h-4 w-4 rounded-full bg-white"></span></span>
+    </button>`;
           return `
     <button type="button" role="switch" aria-checked="${on}" data-tip="lobby-toggle" data-tip-name="${esc(a.name)}" data-action="lobby-toggle" data-id="${esc(a.id)}" class="w-full text-left ${ROW} active:scale-[.98] transition">
       <span class="w-8 h-8 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-sm")}</span>
@@ -152,14 +162,16 @@ function paintLedger() {
 function paintMenus() {
   const body = document.getElementById("lobbyDetailBody");
   if (!body) return;
+  const all = lobbyMenusAll();
   const on = new Set(lobbyMenus());
-  body.innerHTML = menuList.length
-    ? `<p class="text-[10px] text-slate-400">選擇大廳要顯示的菜單（可多選）</p>
-      <div class="space-y-1.5 max-h-[50vh] overflow-y-auto">${menuList.map((c) => `
-      <button type="button" role="checkbox" aria-checked="${on.has(c.id)}" data-tip="lobby-card-pick" data-action="lobby-menu-toggle" data-menu-id="${esc(c.id)}" class="${CHOICE}">
-        <span class="flex-1 min-w-0 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">${esc(c.name || "（未命名）")}</span>${tick(on.has(c.id))}
-      </button>`).join("")}</div>`
-    : '<p class="text-[11px] text-slate-400 text-center py-3">還沒有新增任何菜單，請先到「菜單」新增。</p>';
+  body.innerHTML = `<p class="text-[10px] text-slate-400">大廳要顯示哪些菜單（全部為單選，其他可複選）</p>
+      <div class="space-y-1.5 max-h-[50vh] overflow-y-auto">
+      <button type="button" role="radio" aria-checked="${all}" data-tip="lobby-mode" data-action="lobby-menu-toggle" data-menu-id="all" class="${CHOICE}">
+        <span class="flex-1 text-sm font-bold text-slate-700 dark:text-slate-200">全部</span>${tick(all)}
+      </button>${menuList.map((c) => `
+      <button type="button" role="checkbox" aria-checked="${!all && on.has(c.id)}" data-tip="lobby-card-pick" data-action="lobby-menu-toggle" data-menu-id="${esc(c.id)}" class="${CHOICE}">
+        <span class="flex-1 min-w-0 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">${esc(c.name || "（未命名）")}</span>${tick(!all && on.has(c.id))}
+      </button>`).join("")}</div>${menuList.length ? "" : '<p class="text-[11px] text-slate-400 text-center py-1">還沒有新增任何菜單，請先到「菜單」新增。</p>'}`;
 }
 async function loadMenus() {
   const body = document.getElementById("lobbyDetailBody");

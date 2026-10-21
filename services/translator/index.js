@@ -2,6 +2,7 @@
 // 訪客可用。不寫入任何永久儲存；離開頁面後輸入與結果保留在記憶體直到重新整理。
 import { showTipHint, closeTips } from "../../core/tips.js";
 import { on, emit } from "../../core/store.js";
+import { takeLiveTranslate } from "../../core/lobby-model.js";
 import { holdAwake, releaseAwake } from "../../core/wakelock.js";
 import { LANGS, AUTO, langOf, googleUrl, MAX_CHARS, translatorApi } from "./data.js";
 
@@ -576,6 +577,7 @@ export default {
     root.addEventListener("input", onInput);
     root.addEventListener("change", onChange);
     root.addEventListener("keydown", onKeydown);
+    if (takeLiveTranslate()) setLive(true); // 從大廳「即時翻譯」進來：自動開啟
   },
   unmount() {
     closeTips();

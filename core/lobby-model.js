@@ -13,6 +13,7 @@ export const LOBBY_MODES = {
   "家庭日曆": [{ value: "today", label: "今日" }, { value: "week", label: "未來7天" }, { value: "days14", label: "未來14天" }, { value: "month", label: "這個月" }],
   "換誰洗碗": [{ value: "today", label: "今日" }],
   "記帳": [{ value: "all", label: "全部" }, { value: "balance", label: "本月結餘" }, { value: "income", label: "收入" }, { value: "expense", label: "支出" }], // 記帳本：全部（單選，含結餘/收入/支出）；本月結餘、收入、支出可複選，存成 "balance+income" 這樣的字串
+  "翻譯機": [{ value: "zh-en", label: "中翻英" }, { value: "en-zh", label: "英翻中" }, { value: "live", label: "即時翻譯" }], // 大廳的翻譯機區塊：中翻英 / 英翻中（直接在大廳輸入翻譯）、即時翻譯（一鍵進入即時翻譯）
   "個人記事本": [{ value: "all", label: "全部" }, { value: "pinned", label: "釘選" }], // 我的筆記：只顯示標題；全部 = 所有筆記、釘選 = 只放置頂的；另外每個分類各有一個選項（值 "cat:分類名"，選項由設定視窗依現有分類補上）
 };
 export const modeOptions = (id) => LOBBY_MODES[id] || [];
@@ -47,16 +48,22 @@ export function toggleLobbyCard(id, existing) {
   return true;
 }
 
-// 菜單：大廳要顯示哪幾份（可多選，空 = 都不顯示），做法同生活圖卡
+// 菜單：第一個選項「全部」（單選，空陣列 = 全部）；其餘是已新增的菜單名稱（可複選）。全部勾選或全部取消 = 回到「全部」
 export const lobbyMenus = () => [...state.lobby.menus];
+export const lobbyMenusAll = () => !state.lobby.menus.length;
 export function toggleLobbyMenu(id, existing) {
+  if (id === "all") { if (!state.lobby.menus.length) return false; state.lobby.menus = []; commit(); return true; }
   if (!existing.includes(id)) return false;
   const on = new Set(state.lobby.menus.filter((x) => existing.includes(x)));
   on.has(id) ? on.delete(id) : on.add(id);
-  state.lobby.menus = existing.filter((x) => on.has(x));
+  state.lobby.menus = on.size === existing.length ? [] : existing.filter((x) => on.has(x));
   commit();
   return true;
 }
+// 翻譯機：大廳點「即時翻譯」→ 進入翻譯機後自動開啟即時翻譯
+let liveWanted = false;
+export const requestLiveTranslate = (v) => { liveWanted = !!v; };
+export const takeLiveTranslate = () => { const v = liveWanted; liveWanted = false; return v; };
 // 大廳點菜單 → 進入菜單頁後直接打開那一份
 let menuWanted = null;
 export const requestOpenMenu = (id) => { menuWanted = id || null; };
@@ -72,7 +79,10 @@ export function setMode(id, value) {
 // 大廳區塊標題旁顯示的文字（顯示方式的名稱）
 export const modeLabelOf = (id) => { const v = getMode(id); if (isLedgerMode(id, v)) return ledgerParts(v).map((x) => modeOptions(id).find((o) => o.value === x).label).join("、"); return isCatMode(id, v) ? v.slice(4) : modeOptions(id).find((o) => o.value === v)?.label || ""; };
 
-export const isShown = (id) => state.lobby.shown.includes(id); // 預設全部關閉，要在「顯示管理」自己開
+// 帳密庫：配合帳密安全性，只有「儲存位置」設為 Google 雲端（個人雲端）時才能在大廳顯示；否則上鎖、一律關閉
+export const LOCKED_MSG = "配合帳密安全性，該服務只能儲存個人雲端內";
+export const isLocked = (id) => id === "帳密庫" && state.storage?.vault !== "google";
+export const isShown = (id) => !isLocked(id) && state.lobby.shown.includes(id); // 預設全部關閉，要在「顯示管理」自己開
 
 // 顯示管理清單：已啟用的應用，依「所有應用」目前的排序方式
 export const lobbyCandidates = () => orderedApps();
@@ -92,6 +102,7 @@ export const lobbyOrdered = () => {
 
 export function setShown(id, on) {
   if (!lobbyCandidates().some((a) => a.id === id)) return false;
+  if (on && isLocked(id)) return false;
   const has = state.lobby.shown.includes(id);
   if (on === has) return false;
   state.lobby.shown = on ? [...state.lobby.shown, id] : state.lobby.shown.filter((x) => x !== id);

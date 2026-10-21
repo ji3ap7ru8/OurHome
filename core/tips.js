@@ -544,6 +544,7 @@ const TIPS = {
   "lobby-reset": { scene: orderResetScene, text: "還原成跟「所有應用」一樣的順序。" },
   "lobby-dclose": { scene: calCloseScene, text: "按 ✕，關閉這個小視窗。" },
   "lobby-card-pick": { scene: linePickScene, text: "點圖卡打勾，可以選好幾張，大廳就會顯示。" },
+  "lobby-locked": { scene: storeScene("🔒", "已鎖定"), text: "帳密安全性：帳密庫只能存到個人 Google 雲端；到「儲存位置」把帳密庫設為 Google 雲端後才能開啟。" },
   "lobby-mode": { scene: noteAuthorScene, text: "點選項，決定大廳顯示哪些內容。" },
   "set-sync": { scene: pillToast("立即同步", "已更新", true), text: "重新讀取 Google 雲端硬碟的設定，並重新連線取得最新資料。" },
   "set-autologin": { scene: tglScene("自動登入", "開：下次進網頁自動登入", "關：每次都要自己登入"), text: "開啟後，這支手機每次進網頁都自動登入。公共場所請關閉。" },

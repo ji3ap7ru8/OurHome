@@ -5,7 +5,7 @@
 //   - 各服務要挑哪幾筆、整理成什麼欄位：core/lobby-feed.js（可用 Node 測試）
 import { state, on } from "../core/store.js";
 import { showTipHint } from "../core/tips.js";
-import { lobbyOrdered, getMode, modeLabelOf, lobbyCards, lobbyMenus, ledgerParts } from "../core/lobby-model.js";
+import { lobbyOrdered, getMode, modeLabelOf, lobbyCards, lobbyMenus, lobbyMenusAll, ledgerParts } from "../core/lobby-model.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
 import { noteItems, memoItems, calendarItems, calendarFetchRange, CAL_EMPTY, bowlItems, cardItems } from "../core/lobby-feed.js";
 import { notesApi, PALETTE as NOTE_PALETTE } from "../services/notes/data.js";
@@ -17,6 +17,7 @@ import { menuApi } from "../services/menu/data.js";
 import { cardsApi, KINDS } from "../services/cards/data.js";
 import { ledgerApi } from "../services/ledger/data.js";
 import { summarize, monthKey } from "../services/ledger/engine.js";
+import { translatorApi } from "../services/translator/data.js";
 import { canEnterBowl } from "../core/bowl-emails.js";
 
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -146,10 +147,9 @@ const SECTIONS = {
     login: true,
     load: () => menuApi.list(),
     build(raw, id) {
-      if (!lobbyMenus().length) return msg("還沒選擇要顯示的菜單（大廳設定 → 大廳排序 → 菜單 ›）");
       const pick = new Set(lobbyMenus());
-      const items = (Array.isArray(raw) ? raw : []).filter((m) => pick.has(m.id));
-      if (!items.length) return msg("選擇的菜單已不存在，請重新選擇");
+      const items = (Array.isArray(raw) ? raw : []).filter((m) => lobbyMenusAll() || pick.has(m.id)); // 沒有勾選特定菜單 = 全部
+      if (!items.length) return msg(lobbyMenusAll() ? "還沒有新增任何菜單，請先到「菜單」新增" : "選擇的菜單已不存在，請重新選擇");
       return items.map((m) => {
         const fb = "fa-solid fa-bowl-food text-sm theme-text-primary";
         const u = safeImg(m.iconUrl);
@@ -159,6 +159,27 @@ const SECTIONS = {
           <span class="min-w-0 text-base font-black text-slate-800 dark:text-slate-100 truncate">${esc(m.name)}</span>
         </button>`;
       }).join("");
+    },
+  },
+  翻譯機: {
+    // 大廳的翻譯機：依「大廳設定 → 翻譯機」選的方式顯示。中翻英 / 英翻中 = 直接在大廳輸入、翻譯；即時翻譯 = 一鍵進入翻譯機並開啟即時翻譯
+    load: async () => null,
+    build(_raw, id) {
+      const mode = getMode(id);
+      if (mode === "live") {
+        return `<button type="button" ${nav(id)} data-live="1" data-tip="lobby-card" class="${BIG} w-full flex items-center gap-3 active:scale-95 transition">
+          <span class="w-12 h-12 rounded-xl theme-bg-primary text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-microphone text-xl"></i></span>
+          <span class="min-w-0"><span class="block text-base font-black text-slate-800 dark:text-slate-100">開始即時翻譯</span><span class="block text-xs font-semibold text-slate-400">邊說邊翻，也可以打字</span></span>
+        </button>`;
+      }
+      const zh = mode === "zh-en";
+      return `<div data-lob-tr="${zh ? "zh-en" : "en-zh"}" class="shrink-0 w-full space-y-2">
+        <div class="flex items-end gap-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-white/70 dark:border-slate-700/70 p-2.5">
+          <textarea data-lob-tr-in rows="2" maxlength="500" placeholder="${zh ? "輸入中文，翻成英文…" : "Type English, translate to 中文…"}" class="flex-1 min-w-0 bg-transparent resize-none outline-none text-base font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-400"></textarea>
+          <button type="button" data-lob-tr-go class="h-10 px-4 rounded-xl theme-bg-primary text-white font-black text-sm shrink-0 active:scale-95 transition"><i class="fa-solid fa-language"></i> 翻譯</button>
+        </div>
+        <p data-lob-tr-out class="hidden rounded-2xl border-2 theme-border-primary bg-white/80 dark:bg-slate-800/80 px-3 py-2.5 text-lg font-black text-slate-900 dark:text-white break-words select-text"></p>
+      </div>`;
     },
   },
   生活圖卡: {
@@ -186,11 +207,11 @@ let raw = {};      // 這次進大廳讀回來的原始資料（改大廳設定�
 let seq = 0;       // 每次重畫 +1：舊的非同步結果不會蓋掉新畫面
 let wired = false;
 
-const modeLabel = (a) => (a.id === "生活圖卡" ? `已選 ${lobbyCards().length} 張` : a.id === "菜單" ? `已選 ${lobbyMenus().length} 份` : modeLabelOf(a.id));
+const modeLabel = (a) => (a.id === "生活圖卡" ? `已選 ${lobbyCards().length} 張` : a.id === "菜單" ? (lobbyMenusAll() ? "全部" : `已選 ${lobbyMenus().length} 份`) : modeLabelOf(a.id));
 
 function shell(a) {
   // 除了「生活圖卡」（小卡直接打開那張圖卡），其餘服務點區塊任何地方都跳到該服務頁
-  const whole = a.id === "生活圖卡" || a.id === "菜單" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
+  const whole = a.id === "生活圖卡" || a.id === "菜單" || a.id === "翻譯機" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
   return `<section id="lobbySec-${esc(a.id)}" ${whole} class="glass-card rounded-3xl py-3${whole ? " cursor-pointer" : ""}">
     <button type="button" ${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" class="w-full flex items-center gap-2 px-4 text-left">
       <span class="w-7 h-7 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-xs")}</span>
@@ -244,6 +265,19 @@ export function renderLobby(el /* , services */) {
     wired = true;
     const again = () => { if (state.route === "大廳") draw(false); };
     on("lobby:change", again);
+    document.addEventListener("click", async (e) => { // 大廳的翻譯機（中翻英 / 英翻中）
+      const go = e.target.closest?.("[data-lob-tr-go]");
+      if (!go) return;
+      const box = go.closest("[data-lob-tr]");
+      const text = box.querySelector("[data-lob-tr-in]").value.trim();
+      const out = box.querySelector("[data-lob-tr-out]");
+      if (!text) return;
+      const [from, to] = box.dataset.lobTr === "zh-en" ? ["zh-TW", "en"] : ["en", "zh-TW"];
+      out.classList.remove("hidden");
+      out.textContent = "翻譯中…";
+      try { out.textContent = (await translatorApi.translate(text, from, to)).text; }
+      catch { out.textContent = "目前無法連線翻譯，請稍後再試"; }
+    });
     on("apps:change", again);
   }
   draw(true);
