@@ -117,6 +117,7 @@ function renderOrder() {
 
 // 點「>」：小視窗選這個服務在大廳要怎麼顯示；沒有選項的服務先顯示「暫時沒有可設定的項目」
 let cardList = []; // 生活圖卡視窗目前讀到的圖卡 [{ id, name }]
+let menuState = "ok"; // 菜單清單讀取狀態：loading / ok / err
 let menuList = []; // 菜單視窗目前讀到的菜單 [{ id, name }]
 function closeDetail() { document.getElementById("lobbyDetail")?.remove(); cardList = []; menuList = []; }
 
@@ -171,13 +172,14 @@ function paintMenus() {
       </button>${menuList.map((c) => `
       <button type="button" role="checkbox" aria-checked="${!all && on.has(c.id)}" data-tip="lobby-card-pick" data-action="lobby-menu-toggle" data-menu-id="${esc(c.id)}" class="${CHOICE}">
         <span class="flex-1 min-w-0 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">${esc(c.name || "（未命名）")}</span>${tick(!all && on.has(c.id))}
-      </button>`).join("")}</div>${menuList.length ? "" : '<p class="text-[11px] text-slate-400 text-center py-1">還沒有新增任何菜單，請先到「菜單」新增。</p>'}`;
+      </button>`).join("")}</div>${menuState === "loading" ? '<p class="text-[11px] text-slate-400 text-center py-1">讀取菜單中…</p>' : menuState === "err" ? '<p class="text-[11px] text-slate-400 text-center py-1">讀取菜單失敗（請確認已登入並連線）。仍可選「全部」。</p>' : menuList.length ? "" : '<p class="text-[11px] text-slate-400 text-center py-1">還沒有新增任何菜單，請先到「菜單」新增。</p>'}`;
 }
 async function loadMenus() {
-  const body = document.getElementById("lobbyDetailBody");
-  if (body) body.innerHTML = '<p class="text-[11px] text-slate-400 text-center py-3">讀取菜單中…</p>';
-  try { menuList = (await menuApi.list()).map((c) => ({ id: c.id, name: c.name })); }
-  catch { menuList = []; if (document.getElementById("lobbyDetailBody")) document.getElementById("lobbyDetailBody").innerHTML = '<p class="text-[11px] text-slate-400 text-center py-3">讀取菜單失敗，請確認已登入並連線。</p>'; return; }
+  menuState = "loading"; menuList = [];
+  paintMenus(); // 「全部」不用等資料，先顯示出來
+  const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000)); // 伺服器沒回應時不要一直轉圈
+  try { menuList = (await Promise.race([menuApi.list(), timeout])).map((c) => ({ id: c.id, name: c.name })); menuState = "ok"; }
+  catch { menuList = []; menuState = "err"; }
   paintMenus();
 }
 
