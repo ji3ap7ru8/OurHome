@@ -118,8 +118,9 @@ function renderOrder() {
 // 點「>」：小視窗選這個服務在大廳要怎麼顯示；沒有選項的服務先顯示「暫時沒有可設定的項目」
 let cardList = []; // 生活圖卡視窗目前讀到的圖卡 [{ id, name }]
 let menuState = "ok"; // 菜單清單讀取狀態：loading / ok / err
+let menuOff = null;
 let menuList = []; // 菜單視窗目前讀到的菜單 [{ id, name }]
-function closeDetail() { document.getElementById("lobbyDetail")?.remove(); cardList = []; menuList = []; }
+function closeDetail() { document.getElementById("lobbyDetail")?.remove(); cardList = []; menuList = []; menuOff?.(); menuOff = null; }
 
 const CHOICE = "w-full flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/40 px-3 py-2.5 text-left active:scale-[.98] transition";
 const tick = (on) => `<i class="fa-solid ${on ? "fa-circle-check theme-text-primary" : "fa-circle text-slate-300 dark:text-slate-600"} text-sm shrink-0"></i>`;
@@ -179,7 +180,10 @@ async function loadMenus() {
   paintMenus(); // 「全部」不用等資料，先顯示出來
   const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000)); // 伺服器沒回應時不要一直轉圈
   try { menuList = (await Promise.race([menuApi.list(), timeout])).map((c) => ({ id: c.id, name: c.name })); menuState = "ok"; }
-  catch { menuList = []; menuState = "err"; }
+  catch {
+    menuList = []; menuState = "err";
+    if (!menuOff) menuOff = menuApi.onChange(() => { if ($("lobbyDetail")) loadMenus(); }); // 連線好了、資料進來時自動重讀
+  }
   paintMenus();
 }
 

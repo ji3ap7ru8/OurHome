@@ -148,7 +148,9 @@ const SECTIONS = {
     load: () => menuApi.list(),
     build(raw, id) {
       const pick = new Set(lobbyMenus());
-      const items = (Array.isArray(raw) ? raw : []).filter((m) => lobbyMenusAll() || pick.has(m.id)); // 沒有勾選特定菜單 = 全部
+      const all = Array.isArray(raw) ? raw : [];
+      let items = all.filter((m) => lobbyMenusAll() || pick.has(m.id)); // 沒有勾選特定菜單 = 全部
+      if (!items.length && all.length) items = all; // 以前選的菜單已不存在 → 當作「全部」
       if (!items.length) return msg(lobbyMenusAll() ? "還沒有新增任何菜單，請先到「菜單」新增" : "選擇的菜單已不存在，請重新選擇");
       return items.map((m) => {
         const fb = "fa-solid fa-bowl-food text-sm theme-text-primary";
