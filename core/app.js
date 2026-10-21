@@ -30,6 +30,8 @@ import memo from "../services/memo/index.js";
 import ledger from "../services/ledger/index.js";
 import bowl from "../services/bowl/index.js";
 import menu from "../services/menu/index.js";
+import duty from "../services/duty/index.js";
+import vault from "../services/vault/index.js";
 
 export function bootstrap() {
   initActions(document);
@@ -72,6 +74,8 @@ export function bootstrap() {
   registerService(ledger);
   registerService(bowl);
   registerService(menu);
+  registerService(duty);
+  registerService(vault);
   initRouter();
   navigate("大廳");
 
