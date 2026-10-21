@@ -47,7 +47,7 @@ function render() {
 
     </div>`;
   renderResult();
-  if (live.on) renderLive();
+  if (live.on) { renderLive(); renderBar(); }
 }
 
 const btnBase = "h-12 rounded-2xl font-black text-sm flex items-center justify-center gap-1.5 active:scale-95 transition whitespace-nowrap";
@@ -58,11 +58,6 @@ function liveCard() {
     return `<div class="bg-white/95 dark:bg-slate-800/95 rounded-3xl soft-shadow-md p-4 mb-3">
       <p class="text-sm font-black theme-text-primary mb-2">統整：原文與翻譯（共 ${live.items.length} 句）</p>
       <div data-live-src class="max-h-[50vh] overflow-y-auto space-y-4 select-text"></div>
-      <div class="grid grid-cols-3 gap-2 mt-3">
-        <button data-live-restart class="${btnBase} theme-bg-primary text-white">重新開始</button>
-        <button data-live-copyall class="${btnGray}">複製全部</button>
-        <button data-live-exit class="${btnGray}">離開</button>
-      </div>
     </div>`;
   }
   return `<div class="bg-white/95 dark:bg-slate-800/95 rounded-3xl soft-shadow-md p-4 mb-3">
@@ -71,12 +66,6 @@ function liveCard() {
       <span class="text-xs font-bold text-slate-400">${langOf(liveFrom()).name}</span>
     </div>
     <div data-live-src class="min-h-[5.5rem] max-h-[24vh] overflow-y-auto text-xl font-semibold text-slate-800 dark:text-slate-100 break-words select-text"></div>
-    <div class="grid grid-cols-4 gap-2 mt-3">
-      <button data-live-pause class="${btnBase}"></button>
-      <button data-live-end class="${btnBase} bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900">結束</button>
-      <button data-live-clear class="${btnGray}">清除</button>
-      <button data-live-speak class="${btnBase}"></button>
-    </div>
   </div>`;
 }
 
@@ -108,17 +97,43 @@ function renderLive() {
   setLiveStatus();
 }
 
+const barBtn = "flex-1 min-w-0 h-14 rounded-2xl flex flex-col items-center justify-center gap-0.5 text-[0.8rem] font-black leading-none active:scale-95 transition";
+const barGray = "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-100";
+
+// 即時翻譯時，懸浮在底部（取代快捷列）的操作列：圖示 + 文字
+function renderBar() {
+  if (!live.bar) return;
+  const b = (attr, icon, text, cls) => `<button ${attr} class="${barBtn} ${cls}"><i class="fa-solid ${icon} text-base"></i><span>${text}</span></button>`;
+  live.bar.firstElementChild.innerHTML = live.summary
+    ? b("data-live-restart", "fa-rotate-right", "重新開始", "theme-bg-primary text-white") + b("data-live-copyall", "fa-copy", "複製全部", barGray) + b("data-live-exit", "fa-right-from-bracket", "離開", barGray)
+    : b("data-live-pause", listening ? "fa-pause" : "fa-play", listening ? "暫停" : "開始", listening ? "bg-rose-500 text-white" : "theme-bg-primary text-white") +
+      b("data-live-end", "fa-stop", "結束", "bg-slate-800 dark:bg-slate-100 text-white dark:text-slate-900") +
+      b("data-live-clear", "fa-eraser", "清除", barGray) +
+      b("data-live-speak", liveSpeak ? "fa-volume-high" : "fa-volume-xmark", liveSpeak ? "朗讀：開" : "朗讀：關", liveSpeak ? "theme-bg-light theme-text-primary" : barGray);
+}
+
+function showBar(on) {
+  const dock = document.querySelector(".dock-wrap");
+  if (on) {
+    if (!live.bar && dock) {
+      const el = document.createElement("div");
+      el.className = "dock-wrap absolute left-0 right-0 px-5 z-40";
+      el.innerHTML = `<div class="bg-white/95 dark:bg-slate-800/95 backdrop-blur-md rounded-3xl p-2 flex gap-2 soft-shadow-md border border-slate-100 dark:border-slate-700"></div>`;
+      el.addEventListener("click", onClick);
+      dock.parentNode.appendChild(el);
+      live.bar = el;
+    }
+    if (dock) dock.style.display = "none";
+    renderBar();
+  } else {
+    live.bar?.remove();
+    live.bar = null;
+    if (dock) dock.style.display = "";
+  }
+}
+
 function setLiveStatus() {
-  const p = root?.querySelector("[data-live-pause]");
-  if (p) {
-    p.className = `${btnBase} ${listening ? "bg-rose-500 text-white" : "theme-bg-primary text-white"}`;
-    p.innerHTML = listening ? `<i class="fa-solid fa-pause"></i> 暫停` : `<i class="fa-solid fa-play"></i> 開始`;
-  }
-  const sp = root?.querySelector("[data-live-speak]");
-  if (sp) {
-    sp.className = `${btnBase} ${liveSpeak ? "theme-bg-light theme-text-primary" : btnGray.slice(btnBase.length + 1)}`;
-    sp.textContent = liveSpeak ? "朗讀：開" : "朗讀：關";
-  }
+  renderBar();
   const t = root?.querySelector("[data-live-state]");
   if (t) t.textContent = !SR ? "" : speaking ? "● 朗讀中…" : listening ? "● 聆聽中" : "已暫停";
 }
@@ -230,6 +245,7 @@ function setLive(v) {
   if (v) { stopAll(); live.items = []; live.interim = ""; live.interimTr = ""; holdAwake("translator-live"); }
   else { stopRec(); speaking = 0; if (canSpeak) window.speechSynthesis.cancel(); releaseAwake("translator-live"); live.interim = ""; live.interimTr = ""; }
   emit("translator:live-set", live.on);
+  showBar(live.on);
   if (!root) return;
   render();
   if (v) checkMic().then((m) => {
@@ -395,6 +411,7 @@ function onClick(e) {
   if (q("[data-big]")) return showBig();
   if (q("[data-mic]")) return toggleMic();
   if (q("[data-live-clear]")) { live.items = []; live.interim = ""; live.interimTr = ""; return renderLive(); }
+  if (q("[data-live-speak]")) { liveSpeak = !liveSpeak; if (!liveSpeak && canSpeak) window.speechSynthesis.cancel(); return setLiveStatus(); }
   if (q("[data-live-end]")) { live.paused = true; clearTimeout(live.timer); live.iseq++; stopRec(); speaking = 0; if (canSpeak) window.speechSynthesis.cancel(); live.interim = ""; live.interimTr = ""; live.summary = true; return render(); }
   if (q("[data-live-restart]")) { live.summary = false; live.paused = false; live.items = []; render(); return startLive(); }
   if (q("[data-live-exit]")) return setLive(false);
@@ -438,7 +455,7 @@ export default {
     closeTips();
     offLive?.(); offLive = null;
     clearTimeout(live.timer);
-    stopRec(); live.on = false; releaseAwake("translator-live");
+    stopRec(); live.on = false; showBar(false); releaseAwake("translator-live");
     emit("translator:live-set", false);
     stopAll();
     root?.removeEventListener("click", onClick);
