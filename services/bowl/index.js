@@ -81,8 +81,9 @@ function renderMain() {
   const td = records[todayStr] || { clear: null, wash: null, off: false };
   const heroColor = td.off ? VACATION_COLOR : td.clear ? colorOf(td.clear) : "var(--primary-color)";
   const rec = (s) => records[s] || { clear: null, wash: null, off: false };
-  const dateHead = (dateStr, badge) => `<div class="flex items-center justify-between mb-2"><span class="text-sm font-black text-slate-800 dark:text-slate-100">${dateStr.slice(5)} <span class="text-xs font-bold text-slate-500 dark:text-slate-400">週${weekday(dateStr)}</span></span>${badge}</div>`;
-  const pill = (t, cls) => `<span class="text-[0.65rem] font-black px-1.5 py-0.5 rounded-md ${cls}">${t}</span>`;
+  // 日期標題：日期與星期各自不換行；窄螢幕（今日與未來 2 日一排三張）放不下時，標籤自動掉到下一行並靠左，不會把字擠成直排
+  const dateHead = (dateStr, badge) => `<div class="flex flex-wrap items-center justify-between gap-x-1.5 gap-y-1 mb-2"><span class="whitespace-nowrap text-sm font-black text-slate-800 dark:text-slate-100">${dateStr.slice(5)}<span class="ml-1 text-xs font-bold text-slate-500 dark:text-slate-400">週${weekday(dateStr)}</span></span>${badge}</div>`;
+  const pill = (t, cls) => `<span class="whitespace-nowrap shrink-0 text-[0.65rem] font-black px-1.5 py-0.5 rounded-md ${cls}">${t}</span>`;
 
   // 歷史：唯讀
   const histCard = ({ dateStr }) => {
