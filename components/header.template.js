@@ -51,11 +51,6 @@ export const headerTemplate = `
                         <i class="fa-solid fa-cloud-arrow-up"></i> 覆蓋儲存
                     </button>
 
-                    <!-- 菜單頁專用：︙ 菜單設定（格式大小、排序方式、新增菜單；其他頁隱藏） -->
-                    <button id="headerMenuBtn" data-action="open-menu-options" data-tip="menu-menu" class="hidden w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center" title="菜單設定" aria-label="菜單設定">
-                        <i class="fa-solid fa-ellipsis-vertical text-lg theme-text-primary"></i>
-                    </button>
-
                     <!-- 記帳本頁專用：記一筆（顏色跟著主色調；其他頁隱藏） -->
                     <button id="headerLedgerAddBtn" data-action="ledger-add" data-tip="ledger-add" class="hidden h-10 px-3.5 rounded-2xl theme-bg-primary text-white soft-shadow-sm hover:scale-105 active:scale-95 transition-all items-center gap-1.5 font-black text-sm" title="記一筆" aria-label="記一筆">
                         <i class="fa-solid fa-plus"></i> 記一筆
@@ -64,6 +59,11 @@ export const headerTemplate = `
                     <button id="notificationBtn" data-tip="rem-bell" data-action="open-sheet" data-sheet="notification" class="relative w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center">
                         <i id="bellIcon" class="fa-regular fa-bell text-base theme-text-primary"></i>
                         <span id="unreadBadge" class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-red-500"></span>
+                    </button>
+
+                    <!-- 菜單頁專用：︙ 菜單設定（格式大小、排序方式、新增菜單；其他頁隱藏） -->
+                    <button id="headerMenuBtn" data-action="open-menu-options" data-tip="menu-menu" class="hidden w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center" title="菜單設定" aria-label="菜單設定">
+                        <i class="fa-solid fa-ellipsis-vertical text-lg theme-text-primary"></i>
                     </button>
 
                     <!-- 家庭公告頁專用：管理（固定橘色；登入後才顯示） -->

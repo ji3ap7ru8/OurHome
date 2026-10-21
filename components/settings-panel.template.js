@@ -256,6 +256,17 @@ export const settingsPanelTemplate = `
                         </button>
 
                         <hr class="border-slate-100 dark:border-slate-700/60">
+
+                        <!-- 5-3. 菜單設定（切換到「菜單設定」頁） -->
+                        <button data-tip="set-open-menu" data-action="open-menu-options" class="w-full flex items-center justify-between text-left group py-0.5">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-bowl-food text-slate-400 text-sm w-4 text-center"></i>
+                                <span class="text-xs font-bold text-slate-700 dark:text-slate-200">菜單設定</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-slate-300 dark:text-slate-600 group-hover:text-slate-500 transition-colors"></i>
+                        </button>
+
+                        <hr class="border-slate-100 dark:border-slate-700/60">
                         </div>
 
                         <!-- 6. 排序下方快捷功能 -->

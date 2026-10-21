@@ -531,6 +531,7 @@ const TIPS = {
   "set-font-plus": { scene: fontScene(true), text: "字體放大一點，長輩看更清楚。" },
   "set-nick-reset": { scene: noteFieldScene("暱稱", "牛牛"), text: "把暱稱改回 Google 帳號的名稱。" },
   "set-open-apps": { scene: panelScene(true).replace("系統設定", "所有應用設定"), text: "進入所有應用設定：顯示方式、排序、管理應用。" },
+  "set-open-menu": { scene: panelScene(true).replace("系統設定", "菜單設定"), text: "進入菜單設定：格式大小、排序與新增菜單。" },
   "set-open-cards": { scene: panelScene(true).replace("系統設定", "生活圖卡設定"), text: "進入生活圖卡設定：格式大小與排序。" },
   "set-open-lobby": { scene: panelScene(true).replace("系統設定", "大廳設定"), text: "進入大廳設定：決定大廳顯示什麼、順序。" },
   "set-dock": { scene: dockToggleScene, text: "開：顯示下方快捷列。關：隱藏，其他頁只留一顆「回大廳」。" },
