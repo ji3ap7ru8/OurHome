@@ -13,7 +13,6 @@ export const INCOME_CATS = [
   { name: "薪資", icon: "fa-briefcase", color: "#16a34a" },
   { name: "獎金", icon: "fa-gift", color: "#eab308" },
   { name: "紅包", icon: "fa-envelope", color: "#dc2626" },
-  { name: "投資", icon: "fa-chart-line", color: "#0891b2" },
   { name: "其他", icon: "fa-ellipsis", color: "#64748b" },
 ];
 export const catsOf = (type) => (type === "income" ? INCOME_CATS : EXPENSE_CATS);

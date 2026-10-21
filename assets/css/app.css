@@ -704,3 +704,15 @@ input:checked + .memo-pick { background: var(--primary-color); color: #fff; bord
 .lg-slot > i { color: var(--primary-color); width: 1.1rem; text-align: center; }
 .lg-slot > span { width: 2.2rem; flex: none; font-size: .8rem; font-weight: 800; color: #64748b; }
 .lg-slot input { flex: 1; min-width: 0; background: transparent; outline: 0; font-size: 1rem; font-weight: 700; color: inherit; }
+
+/* 記帳本表單：淡色調 + 四角圓角 */
+.lg-sheet { border-radius: 1.6rem; background: color-mix(in srgb, var(--primary-light) 40%, #fbfcfe); box-shadow: 0 18px 50px -12px #0006; }
+.lg-wallet { background: linear-gradient(155deg, color-mix(in srgb, var(--primary-color) 58%, #fff) 0%, color-mix(in srgb, var(--primary-color) 78%, #fff) 100%); box-shadow: 0 8px 18px -10px var(--primary-color), inset 0 1px 0 #fff7; }
+.lg-wallet::before { border-color: #ffffff80; }
+.lg-wallet .lg-seg { background: #ffffff2e; }
+.lg-wallet .lg-seg .pick span { color: #fff; }
+.lg-wallet .lg-amount > div { border-bottom-color: #ffffffaa; }
+.lg-clasp { border-color: color-mix(in srgb, var(--primary-color) 70%, #fff); }
+.lg-save { background: color-mix(in srgb, var(--primary-color) 82%, #fff); box-shadow: 0 6px 14px -8px var(--primary-color); }
+.lg-slot { border-color: color-mix(in srgb, var(--primary-color) 32%, transparent); }
+.dark .lg-sheet { background: color-mix(in srgb, var(--primary-dark) 18%, #0f172a); }
