@@ -628,6 +628,7 @@ const TIPS = {
   "ledger-del": { scene: calDelScene, text: "按一下，再按一次「再按一次刪除」才會真的刪除。" },
   "ledger-save": { scene: memoSaveScene, text: "金額和分類填好後按儲存，帳目就會記下來。" },
   // ---- 翻譯機 ----
+  "tr-live": { scene: tapScene("即時翻譯 開"), text: "打開後會一直聽你說話，邊說邊翻譯，不會自己停下來；關掉就停止。" },
   "tr-swap": { scene: tapScene("⇄ 對調語言"), text: "把「來源語言」和「目標語言」對調。" },
   "tr-mic": { scene: tapScene("🎤 語音輸入"), text: "按一下開始說話，說完會變成文字；再按一次停止。" },
   "tr-clear": { scene: orderResetScene, text: "清除輸入的文字和翻譯結果。" },

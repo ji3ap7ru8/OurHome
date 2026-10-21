@@ -12,6 +12,8 @@ export function mountHeader(mountEl) {
   on("auth:change", renderAccount);
   on("nickname:change", () => renderAccount({ isLoggedIn: state.isLoggedIn, account: state.account }));
   on("route:change", renderRoute);
+  document.getElementById("liveToggle")?.addEventListener("change", (e) => emit("translator:live", e.target.checked)); // 翻譯機：即時翻譯開關
+  on("translator:live-set", (v) => { const t = document.getElementById("liveToggle"); if (t) t.checked = !!v; });
   renderAccount({ isLoggedIn: state.isLoggedIn, account: state.account });
   renderRoute(state.route);
 }
@@ -30,6 +32,9 @@ function renderRoute(id) {
   document.getElementById("headerUser")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr);
   document.getElementById("headerPaletteBtn")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr);
   const mn = id === "菜單"; // 菜單頁：左側改放「菜單」標題，右側多一個 ︙ 菜單設定
+  const ls = document.getElementById("headerLiveSwitch");
+  ls?.classList.toggle("hidden", !tr);
+  ls?.classList.toggle("flex", tr);
   const trt = document.getElementById("headerTranslatorTitle");
   trt?.classList.toggle("hidden", !tr);
   trt?.classList.toggle("flex", tr);

@@ -1,6 +1,8 @@
 // 翻譯機 — Stage 4：純前端 UI 與邏輯。
 // 訪客可用。不寫入任何永久儲存；離開頁面後輸入與結果保留在記憶體直到重新整理。
 import { showTipHint, closeTips } from "../../core/tips.js";
+import { on, emit } from "../../core/store.js";
+import { holdAwake, releaseAwake } from "../../core/wakelock.js";
 import { LANGS, AUTO, langOf, googleUrl, MAX_CHARS, translatorApi } from "./data.js";
 
 const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -11,6 +13,9 @@ let seq = 0;            // 避免舊回應蓋掉新結果
 let ctrl = null;        // 取消進行中的請求
 let rec = null;         // 語音辨識實例
 let listening = false;
+// 即時翻譯：持續聆聽、邊說邊翻，語音辨識中斷時自動接續
+let live = { on: false, items: [], interim: "", interimTr: "", rec: null, timer: null, iseq: 0, restarts: 0 };
+let offLive = null;
 
 const SR = typeof window !== "undefined" ? window.SpeechRecognition || window.webkitSpeechRecognition : null;
 const canSpeak = typeof window !== "undefined" && "speechSynthesis" in window;
@@ -26,7 +31,7 @@ function render() {
         <select data-to aria-label="目標語言" class="flex-1 min-w-0 h-12 px-3 rounded-2xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold text-base soft-shadow-sm border-0">${opts(LANGS, st.to)}</select>
       </div>
 
-      <div class="bg-white/95 dark:bg-slate-800/95 rounded-3xl soft-shadow-md p-4 mb-3">
+      ${live.on ? liveCard() : `<div class="bg-white/95 dark:bg-slate-800/95 rounded-3xl soft-shadow-md p-4 mb-3">
         <textarea data-text rows="4" maxlength="${MAX_CHARS}" placeholder="輸入要翻譯的文字…" class="w-full bg-transparent resize-none outline-none text-xl font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 select-text">${esc(st.text)}</textarea>
         <div class="flex items-center gap-2 mt-2">
           ${SR ? `<button data-tip="tr-mic" data-mic aria-label="語音輸入" class="w-12 h-12 rounded-full ${listening ? "bg-rose-500 text-white animate-pulse" : "theme-bg-light theme-text-primary"} text-lg active:scale-90 transition"><i class="fa-solid fa-microphone"></i></button>` : ""}
@@ -34,12 +39,118 @@ function render() {
           <span data-count class="text-xs font-bold text-slate-400 ml-1">${st.text.length}/${MAX_CHARS}</span>
           <button data-tip="tr-go" data-go class="ml-auto h-12 px-6 rounded-full theme-bg-primary text-white font-black text-lg soft-shadow-md active:scale-95 transition"><i class="fa-solid fa-language"></i> 翻譯</button>
         </div>
-      </div>
+      </div>`}
 
       <div data-result-box></div>
 
     </div>`;
   renderResult();
+  if (live.on) renderLive();
+}
+
+function liveCard() {
+  return `<div class="bg-white/95 dark:bg-slate-800/95 rounded-3xl soft-shadow-md p-4 mb-3">
+    <div class="flex items-center gap-2 mb-2">
+      <span data-live-dot class="w-3 h-3 rounded-full ${listening ? "bg-rose-500 animate-pulse" : "bg-slate-300"}"></span>
+      <span data-live-state class="text-sm font-black text-slate-600 dark:text-slate-200">${listening ? "聆聽中，請直接說話…" : SR ? "已暫停" : "此瀏覽器不支援語音辨識"}</span>
+      <button data-live-clear aria-label="清除紀錄" class="ml-auto w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200 active:scale-90 transition"><i class="fa-solid fa-xmark"></i></button>
+      ${SR ? `<button data-live-pause aria-label="${listening ? "暫停" : "繼續"}" class="h-10 px-4 rounded-full theme-bg-primary text-white font-black active:scale-95 transition"><i class="fa-solid ${listening ? "fa-pause" : "fa-microphone"}"></i> ${listening ? "暫停" : "繼續"}</button>` : ""}
+    </div>
+    <div data-live-log class="max-h-[52vh] overflow-y-auto space-y-3 select-text"></div>
+  </div>`;
+}
+
+function renderLive() {
+  const box = root?.querySelector("[data-live-log]");
+  if (!box) return;
+  const row = (src, tr, dim) => `<div class="${dim ? "opacity-60" : ""}"><p class="text-sm font-semibold text-slate-500 dark:text-slate-400 break-words">${esc(src)}</p><p class="text-xl font-black text-slate-900 dark:text-white leading-snug break-words">${esc(tr) || "…"}</p></div>`;
+  box.innerHTML = live.items.map((i) => row(i.src, i.tr)).join("") + (live.interim ? row(live.interim, live.interimTr, true) : "") ||
+    `<p class="text-slate-400 font-semibold py-6 text-center">說話後，原文與翻譯會即時出現在這裡</p>`;
+  box.scrollTop = box.scrollHeight;
+}
+
+function setLiveStatus() {
+  const d = root?.querySelector("[data-live-dot]");
+  if (d) d.className = `w-3 h-3 rounded-full ${listening ? "bg-rose-500 animate-pulse" : "bg-slate-300"}`;
+  const t = root?.querySelector("[data-live-state]");
+  if (t) t.textContent = listening ? "聆聽中，請直接說話…" : "已暫停";
+  const b = root?.querySelector("[data-live-pause]");
+  if (b) b.innerHTML = listening ? `<i class="fa-solid fa-pause"></i> 暫停` : `<i class="fa-solid fa-microphone"></i> 繼續`;
+}
+
+async function liveTranslate(text, from) {
+  const r = await translatorApi.translate(text, from, st.to);
+  return r.text;
+}
+
+const liveFrom = () => (st.from === "auto" ? "zh-TW" : st.from);
+
+function startLive() {
+  if (!SR || !live.on) return;
+  stopRec();
+  const rc = new SR();
+  live.rec = rc;
+  rc.lang = langOf(liveFrom()).speech;
+  rc.continuous = true;
+  rc.interimResults = true;
+  rc.onstart = () => { listening = true; live.restarts = 0; setLiveStatus(); };
+  rc.onresult = (e) => {
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const r = e.results[i];
+      const said = (r[0]?.transcript || "").trim();
+      if (r.isFinal) {
+        live.interim = ""; live.interimTr = "";
+        if (said) {
+          const item = { src: said, tr: "" };
+          live.items.push(item);
+          if (live.items.length > 40) live.items.shift();
+          const from = liveFrom();
+          liveTranslate(said, from).then((t) => { item.tr = t; }).catch(() => { item.tr = "（翻譯失敗）"; }).finally(() => live.on && renderLive());
+        }
+      } else if (said) {
+        live.interim = said;
+        clearTimeout(live.timer);
+        const my = ++live.iseq;
+        live.timer = setTimeout(async () => { // 稍停頓才翻譯暫時結果，避免狂送請求
+          try { const t = await liveTranslate(said, liveFrom()); if (my === live.iseq && live.on) { live.interimTr = t; renderLive(); } } catch {}
+        }, 450);
+      }
+    }
+    renderLive();
+  };
+  rc.onerror = (e) => {
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") { toast("無法使用麥克風，請確認已允許權限"); setLive(false); }
+  };
+  rc.onend = () => { // 瀏覽器會自動結束辨識（靜音、時間上限）：只要開關還開著就接續
+    listening = false;
+    if (live.rec === rc) live.rec = null;
+    if (!live.on || live.paused) return setLiveStatus();
+    setLiveStatus();
+    live.restarts++;
+    setTimeout(() => { if (live.on && !live.paused && !live.rec) startLive(); }, Math.min(300 * live.restarts, 2000));
+  };
+  try { rc.start(); } catch { listening = false; setLiveStatus(); }
+}
+
+function stopRec() {
+  const rc = live.rec;
+  live.rec = null;
+  if (rc) { rc.onend = null; rc.onresult = null; rc.onerror = null; try { rc.abort(); } catch {} }
+  listening = false;
+}
+
+function setLive(v) {
+  if (v && !SR) toast("此瀏覽器不支援語音辨識，請改用 Chrome / Safari");
+  v = !!v && !!SR;
+  live.on = v; live.paused = false;
+  clearTimeout(live.timer);
+  live.iseq++;
+  if (v) { stopAll(); live.items = []; live.interim = ""; live.interimTr = ""; holdAwake("translator-live"); }
+  else { stopRec(); releaseAwake("translator-live"); live.interim = ""; live.interimTr = ""; }
+  emit("translator:live-set", live.on);
+  if (!root) return;
+  render();
+  if (v) startLive();
 }
 
 function renderResult() {
@@ -117,6 +228,7 @@ function changeLang(which, code) {
   if (st[other] === code && code !== "auto") st[other] = prev === "auto" ? (code === "en" ? "zh-TW" : "en") : prev; // 避免兩邊相同
   st.result = ""; st.status = "idle"; st.offline = false;
   render();
+  if (live.on && !live.paused) startLive(); // 即時翻譯中換語言：以新語言重新聆聽
 }
 
 function swap() {
@@ -125,6 +237,7 @@ function swap() {
   st.text = st.result || st.text; // 把譯文帶回輸入框，方便回譯
   st.result = ""; st.status = "idle"; st.offline = false;
   render();
+  if (live.on && !live.paused) startLive();
 }
 
 function speak() {
@@ -194,6 +307,8 @@ function onClick(e) {
   if (q("[data-copy]")) return copy();
   if (q("[data-big]")) return showBig();
   if (q("[data-mic]")) return toggleMic();
+  if (q("[data-live-clear]")) { live.items = []; live.interim = ""; live.interimTr = ""; return renderLive(); }
+  if (q("[data-live-pause]")) { if (listening || live.rec) { live.paused = true; stopRec(); setLiveStatus(); } else { live.paused = false; startLive(); } return; }
 }
 
 function onInput(e) {
@@ -218,6 +333,9 @@ export default {
   mount(el) {
     root = el;
     showTipHint("translator");
+    live = { on: false, items: [], interim: "", interimTr: "", rec: null, timer: null, iseq: 0, restarts: 0, paused: false };
+    emit("translator:live-set", false); // 每次進入翻譯機，即時翻譯預設關閉
+    offLive = on("translator:live", setLive);
     if (st.status === "loading") st.status = "idle";
     render();
     root.addEventListener("click", onClick);
@@ -227,6 +345,10 @@ export default {
   },
   unmount() {
     closeTips();
+    offLive?.(); offLive = null;
+    clearTimeout(live.timer);
+    stopRec(); live.on = false; releaseAwake("translator-live");
+    emit("translator:live-set", false);
     stopAll();
     root?.removeEventListener("click", onClick);
     root?.removeEventListener("input", onInput);

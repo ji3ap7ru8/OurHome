@@ -59,6 +59,13 @@ export const headerTemplate = `
                         <i class="fa-solid fa-plus"></i> 記一筆
                     </button>
 
+                    <!-- 翻譯機頁專用：即時翻譯開關（預設關閉；其他頁隱藏） -->
+                    <label id="headerLiveSwitch" data-tip="tr-live" class="hidden h-10 px-3 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm items-center gap-2 cursor-pointer select-none active:scale-95 transition-all">
+                        <span class="text-sm font-black text-slate-700 dark:text-slate-100 whitespace-nowrap">即時翻譯</span>
+                        <input id="liveToggle" type="checkbox" class="sr-only" aria-label="即時翻譯">
+                        <div class="oh-switch"></div>
+                    </label>
+
                     <button id="notificationBtn" data-tip="rem-bell" data-action="open-sheet" data-sheet="notification" class="relative w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center">
                         <i id="bellIcon" class="fa-regular fa-bell text-base theme-text-primary"></i>
                         <span id="unreadBadge" class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-red-500"></span>
