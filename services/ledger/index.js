@@ -104,20 +104,25 @@ function openForm(r = null) {
   wrap.className = "fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-end sm:items-center justify-center";
   wrap.innerHTML = `
     <form class="lg-sheet w-full max-w-md max-h-[92vh] overflow-y-auto" novalidate>
-      <div class="lg-sheet-head">
-        <h3><i class="fa-solid ${r ? "fa-pen-to-square" : "fa-file-invoice-dollar"}"></i> ${r ? "編輯帳目" : "記一筆"}</h3>
-        <button type="button" data-tip="ledger-close" data-close aria-label="關閉" class="lg-x"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="lg-body">
+      <div class="lg-wallet">
+        <div class="lg-wallet-top">
+          <h3><i class="fa-solid ${r ? "fa-pen-to-square" : "fa-wallet"}"></i> ${r ? "編輯帳目" : "記一筆"}</h3>
+          <button type="button" data-tip="ledger-close" data-close aria-label="關閉" class="lg-x"><i class="fa-solid fa-xmark"></i></button>
+        </div>
         <div class="lg-seg">
           <label data-tip="ledger-type" class="pick pick-ex"><input type="radio" name="type" value="expense" class="sr-only" ${d.type === "expense" ? "checked" : ""}><span><i class="fa-solid fa-arrow-trend-down"></i> 支出</span></label>
           <label data-tip="ledger-type" class="pick pick-in"><input type="radio" name="type" value="income" class="sr-only" ${d.type === "income" ? "checked" : ""}><span><i class="fa-solid fa-arrow-trend-up"></i> 收入</span></label>
         </div>
-        <label class="lg-amount"><span class="lg-label">金額 <b class="text-red-500">*</b></span>
+        <label class="lg-amount"><span>金額 <b>*</b></span>
           <div><em>$</em><input name="amount" inputmode="decimal" autocomplete="off" value="${d.amount}" placeholder="0"></div></label>
+        <span class="lg-clasp"></span>
+      </div>
+      <div class="lg-body">
         <div><span class="lg-label">分類 <b class="text-red-500">*</b></span><div data-cats class="grid grid-cols-4 gap-2 mt-1.5"></div></div>
-        <label class="lg-field"><span>日期</span><input type="date" name="date" value="${d.date}" max="${ymd()}"></label>
-        <label class="lg-field"><span>備註</span><input name="note" maxlength="40" value="${esc(d.note)}" placeholder="選填，例如：全聯買菜"></label>
+        <div class="lg-slots">
+          <label class="lg-slot"><i class="fa-solid fa-calendar-day"></i><span>日期</span><input type="date" name="date" value="${d.date}" max="${ymd()}"></label>
+          <label class="lg-slot"><i class="fa-solid fa-pen"></i><span>備註</span><input name="note" maxlength="40" value="${esc(d.note)}" placeholder="選填，例如：全聯買菜"></label>
+        </div>
         <p data-err class="text-red-600 font-bold text-sm hidden"></p>
         <div class="flex gap-2 pt-1">
           ${r ? '<button type="button" data-tip="ledger-del" data-del class="lg-del"><i class="fa-solid fa-trash"></i> 刪除</button>' : ""}
@@ -192,19 +197,16 @@ export default {
         <div data-chart></div>
       </div>
       <h3 class="lg-h"><i class="fa-solid fa-list-ul"></i> 流水帳</h3>
-      <div data-list class="space-y-3"></div>
-      <div class="sticky bottom-24 flex justify-end pr-1 pt-4 pointer-events-none">
-        <button data-tip="ledger-add" data-add aria-label="記一筆" class="lg-fab"><i class="fa-solid fa-plus"></i> 記一筆</button>
-      </div>`;
+      <div data-list class="space-y-3"></div>`;
     el.appendChild(root);
     setNote();
     if (!noteListening) { noteListening = true;
+      on("ledger:add", () => { if (alive && root) openForm(); }); // 頂部列「記一筆」
       on("data:change", (e) => { if (alive && e?.name === "ledger") reload(); }); // 切換儲存位置 / 雲端資料更新後重新讀取
       for (const ev of ["auth:change", "cloud:change", "storage:sync", "storage:change"]) on(ev, () => { if (alive) setNote(); });
     }
     root.querySelector("[data-prev]").onclick = () => { month = shiftMonth(month, -1); render(); };
     root.querySelector("[data-next]").onclick = () => { if (month < monthKey()) { month = shiftMonth(month, 1); render(); } };
-    root.querySelector("[data-add]").onclick = () => openForm();
     root.addEventListener("click", (e) => {
       const c = e.target.closest("[data-ct]"); if (c) { chartType = c.dataset.ct; render(); return; }
       const o = e.target.closest("[data-open]"); if (o) openForm(rows.find((x) => x.id === o.dataset.open));

@@ -672,3 +672,35 @@ input:checked + .memo-pick { background: var(--primary-color); color: #fff; bord
 .lg-field input { flex: 1; min-width: 0; padding: .4rem 0; background: transparent; outline: 0; font-size: 1rem; font-weight: 700; color: inherit; }
 .lg-del { padding: 0 1rem; border-radius: .9rem; font-weight: 900; background: #fee2e2; color: #b91c1c; }
 .lg-save { flex: 1; padding: .85rem 0; border-radius: .9rem; font-weight: 900; font-size: 1rem; color: #fff; background: var(--primary-color); box-shadow: 0 6px 14px -6px var(--primary-color); }
+
+
+/* ===== 記帳本 新增 / 編輯：錢包風格（皮夾本體 + 縫線 + 扣環 + 卡槽） ===== */
+.lg-sheet { padding: .6rem; background: color-mix(in srgb, var(--primary-light) 55%, #f8fafc); border-top: 0; border-radius: 1.6rem 1.6rem 0 0; }
+.dark .lg-sheet { background: color-mix(in srgb, var(--primary-dark) 18%, #0f172a); }
+.lg-wallet { position: relative; padding: 1rem 1.1rem 1.6rem; border-radius: 1.3rem; color: #fff; background: linear-gradient(155deg, color-mix(in srgb, var(--primary-color) 88%, #fff) 0%, var(--primary-color) 45%, var(--primary-dark) 100%); box-shadow: 0 10px 22px -10px var(--primary-dark), inset 0 1px 0 #fff5; }
+.lg-wallet::before { content: ""; position: absolute; inset: .45rem; border: 2px dashed #ffffff66; border-radius: 1rem; pointer-events: none; }
+.lg-wallet-top { position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: .8rem; }
+.lg-wallet-top h3 { font-size: 1.1rem; font-weight: 900; color: #fff; }
+.lg-wallet .lg-x { background: #ffffff30; color: #fff; }
+.lg-wallet .lg-seg { position: relative; padding: .25rem; border-radius: 999px; background: #00000026; gap: .25rem; }
+.lg-wallet .lg-seg .pick span { border: 0; padding: .5rem 0; border-radius: 999px; color: #ffffffd0; }
+.lg-wallet .lg-seg .pick input:checked + span { background: #fff; color: var(--primary-dark); box-shadow: 0 2px 6px #0003; }
+.lg-wallet .lg-seg .pick-ex input:checked + span i { color: #dc2626; }
+.lg-wallet .lg-seg .pick-in input:checked + span i { color: #16a34a; }
+.lg-wallet .lg-amount { position: relative; display: block; margin-top: .8rem; }
+.lg-wallet .lg-amount > span { font-size: .75rem; font-weight: 800; color: #ffffffcc; }
+.lg-wallet .lg-amount b { color: #fecaca; }
+.lg-wallet .lg-amount > div { border-bottom: 2px solid #ffffff88; }
+.lg-wallet .lg-amount em, .lg-wallet .lg-amount input { color: #fff; }
+.lg-wallet .lg-amount input::placeholder { color: #ffffff77; }
+.lg-clasp { position: absolute; left: 50%; bottom: -.7rem; width: 3.2rem; height: 1.4rem; transform: translateX(-50%); border-radius: .7rem; background: #fff; border: 3px solid var(--primary-dark); box-shadow: 0 3px 8px #0003; }
+.lg-clasp::after { content: ""; position: absolute; left: 50%; top: 50%; width: .5rem; height: .5rem; border-radius: 50%; transform: translate(-50%, -50%); background: var(--primary-color); }
+.lg-sheet .lg-body { padding: 1.4rem .4rem .6rem; gap: .8rem; }
+.lg-pickcat { background: #ffffffd9; border: 2px solid transparent; box-shadow: 0 2px 6px -3px #0004; }
+.dark .lg-pickcat { background: #1e293bd9; }
+.lg-slots { display: grid; gap: .5rem; }
+.lg-slot { display: flex; align-items: center; gap: .6rem; padding: .65rem .85rem; border-radius: .9rem; background: #ffffffe6; border: 1.5px dashed color-mix(in srgb, var(--primary-color) 45%, transparent); }
+.dark .lg-slot { background: #1e293be6; }
+.lg-slot > i { color: var(--primary-color); width: 1.1rem; text-align: center; }
+.lg-slot > span { width: 2.2rem; flex: none; font-size: .8rem; font-weight: 800; color: #64748b; }
+.lg-slot input { flex: 1; min-width: 0; background: transparent; outline: 0; font-size: 1rem; font-weight: 700; color: inherit; }

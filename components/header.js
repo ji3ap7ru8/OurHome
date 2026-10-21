@@ -8,7 +8,7 @@ import { openCalendarId } from "../core/overlay.js";
 
 export function mountHeader(mountEl) {
   mountEl.innerHTML = headerTemplate;
-  registerActions({ "open-calendar-id": () => openCalendarId(), "calendar-today": () => emit("calendar:today"), "bowl-overwrite": () => emit("bowl:overwrite") }); // 家庭日曆的 ︙ ID設定、回到今天
+  registerActions({ "open-calendar-id": () => openCalendarId(), "calendar-today": () => emit("calendar:today"), "bowl-overwrite": () => emit("bowl:overwrite"), "ledger-add": () => emit("ledger:add") }); // 家庭日曆的 ︙ ID設定、回到今天
   on("auth:change", renderAccount);
   on("nickname:change", () => renderAccount({ isLoggedIn: state.isLoggedIn, account: state.account }));
   on("route:change", renderRoute);
@@ -30,6 +30,9 @@ function renderRoute(id) {
   const lt = document.getElementById("headerLedgerTitle");
   lt?.classList.toggle("hidden", !ledger);
   lt?.classList.toggle("flex", ledger);
+  const la = document.getElementById("headerLedgerAddBtn");
+  la?.classList.toggle("hidden", !ledger);
+  la?.classList.toggle("flex", ledger);
   const mt = document.getElementById("headerMemoTitle");
   mt?.classList.toggle("hidden", !memo);
   mt?.classList.toggle("flex", memo);
