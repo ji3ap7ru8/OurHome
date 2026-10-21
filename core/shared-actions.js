@@ -1,6 +1,6 @@
 // 跨元件共用的 data-action（開關視窗、登入/登出）。
 import { registerActions } from "./actions.js";
-import { openSheet, closeSheet, openSettings, closeSettings, openAppsOptions, closeAppsOptions, openCardsOptions, openBowlOptions, closeAll } from "./overlay.js";
+import { openSheet, closeSheet, openSettings, closeSettings, openAppsOptions, closeAppsOptions, openCardsOptions, openMenuOptions, openBowlOptions, closeAll } from "./overlay.js";
 import { loginWithGoogle, logout, handleUserHeaderClick } from "./auth.js";
 
 export function initSharedActions() {
@@ -11,6 +11,7 @@ export function initSharedActions() {
     "close-settings": () => closeSettings(),
     "open-apps-options": () => openAppsOptions(),
     "open-cards-options": () => openCardsOptions(),
+    "open-menu-options": () => openMenuOptions(),
     "open-bowl-options": () => openBowlOptions(),
     "close-apps-options": () => closeAppsOptions(),
     "close-all": () => closeAll(),

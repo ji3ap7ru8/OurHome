@@ -82,6 +82,16 @@ export function openCardsOptions() {
   emit("overlay:change", { ...state.overlay });
 }
 
+// 菜單頁的 ︙ 菜單設定視窗（右側滑出，和系統設定互斥；關閉沿用 closeAppsOptions）
+export function openMenuOptions() {
+  state.overlay.admin = null;
+  state.overlay.sheet = null;
+  state.overlay.settings = null;
+  state.overlay.apps = "menu";
+  syncBackdrop();
+  emit("overlay:change", { ...state.overlay });
+}
+
 // 換誰洗碗頁的 ︙ 換誰洗碗設定視窗（右側滑出，和系統設定互斥；關閉沿用 closeAppsOptions）
 export function openBowlOptions() {
   state.overlay.admin = null;

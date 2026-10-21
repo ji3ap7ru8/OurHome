@@ -28,6 +28,7 @@ import { parseFirebaseConfig } from "./fbconfig.js";
 import { applySavedTheme, snapshotTheme, resetTheme } from "./theme.js";
 import { snapshotApps, applyApps, resetApps } from "./apps-model.js";
 import { snapshotCards, applyCards, resetCards } from "./cards-model.js";
+import { snapshotMenu, applyMenu, resetMenu } from "./menu-model.js";
 import { snapshotLobby, applyLobby, resetLobby } from "./lobby-model.js";
 import { snapshotCalendarIds, applyCalendarIds, resetCalendarIds } from "./calendar-ids.js";
 import { snapshotLineBotIds, snapshotLineBotToken, snapshotLineRelayUrl, applyLineBotIds, resetLineBotIds } from "./line-bot-ids.js";
@@ -92,7 +93,7 @@ export function friendlyError(e, scope = "") {
 }
 
 /* ---------- 設定快照 / 套用 ---------- */
-const snapshotSettings = () => ({ theme: snapshotTheme(), shortcuts: [...state.shortcuts], dockVisible: state.dockVisible !== false, apps: snapshotApps(), lobby: snapshotLobby(), cards: snapshotCards(), nickname: state.nickname || "", storage: { ...state.storage }, calendarIds: snapshotCalendarIds(), lineBotToken: snapshotLineBotToken(), lineRelayUrl: snapshotLineRelayUrl(), lineBotIds: snapshotLineBotIds(), autoLogin: snapshotAutoLogin(), tips: snapshotTips() });
+const snapshotSettings = () => ({ theme: snapshotTheme(), shortcuts: [...state.shortcuts], dockVisible: state.dockVisible !== false, apps: snapshotApps(), lobby: snapshotLobby(), cards: snapshotCards(), menu: snapshotMenu(), nickname: state.nickname || "", storage: { ...state.storage }, calendarIds: snapshotCalendarIds(), lineBotToken: snapshotLineBotToken(), lineRelayUrl: snapshotLineRelayUrl(), lineBotIds: snapshotLineBotIds(), autoLogin: snapshotAutoLogin(), tips: snapshotTips() });
 
 function applySettings(s) {
   if (!s) return;
@@ -122,6 +123,7 @@ function applySettings(s) {
     }
     applyTips(s.tips); // 操作提示說明開關（舊設定檔沒有這欄 = 開啟）
     applyAutoLogin(s.autoLogin); // 自動登入開關（舊設定檔沒有這欄 = 關閉）
+    applyMenu(s.menu); // 菜單設定：格式大小、排序方式、自訂編號（舊設定檔沒有 menu 時不動）
     applyCards(s.cards); // 生活圖卡設定：格式大小、排序方式、自訂編號（舊設定檔沒有 cards 時不動）
     applyApps(s.apps); // 所有應用頁：排序方式、自訂編號、擴充插件（舊設定檔沒有 apps 時不動）
     applyLobby(s.lobby); // 大廳設定：顯示/隱藏、大廳順序（舊設定檔沒有 lobby 時不動；要在 applyApps 之後，才認得插件 id）
@@ -381,6 +383,7 @@ export async function afterLogout(onStep = () => {}) {
   driveLoaded = false; fileId = null; cfg = BLANK(); dirty = false;
   resetLineBotIds(); // LINE Bot Token 與接收對象不留在共用手機上
   resetCalendarIds(); // 日曆 ID 不留在共用手機上
+  resetMenu(); // 菜單設定回到預設
   resetCards(); // 生活圖卡設定回到預設
   resetLobby(); // 大廳設定回到預設（全部顯示、順序跟所有應用相同）
   resetApps(); // 插件網址與自訂編號不留在共用手機上（driveLoaded 已為 false，不會觸發存檔）
@@ -458,6 +461,8 @@ on("apps:change", scheduleSettingsSave);
 on("lobby:change", scheduleSettingsSave); // 大廳顯示/隱藏與順序
 on("cards:change", scheduleSettingsSave); // 生活圖卡排序
 on("cards:view", scheduleSettingsSave); // 生活圖卡格式大小
+on("menu:change", scheduleSettingsSave); // 菜單排序
+on("menu:view", scheduleSettingsSave); // 菜單格式大小
 on("apps:view", scheduleSettingsSave); // 格式大小（圖卡/清單、大小、每行數量）
 on("storage:change", scheduleSettingsSave);
 on("autologin:change", scheduleSettingsSave);

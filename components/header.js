@@ -8,7 +8,7 @@ import { openCalendarId } from "../core/overlay.js";
 
 export function mountHeader(mountEl) {
   mountEl.innerHTML = headerTemplate;
-  registerActions({ "open-calendar-id": () => openCalendarId(), "calendar-today": () => emit("calendar:today"), "bowl-overwrite": () => emit("bowl:overwrite"), "ledger-add": () => emit("ledger:add"), "menu-add": () => emit("menu:add") }); // 家庭日曆的 ︙ ID設定、回到今天
+  registerActions({ "open-calendar-id": () => openCalendarId(), "calendar-today": () => emit("calendar:today"), "bowl-overwrite": () => emit("bowl:overwrite"), "ledger-add": () => emit("ledger:add") }); // 家庭日曆的 ︙ ID設定、回到今天
   on("auth:change", renderAccount);
   on("nickname:change", () => renderAccount({ isLoggedIn: state.isLoggedIn, account: state.account }));
   on("route:change", renderRoute);
@@ -28,11 +28,11 @@ function renderRoute(id) {
   const ledger = id === "記帳"; // 記帳本頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「記帳本」標題
   document.getElementById("headerUser")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu);
   document.getElementById("headerPaletteBtn")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu);
-  const mn = id === "菜單"; // 菜單頁：左側改放「菜單」標題，右側多一個「新增」
+  const mn = id === "菜單"; // 菜單頁：左側改放「菜單」標題，右側多一個 ︙ 菜單設定
   const mt2 = document.getElementById("headerMenuTitle");
   mt2?.classList.toggle("hidden", !mn);
   mt2?.classList.toggle("flex", mn);
-  const ma = document.getElementById("headerMenuAddBtn");
+  const ma = document.getElementById("headerMenuBtn");
   ma?.classList.toggle("hidden", !mn);
   ma?.classList.toggle("flex", mn);
   const lt = document.getElementById("headerLedgerTitle");

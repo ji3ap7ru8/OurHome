@@ -11,6 +11,7 @@ import { mountAdminReminder } from "../components/admin-reminder.js";
 import { mountCalendarIds } from "../components/calendar-ids.js";
 import { mountAppsOptions } from "../components/apps-options.js";
 import { mountCardsOptions } from "../components/cards-options.js";
+import { mountMenuOptions } from "../components/menu-options.js";
 import { mountBowlOptions } from "../components/bowl-options.js";
 import { mountCloudSettings } from "../components/cloud-settings.js";
 import { preloadGoogle } from "./google.js";
@@ -49,9 +50,13 @@ export function bootstrap() {
   cardsMount.id = "cardsOptionsMount";
   calMount.insertAdjacentElement("afterend", cardsMount);
   mountCardsOptions(cardsMount);
+  const menuMount = document.createElement("div"); // 菜單的 ︙ 菜單設定視窗
+  menuMount.id = "menuOptionsMount";
+  cardsMount.insertAdjacentElement("afterend", menuMount);
+  mountMenuOptions(menuMount);
   const bowlMount = document.createElement("div"); // 換誰洗碗的 ︙ 換誰洗碗設定視窗
   bowlMount.id = "bowlOptionsMount";
-  cardsMount.insertAdjacentElement("afterend", bowlMount);
+  menuMount.insertAdjacentElement("afterend", bowlMount);
   mountBowlOptions(bowlMount);
   mountCloudSettings();
   preloadGoogle(); // 預載 Google 登入元件，點「登入」時才能立刻彈出視窗

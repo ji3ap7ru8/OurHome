@@ -51,9 +51,9 @@ export const headerTemplate = `
                         <i class="fa-solid fa-cloud-arrow-up"></i> 覆蓋儲存
                     </button>
 
-                    <!-- 菜單頁專用：新增菜單（顏色跟著主色調；其他頁隱藏） -->
-                    <button id="headerMenuAddBtn" data-action="menu-add" data-tip="menu-add" class="hidden h-10 px-3.5 rounded-2xl theme-bg-primary text-white soft-shadow-sm hover:scale-105 active:scale-95 transition-all items-center gap-1.5 font-black text-sm" title="新增菜單" aria-label="新增菜單">
-                        <i class="fa-solid fa-plus"></i> 新增
+                    <!-- 菜單頁專用：︙ 菜單設定（格式大小、排序方式、新增菜單；其他頁隱藏） -->
+                    <button id="headerMenuBtn" data-action="open-menu-options" data-tip="menu-menu" class="hidden w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center" title="菜單設定" aria-label="菜單設定">
+                        <i class="fa-solid fa-ellipsis-vertical text-lg theme-text-primary"></i>
                     </button>
 
                     <!-- 記帳本頁專用：記一筆（顏色跟著主色調；其他頁隱藏） -->
