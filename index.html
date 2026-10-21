@@ -77,6 +77,32 @@
             </svg>
         </div>
 
+        <!-- 「菜單」頁專用背景：米色餐桌紙 + 格紋桌巾 + 餐具／檸檬／咖啡杯線稿（只在該頁顯示，見 app.css） -->
+        <div id="bgMenu" class="bg-menu-layer pointer-events-none z-0" aria-hidden="true">
+            <svg viewBox="0 0 390 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <g id="bm-fork"><path d="M-9 -30V-14Q-9 -6 0 -6Q9 -6 9 -14V-30M0 -30V-6M0 -6V34"/></g>
+                    <g id="bm-knife"><path d="M-4 -32Q9 -26 9 -4V6H-4ZM2 6V36"/></g>
+                    <g id="bm-spoon"><ellipse cx="0" cy="-20" rx="9" ry="13"/><path d="M0 -7V34"/></g>
+                    <g id="bm-lemon"><circle r="22"/><circle r="16"/><path d="M0 -16V16M-16 0H16M-11 -11L11 11M11 -11L-11 11"/></g>
+                    <g id="bm-cup"><path d="M-18 -10H14V8A14 14 0 0 1 0 22H-4A14 14 0 0 1 -18 8ZM14 -4H20A7 7 0 0 1 20 10H14M-9 -20Q-5 -26 -9 -32M1 -20Q5 -26 1 -32"/></g>
+                    <g id="bm-leaf"><path d="M0 0Q20 -22 42 0Q20 22 0 0ZM0 0H42M12 0L22 -9M12 0L22 9"/></g>
+                </defs>
+                <g class="bgm">
+                    <circle cx="348" cy="78" r="64"/><circle cx="348" cy="78" r="46"/>
+                    <use href="#bm-fork" transform="translate(262 92) rotate(-14)"/>
+                    <use href="#bm-knife" transform="translate(436 76) rotate(14)"/>
+                    <circle cx="30" cy="650" r="70"/><circle cx="30" cy="650" r="50"/>
+                    <use href="#bm-spoon" transform="translate(120 690) rotate(24)"/>
+                    <use href="#bm-lemon" transform="translate(48 250) rotate(12)"/>
+                    <use href="#bm-cup" transform="translate(338 400) rotate(-10)"/>
+                    <use href="#bm-leaf" transform="translate(250 560) rotate(-30)"/>
+                    <use href="#bm-leaf" transform="translate(300 745) rotate(18) scale(.8)"/>
+                    <use href="#bm-fork" transform="translate(196 760) rotate(34) scale(.8)"/>
+                </g>
+            </svg>
+        </div>
+
         <!-- 「應用程式」頁專用背景：點陣 + 主題色光暈 + 圓環（只在該頁顯示，見 app.css） -->
         <div id="bgApps" class="bg-apps-layer overflow-hidden pointer-events-none z-0"></div>
 

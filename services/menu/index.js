@@ -16,7 +16,7 @@ let fs = { scale: 1, rotated: false, dist: 0, multi: false };
 const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const safeImg = (u) => (/^https:\/\//i.test(u || "") ? u : "");
 const iconHtml = (m) => {
-  const fb = "fa-solid fa-utensils text-2xl flat-icon";
+  const fb = "fa-solid fa-utensils text-2xl menu-icon";
   const u = safeImg(m.iconUrl);
   return u ? `<img data-icon data-fb="${fb}" src="${esc(u)}" alt="" referrerpolicy="no-referrer" class="w-full h-full object-contain">` : `<i class="${fb}"></i>`;
 };
@@ -41,19 +41,22 @@ function render() {
   if (!root) return;
   const html = items.map((m) => `
     <div class="relative">
-      <button data-open="${m.id}" data-tip="menu-open" class="flat-card w-full min-w-0 rounded-3xl p-5 flex flex-col items-center active:scale-95 transition">
-        <span class="flat-ibox w-14 h-14 rounded-2xl overflow-hidden flex items-center justify-center shrink-0 mb-3">${iconHtml(m)}</span>
-        <span class="text-base font-bold text-slate-800 dark:text-slate-100 text-center break-words w-full">${esc(m.name)}</span>
+      <button data-open="${m.id}" data-tip="menu-open" class="menu-card w-full min-w-0 rounded-3xl px-4 py-6 flex flex-col items-center active:scale-95 transition">
+        <span class="menu-plate w-16 h-16 rounded-full overflow-hidden flex items-center justify-center shrink-0 mb-4 p-2">${iconHtml(m)}</span>
+        <span class="menu-name">${esc(m.name)}</span>
+        <span class="menu-rule"></span>
       </button>
-      <button data-edit="${m.id}" data-tip="menu-edit" aria-label="編輯 ${esc(m.name)}" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 dark:bg-slate-700/90 text-slate-500 dark:text-slate-300 text-xs flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-pen"></i></button>
+      <button data-edit="${m.id}" data-tip="menu-edit" aria-label="編輯 ${esc(m.name)}" class="menu-edit absolute top-3 right-3 w-8 h-8 rounded-full text-xs flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-pen"></i></button>
     </div>`).join("");
   const empty = loaded && !items.length
-    ? '<div class="col-span-full text-center text-slate-400 dark:text-slate-500 font-bold py-10 leading-relaxed"><i class="fa-solid fa-utensils text-2xl mb-2"></i><br>還沒有菜單<br><span class="text-sm font-semibold">點右上角「新增」加入第一份菜單</span></div>' : "";
+    ? '<div class="menu-empty col-span-full text-center font-bold py-10 leading-relaxed"><i class="fa-solid fa-utensils text-2xl mb-2"></i><br>還沒有菜單<br><span class="text-sm font-semibold">點右上角「新增」加入第一份菜單</span></div>' : "";
   root.innerHTML = `
-    <div class="px-5 pt-2 pb-6">
-      <div class="grid grid-cols-2 gap-4">
+    <div class="menu-awning"></div>
+    <div class="menu-title">MENU</div>
+    <div class="px-5 pt-3 pb-6">
+      <div class="menu-grid grid grid-cols-2 gap-4">
         ${html}
-        ${loaded ? "" : '<div class="col-span-full text-center text-slate-400 font-bold py-4">載入中…</div>'}
+        ${loaded ? "" : '<div class="menu-empty col-span-full text-center font-bold py-4">載入中…</div>'}
         ${empty}
       </div>
     </div>`;

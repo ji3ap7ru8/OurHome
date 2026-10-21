@@ -316,6 +316,75 @@ input[type=range] {
 .dark .flat-form { background: #1e293b; }
 .flat-btn { background: var(--primary-color); }
 
+/* ===== 菜單頁：餐廳菜單風（米色紙 + 格紋桌巾 + 餐具線稿 + 遮陽棚；固定暖色配色，不受主題色影響；深色模式 = 黑板菜單） ===== */
+#appContainer[data-view="menu"] {
+    --m-paper: #fbf3e3; --m-ink: #b45309; --m-line: #e3c697; --m-card: #fffaf0; --m-text: #4a2c17; --m-sub: #9a6b3f;
+    --m-red: #c2410c; --m-green: #4d7c0f; --m-gold: #d97706; --m-brown: #92400e;
+}
+#appContainer.dark[data-view="menu"] {
+    --m-paper: #221b16; --m-ink: #e8d5b5; --m-line: #5b4630; --m-card: #2d251e; --m-text: #f5e9d3; --m-sub: #c9ab80;
+    --m-red: #f08a5d; --m-green: #a3c95f; --m-gold: #f2b84b; --m-brown: #d9a273;
+}
+#appContainer[data-view="menu"] #bgShapes { opacity: 0 !important; }
+#appContainer[data-view="menu"],
+#appContainer[data-view="menu"] > .overflow-y-auto {
+    background-color: var(--m-paper) !important;
+}
+#appContainer[data-view="menu"] > .overflow-y-auto {
+    background-image:
+        radial-gradient(90% 40% at 50% 0%, rgba(255, 255, 255, .55), transparent 70%),
+        radial-gradient(120% 60% at 50% 110%, rgba(180, 83, 9, .14), transparent 70%),
+        repeating-linear-gradient(0deg, rgba(194, 65, 12, .065) 0 16px, transparent 16px 32px),
+        repeating-linear-gradient(90deg, rgba(194, 65, 12, .065) 0 16px, transparent 16px 32px) !important; /* 紅白格紋桌巾 */
+}
+#appContainer.dark[data-view="menu"] > .overflow-y-auto {
+    background-image:
+        radial-gradient(90% 40% at 50% 0%, rgba(255, 237, 213, .07), transparent 70%),
+        repeating-linear-gradient(0deg, rgba(255, 237, 213, .035) 0 16px, transparent 16px 32px),
+        repeating-linear-gradient(90deg, rgba(255, 237, 213, .035) 0 16px, transparent 16px 32px) !important; /* 黑板上的粉筆格線 */
+}
+#appContainer[data-view="menu"] #headerMount > div { background-color: #fde6c8; border-bottom: 2px dashed #e3b27a; padding-top: .9rem; padding-bottom: .9rem; }
+#appContainer.dark[data-view="menu"] #headerMount > div { background-color: #2d251e; border-bottom-color: #5b4630; }
+#appContainer[data-view="menu"] #notificationBtn { background-color: #fff !important; }
+#appContainer[data-view="menu"] #bellIcon { color: var(--m-red) !important; }
+
+.bg-menu-layer {
+    position: sticky; top: 0; height: var(--app-h); margin-bottom: calc(-1 * var(--app-h)); flex: none; overflow: hidden;
+    opacity: 0; transition: opacity .3s ease;
+}
+.bg-menu-layer svg { width: 100%; height: 100%; display: block; }
+#appContainer[data-view="menu"] .bg-menu-layer { opacity: 1; }
+.bgm { fill: none; stroke: var(--m-ink, #b45309); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: .2; }
+
+/* 頂部遮陽棚 + 「MENU」標題 */
+.menu-awning { height: 14px; background: repeating-linear-gradient(90deg, var(--m-red) 0 20px, #fff7ed 20px 40px); }
+.menu-awning::after {
+    content: ""; display: block; height: 10px; margin-top: 14px;
+    background:
+        radial-gradient(circle at 10px 0, var(--m-red) 10px, transparent 10.5px) 0 0 / 40px 10px repeat-x,
+        radial-gradient(circle at 30px 0, #fff7ed 10px, transparent 10.5px) 0 0 / 40px 10px repeat-x;
+    filter: drop-shadow(0 2px 1px rgba(120, 53, 15, .25));
+}
+.menu-title { display: flex; align-items: center; gap: .6rem; justify-content: center; padding: 1.1rem 1.25rem .3rem; color: var(--m-brown); font-family: "Noto Serif TC", "Songti TC", "PMingLiU", Georgia, serif; font-weight: 900; letter-spacing: .35em; font-size: .95rem; }
+.menu-title::before, .menu-title::after { content: ""; flex: 1; height: 0; border-top: 2px double var(--m-line); }
+
+/* 菜單卡：像菜單上的一格（米色紙 + 內縮虛線框 + 圓盤圖示），四種食材色輪流 */
+.menu-card {
+    --mc: var(--m-red); position: relative; background: var(--m-card); color: var(--m-text);
+    border: 1.5px solid var(--m-line); box-shadow: 0 8px 16px -8px rgba(120, 53, 15, .4);
+}
+.menu-card::before { content: ""; position: absolute; inset: 5px; border: 1.5px dashed var(--m-line); border-radius: 1.05rem; pointer-events: none; }
+.menu-grid > div:nth-child(4n+2) .menu-card { --mc: var(--m-green); }
+.menu-grid > div:nth-child(4n+3) .menu-card { --mc: var(--m-gold); }
+.menu-grid > div:nth-child(4n+4) .menu-card { --mc: var(--m-brown); }
+.menu-plate { background: #fff; box-shadow: 0 0 0 3px #fff, 0 0 0 5px color-mix(in srgb, var(--mc) 55%, transparent), 0 4px 8px rgba(120, 53, 15, .2); }
+.dark .menu-plate { background: #3a3027; box-shadow: 0 0 0 3px #3a3027, 0 0 0 5px color-mix(in srgb, var(--mc) 65%, transparent); }
+.menu-icon { color: var(--mc); }
+.menu-name { font-family: "Noto Serif TC", "Songti TC", "PMingLiU", Georgia, serif; font-weight: 900; font-size: 1.05rem; color: var(--m-text); text-align: center; word-break: break-word; width: 100%; }
+.menu-rule { display: block; width: 2.2rem; margin-top: .45rem; border-top: 2px solid var(--mc); opacity: .7; }
+.menu-edit { background: var(--m-card); color: var(--m-sub); border: 1px solid var(--m-line); }
+.menu-empty { color: var(--m-sub); }
+
 /* ===== 家庭日曆：左上角日曆切換（家庭日曆 / Google 日曆 / 全部） ===== */
 .cal-src { display: inline-flex; align-items: center; gap: .5rem; max-width: 100%; height: 2.5rem; padding: 0 .9rem; border-radius: 1rem; font-size: .95rem; font-weight: 800; color: var(--primary-dark); background: #fff; border: 1.5px solid var(--primary-color); box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-color) 28%, transparent); }
 .dark .cal-src { background: #1e293b; color: #f1f5f9; }
