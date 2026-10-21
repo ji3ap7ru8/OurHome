@@ -597,3 +597,75 @@ input:checked + .memo-pick { background: var(--primary-color); color: #fff; bord
     --lg-major: rgba(255, 255, 255, .07);
     --lg-ring: color-mix(in srgb, var(--primary-color) 26%, transparent);
 }
+
+
+/* ===== 記帳本 UI：帳簿 / 傳票風（顏色全由主色調推算） ===== */
+.lg-note { margin: 0 .25rem .75rem; font-size: .72rem; font-weight: 800; line-height: 1.5; padding: .45rem .75rem; border-radius: .75rem; border: 1px dashed; }
+.lg-note.warn { background: #fef3c7cc; color: #78350f; border-color: #f59e0b88; }
+.lg-note.ok { background: #d1fae5cc; color: #064e3b; border-color: #10b98188; }
+.lg-monthbar { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin: 0 .25rem .75rem; }
+.lg-monthbar [data-month] { font-size: 1.05rem; font-weight: 900; padding: .35rem 1.1rem; border-radius: 999px; color: var(--primary-dark); background: #fffe; border: 1.5px solid var(--primary-color); }
+.dark .lg-monthbar [data-month] { background: #1e293bee; color: #e2e8f0; }
+.lg-card { position: relative; margin: 0 .25rem .9rem; background: #ffffffee; border: 1px solid color-mix(in srgb, var(--primary-color) 22%, transparent); border-radius: 1rem; box-shadow: 0 6px 16px -8px color-mix(in srgb, var(--primary-color) 45%, transparent); overflow: hidden; }
+.dark .lg-card { background: #1e293bee; }
+.lg-book { padding-left: .9rem; }
+.lg-spine { position: absolute; left: 0; top: 0; bottom: 0; width: .9rem; background: var(--primary-color); }
+.lg-spine::after { content: ""; position: absolute; inset: .6rem 0; background: radial-gradient(circle, #fff9 0 .17rem, transparent .2rem) 50% 0 / 100% 1.1rem repeat-y; }
+.lg-sum-top { padding: .9rem 1rem .6rem; text-align: center; }
+.lg-label { font-size: .75rem; font-weight: 800; color: #64748b; display: inline-flex; gap: .4rem; align-items: center; }
+.dark .lg-label { color: #94a3b8; }
+.lg-stamp { font-size: .65rem; padding: 0 .4rem; border: 1.5px solid var(--primary-color); color: var(--primary-color); border-radius: .3rem; transform: rotate(-4deg); }
+.lg-balance { font-size: 2rem; font-weight: 900; font-variant-numeric: tabular-nums; color: var(--primary-color); line-height: 1.2; }
+.lg-balance.neg { color: #dc2626; }
+.lg-ratio { height: .4rem; margin: .5rem auto 0; max-width: 14rem; border-radius: 999px; background: #dc262655; overflow: hidden; }
+.lg-ratio i { display: block; height: 100%; background: #16a34a; }
+.lg-cols { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 2px double color-mix(in srgb, var(--primary-color) 40%, transparent); text-align: center; }
+.lg-cols > div { padding: .6rem .2rem; display: flex; flex-direction: column; gap: .1rem; align-items: center; }
+.lg-cols > div + div { border-left: 1px dashed color-mix(in srgb, var(--primary-color) 40%, transparent); }
+.lg-cols b { font-size: 1.05rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.lg-in { color: #16a34a; } .lg-out { color: #dc2626; }
+.lg-chart { padding: 0 1rem .6rem; }
+.lg-tabs { display: flex; margin: 0 -1rem .7rem; border-bottom: 2px solid color-mix(in srgb, var(--primary-color) 25%, transparent); }
+.lg-tabs button { flex: 1; padding: .7rem 0; font-weight: 900; font-size: .9rem; color: #64748b; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.lg-tabs button.on { color: var(--primary-color); border-bottom-color: var(--primary-color); background: color-mix(in srgb, var(--primary-light) 55%, transparent); }
+.lg-cat { display: flex; gap: .65rem; align-items: center; padding: .45rem 0; }
+.lg-chip { width: 2.3rem; height: 2.3rem; border-radius: .7rem; display: inline-flex; align-items: center; justify-content: center; color: #fff; flex: none; box-shadow: inset 0 -2px 0 #0002; }
+.lg-dots { flex: 1; border-bottom: 2px dotted #94a3b8aa; transform: translateY(-3px); min-width: .5rem; }
+.lg-bar { height: .45rem; margin-top: .3rem; border-radius: 999px; background: #94a3b833; overflow: hidden; }
+.lg-bar div { height: 100%; border-radius: 999px; }
+.lg-h { display: flex; align-items: center; gap: .5rem; margin: 0 .25rem .5rem; font-weight: 900; font-size: .95rem; color: var(--primary-dark); }
+.lg-h::after { content: ""; flex: 1; border-bottom: 2px double color-mix(in srgb, var(--primary-color) 40%, transparent); }
+.dark .lg-h { color: color-mix(in srgb, var(--primary-color) 55%, #fff); }
+.lg-day { margin: 0 .25rem; background: #fffffff0; border: 1px solid color-mix(in srgb, var(--primary-color) 22%, transparent); border-radius: .9rem; overflow: hidden; box-shadow: 0 4px 12px -8px color-mix(in srgb, var(--primary-color) 50%, transparent); }
+.dark .lg-day { background: #1e293bf0; }
+.lg-day header { display: flex; justify-content: space-between; padding: .45rem .9rem; font-size: .82rem; font-weight: 900; color: var(--primary-dark); background: color-mix(in srgb, var(--primary-light) 70%, #fff); border-bottom: 2px double color-mix(in srgb, var(--primary-color) 40%, transparent); }
+.dark .lg-day header { background: color-mix(in srgb, var(--primary-color) 18%, #1e293b); color: #e2e8f0; }
+.lg-row { width: 100%; display: flex; align-items: center; gap: .75rem; padding: .7rem .9rem; text-align: left; border-bottom: 1px dashed #94a3b855; }
+.lg-row:last-child { border-bottom: 0; }
+.lg-row:active { background: color-mix(in srgb, var(--primary-light) 55%, transparent); }
+.lg-amt { font-weight: 900; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.lg-empty { text-align: center; padding: 2rem 1rem; font-weight: 800; color: #64748b; line-height: 1.7; }
+.lg-empty i { font-size: 2rem; color: var(--primary-color); opacity: .6; margin-bottom: .5rem; }
+.lg-fab { pointer-events: auto; display: inline-flex; align-items: center; gap: .5rem; height: 3.2rem; padding: 0 1.3rem; border-radius: 1rem; background: var(--primary-color); color: #fff; font-weight: 900; box-shadow: 0 8px 18px -6px color-mix(in srgb, var(--primary-color) 70%, #000); }
+
+/* 新增 / 編輯：傳票表單 */
+.lg-sheet { background: #fffdf8; color: #1e293b; border-radius: 1.5rem 1.5rem 0 0; box-shadow: 0 -10px 40px #0005; border-top: 6px solid var(--primary-color); }
+.dark .lg-sheet { background: #1e293b; color: #f1f5f9; }
+.lg-sheet-head { display: flex; justify-content: space-between; align-items: center; padding: .9rem 1.2rem; border-bottom: 2px double color-mix(in srgb, var(--primary-color) 40%, transparent); }
+.lg-sheet-head h3 { font-size: 1.15rem; font-weight: 900; color: var(--primary-dark); }
+.dark .lg-sheet-head h3 { color: color-mix(in srgb, var(--primary-color) 55%, #fff); }
+.lg-x { width: 2.3rem; height: 2.3rem; border-radius: .7rem; background: #94a3b822; }
+.lg-body { padding: 1rem 1.2rem 1.3rem; display: flex; flex-direction: column; gap: .9rem; }
+.lg-seg { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.lg-seg .pick { cursor: pointer; }
+.lg-seg .pick span { display: block; text-align: center; padding: .65rem 0; border-radius: .8rem; font-weight: 900; border: 1.5px solid #94a3b877; }
+.lg-amount > div { display: flex; align-items: baseline; gap: .4rem; margin-top: .2rem; padding: .3rem .1rem; border-bottom: 3px double var(--primary-color); }
+.lg-amount em { font-style: normal; font-size: 1.6rem; font-weight: 900; color: var(--primary-color); }
+.lg-amount input { flex: 1; min-width: 0; background: transparent; outline: 0; font-size: 2.2rem; font-weight: 900; font-variant-numeric: tabular-nums; color: inherit; }
+.lg-pickcat { display: flex; flex-direction: column; align-items: center; gap: .3rem; padding: .5rem 0; border-radius: .9rem; border: 2px solid transparent; font-size: .75rem; font-weight: 800; }
+.lg-pickcat.on { border-color: var(--cc); background: color-mix(in srgb, var(--cc) 14%, transparent); }
+.lg-field { display: flex; align-items: center; gap: .8rem; border-bottom: 1px solid #94a3b877; padding: .3rem 0; }
+.lg-field span { width: 2.6rem; flex: none; font-size: .8rem; font-weight: 800; color: #64748b; }
+.lg-field input { flex: 1; min-width: 0; padding: .4rem 0; background: transparent; outline: 0; font-size: 1rem; font-weight: 700; color: inherit; }
+.lg-del { padding: 0 1rem; border-radius: .9rem; font-weight: 900; background: #fee2e2; color: #b91c1c; }
+.lg-save { flex: 1; padding: .85rem 0; border-radius: .9rem; font-weight: 900; font-size: 1rem; color: #fff; background: var(--primary-color); box-shadow: 0 6px 14px -6px var(--primary-color); }

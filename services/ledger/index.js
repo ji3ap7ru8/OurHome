@@ -19,41 +19,48 @@ const dayLabel = (d) => { const x = new Date(d + "T00:00:00"); return `${x.getMo
 function render() {
   if (!root) return;
   const sum = summarize(rows, month);
+  const cnt = rows.filter((r) => r.date.startsWith(month)).length;
+  const flow = sum.income + sum.expense;
+  const inPct = flow ? Math.round((sum.income / flow) * 100) : 50;
   root.querySelector("[data-month]").textContent = monthLabel(month);
   root.querySelector("[data-next]").disabled = month >= monthKey();
   root.querySelector("[data-sum]").innerHTML = `
-    <div class="col-span-3 text-center pb-2"><div class="text-xs font-bold text-slate-500 dark:text-slate-400">本月結餘</div>
-      <div class="text-3xl font-black tabular-nums ${sum.balance < 0 ? "text-red-600" : "theme-text-primary"}">${sum.balance < 0 ? "-" : ""}${money(Math.abs(sum.balance))}</div></div>
-    <div class="text-center"><div class="text-xs font-bold text-slate-500 dark:text-slate-400">收入</div><div class="text-lg font-black text-green-600 tabular-nums">${money(sum.income)}</div></div>
-    <div class="text-center border-x border-slate-200 dark:border-slate-600"><div class="text-xs font-bold text-slate-500 dark:text-slate-400">支出</div><div class="text-lg font-black text-red-600 tabular-nums">${money(sum.expense)}</div></div>
-    <div class="text-center"><div class="text-xs font-bold text-slate-500 dark:text-slate-400">筆數</div><div class="text-lg font-black text-slate-700 dark:text-slate-200 tabular-nums">${rows.filter((r) => r.date.startsWith(month)).length}</div></div>`;
+    <div class="lg-spine"></div>
+    <div class="lg-sum-top">
+      <div class="lg-label">本月結餘 <span class="lg-stamp">${month.slice(5)}月</span></div>
+      <div class="lg-balance ${sum.balance < 0 ? "neg" : ""}">${sum.balance < 0 ? "-" : ""}${money(Math.abs(sum.balance))}</div>
+      <div class="lg-ratio" title="收入與支出比例"><i style="width:${inPct}%"></i></div>
+    </div>
+    <div class="lg-cols">
+      <div><span class="lg-label">收入</span><b class="lg-in">${money(sum.income)}</b></div>
+      <div><span class="lg-label">支出</span><b class="lg-out">${money(sum.expense)}</b></div>
+      <div><span class="lg-label">筆數</span><b>${cnt}</b></div>
+    </div>`;
 
-  root.querySelectorAll("[data-ct]").forEach((b) => {
-    const on = b.dataset.ct === chartType;
-    b.className = `flex-1 py-2 rounded-full text-sm font-bold ${on ? "theme-bg-primary text-white" : "text-slate-600 dark:text-slate-300"}`;
-  });
+  root.querySelectorAll("[data-ct]").forEach((b) => b.classList.toggle("on", b.dataset.ct === chartType));
   const cats = byCategory(rows, month, chartType);
   root.querySelector("[data-chart]").innerHTML = cats.length ? cats.map((c) => {
     const i = catInfo(chartType, c.name);
-    return `<div class="mb-2.5"><div class="flex justify-between text-sm font-bold text-slate-700 dark:text-slate-200 mb-1">
-        <span><i class="fa-solid ${i.icon}" style="color:${i.color}"></i> ${esc(c.name)} <span class="text-slate-400 font-medium">${c.pct.toFixed(0)}%</span></span><span class="tabular-nums">${money(c.total)}</span></div>
-      <div class="h-3 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden"><div class="h-full rounded-full" style="width:${Math.max(c.pct, 2)}%;background:${i.color}"></div></div></div>`;
+    return `<div class="lg-cat">
+        <span class="lg-chip" style="background:${i.color}"><i class="fa-solid ${i.icon}"></i></span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-baseline gap-1.5"><span class="font-black text-sm">${esc(c.name)}</span><span class="text-xs font-bold text-slate-400">${c.pct.toFixed(0)}%</span><span class="lg-dots"></span><span class="font-black text-sm tabular-nums">${money(c.total)}</span></div>
+          <div class="lg-bar"><div style="width:${Math.max(c.pct, 2)}%;background:${i.color}"></div></div>
+        </div></div>`;
   }).join("") : `<p class="text-center text-sm font-bold text-slate-400 py-4">這個月還沒有${chartType === "income" ? "收入" : "支出"}紀錄</p>`;
 
   const days = groupByDay(rows, month);
   root.querySelector("[data-list]").innerHTML = days.length ? days.map((d) => `
-    <div>
-      <div class="flex justify-between px-1 pb-1 text-sm font-black text-slate-500 dark:text-slate-400"><span>${dayLabel(d.date)}</span><span class="tabular-nums">${d.net < 0 ? "-" : "+"}${money(Math.abs(d.net))}</span></div>
-      <div class="bg-white/95 dark:bg-slate-800/95 rounded-2xl soft-shadow-sm divide-y divide-slate-100 dark:divide-slate-700">
-        ${d.items.map((r) => { const i = catInfo(r.type, r.category); return `
-        <button data-tip="ledger-open" data-open="${r.id}" class="w-full flex items-center gap-3 p-3.5 text-left active:bg-slate-50 dark:active:bg-slate-700 rounded-2xl">
-          <span class="w-11 h-11 rounded-full flex items-center justify-center text-white shrink-0" style="background:${i.color}"><i class="fa-solid ${i.icon}"></i></span>
-          <span class="flex-1 min-w-0"><span class="block font-black text-base text-slate-800 dark:text-slate-100">${esc(r.category)}</span>
-            ${r.note ? `<span class="block text-sm font-medium text-slate-500 dark:text-slate-400 truncate">${esc(r.note)}</span>` : ""}</span>
-          <span class="font-black text-lg tabular-nums ${r.type === "income" ? "text-green-600" : "text-red-600"}">${r.type === "income" ? "+" : "-"}${money(r.amount)}</span>
-        </button>`; }).join("")}
-      </div>
-    </div>`).join("") : '<div class="text-center py-10 text-slate-500 dark:text-slate-400 font-bold text-base leading-relaxed">這個月還沒有帳目<br>按右下角「＋」記一筆</div>';
+    <section class="lg-day">
+      <header><span>${dayLabel(d.date)}</span><span class="tabular-nums">${d.net < 0 ? "-" : "+"}${money(Math.abs(d.net))}</span></header>
+      ${d.items.map((r) => { const i = catInfo(r.type, r.category); return `
+      <button data-tip="ledger-open" data-open="${r.id}" class="lg-row">
+        <span class="lg-chip" style="background:${i.color}"><i class="fa-solid ${i.icon}"></i></span>
+        <span class="flex-1 min-w-0"><span class="block font-black text-base">${esc(r.category)}</span>
+          ${r.note ? `<span class="block text-sm font-medium text-slate-500 dark:text-slate-400 truncate">${esc(r.note)}</span>` : ""}</span>
+        <span class="lg-amt ${r.type === "income" ? "lg-in" : "lg-out"}">${r.type === "income" ? "+" : "-"}${money(r.amount)}</span>
+      </button>`; }).join("")}
+    </section>`).join("") : '<div class="lg-empty"><i class="fa-solid fa-book-open"></i><p>這個月還沒有帳目<br>按右下角「記一筆」開始記帳</p></div>';
 }
 
 function toast(msg, err = false) {
@@ -64,29 +71,29 @@ function toast(msg, err = false) {
 
 function openForm(r = null) {
   const d = r || { type: "expense", amount: "", category: "", date: ymd(), note: "" };
-  const input = "w-full p-3 border border-slate-300 dark:border-slate-600 rounded-xl text-base bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100";
   const wrap = document.createElement("div");
   wrap.className = "fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-end sm:items-center justify-center";
   wrap.innerHTML = `
-    <form class="w-full max-w-md max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-t-3xl p-5 space-y-3 shadow-2xl" novalidate>
-      <div class="flex justify-between items-center">
-        <h3 class="text-xl font-black">${r ? "編輯帳目" : "記一筆"}</h3>
-        <button type="button" data-tip="ledger-close" data-close aria-label="關閉" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
+    <form class="lg-sheet w-full max-w-md max-h-[92vh] overflow-y-auto" novalidate>
+      <div class="lg-sheet-head">
+        <h3><i class="fa-solid ${r ? "fa-pen-to-square" : "fa-file-invoice-dollar"}"></i> ${r ? "編輯帳目" : "記一筆"}</h3>
+        <button type="button" data-tip="ledger-close" data-close aria-label="關閉" class="lg-x"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="grid grid-cols-2 gap-2">
-        <label data-tip="ledger-type" class="pick pick-ex cursor-pointer"><input type="radio" name="type" value="expense" class="sr-only" ${d.type === "expense" ? "checked" : ""}><span class="block text-center py-3 rounded-xl font-black border border-slate-300 dark:border-slate-600">支出</span></label>
-        <label data-tip="ledger-type" class="pick pick-in cursor-pointer"><input type="radio" name="type" value="income" class="sr-only" ${d.type === "income" ? "checked" : ""}><span class="block text-center py-3 rounded-xl font-black border border-slate-300 dark:border-slate-600">收入</span></label>
-      </div>
-      <label class="block font-bold text-sm">金額 <span class="text-red-500">*</span>
-        <input name="amount" inputmode="decimal" autocomplete="off" value="${d.amount}" placeholder="0" class="${input} mt-1 text-2xl font-black tabular-nums"></label>
-      <div><span class="font-bold text-sm">分類 <span class="text-red-500">*</span></span><div data-cats class="grid grid-cols-4 gap-2 mt-1"></div></div>
-      <label class="block font-bold text-sm">日期<input type="date" name="date" value="${d.date}" max="${ymd()}" class="${input} mt-1"></label>
-      <label class="block font-bold text-sm">備註 <span class="text-xs text-slate-400 font-normal">(選填)</span>
-        <input name="note" maxlength="40" value="${esc(d.note)}" placeholder="例如：全聯買菜" class="${input} mt-1"></label>
-      <p data-err class="text-red-600 font-bold text-sm hidden"></p>
-      <div class="flex gap-2 pt-1">
-        ${r ? '<button type="button" data-tip="ledger-del" data-del class="px-4 py-3 rounded-xl font-bold bg-red-100 text-red-700"><i class="fa-solid fa-trash"></i> 刪除</button>' : ""}
-        <button type="submit" data-tip="ledger-save" class="flex-1 theme-bg-primary text-white py-3 rounded-xl font-bold text-base">儲存</button>
+      <div class="lg-body">
+        <div class="lg-seg">
+          <label data-tip="ledger-type" class="pick pick-ex"><input type="radio" name="type" value="expense" class="sr-only" ${d.type === "expense" ? "checked" : ""}><span><i class="fa-solid fa-arrow-trend-down"></i> 支出</span></label>
+          <label data-tip="ledger-type" class="pick pick-in"><input type="radio" name="type" value="income" class="sr-only" ${d.type === "income" ? "checked" : ""}><span><i class="fa-solid fa-arrow-trend-up"></i> 收入</span></label>
+        </div>
+        <label class="lg-amount"><span class="lg-label">金額 <b class="text-red-500">*</b></span>
+          <div><em>$</em><input name="amount" inputmode="decimal" autocomplete="off" value="${d.amount}" placeholder="0"></div></label>
+        <div><span class="lg-label">分類 <b class="text-red-500">*</b></span><div data-cats class="grid grid-cols-4 gap-2 mt-1.5"></div></div>
+        <label class="lg-field"><span>日期</span><input type="date" name="date" value="${d.date}" max="${ymd()}"></label>
+        <label class="lg-field"><span>備註</span><input name="note" maxlength="40" value="${esc(d.note)}" placeholder="選填，例如：全聯買菜"></label>
+        <p data-err class="text-red-600 font-bold text-sm hidden"></p>
+        <div class="flex gap-2 pt-1">
+          ${r ? '<button type="button" data-tip="ledger-del" data-del class="lg-del"><i class="fa-solid fa-trash"></i> 刪除</button>' : ""}
+          <button type="submit" data-tip="ledger-save" class="lg-save"><i class="fa-solid fa-check"></i> 儲存</button>
+        </div>
       </div>
     </form>`;
   root.appendChild(wrap);
@@ -96,9 +103,9 @@ function openForm(r = null) {
     const type = f.type.value;
     if (!catsOf(type).some((c) => c.name === cat)) cat = "";
     f.querySelector("[data-cats]").innerHTML = catsOf(type).map((c) => `
-      <button type="button" data-tip="ledger-cat" data-c="${c.name}" class="flex flex-col items-center gap-1 py-2 rounded-xl border-2 ${c.name === cat ? "" : "border-transparent"}" style="${c.name === cat ? `border-color:${c.color};background:${c.color}22` : ""}">
-        <span class="w-10 h-10 rounded-full flex items-center justify-center text-white" style="background:${c.color}"><i class="fa-solid ${c.icon}"></i></span>
-        <span class="text-xs font-bold">${c.name}</span></button>`).join("");
+      <button type="button" data-tip="ledger-cat" data-c="${c.name}" class="lg-pickcat ${c.name === cat ? "on" : ""}" style="--cc:${c.color}">
+        <span class="lg-chip" style="background:${c.color}"><i class="fa-solid ${c.icon}"></i></span>
+        <span>${c.name}</span></button>`).join("");
   };
   f.addEventListener("change", (e) => e.target.name === "type" && drawCats());
   f.querySelector("[data-cats]").addEventListener("click", (e) => { const b = e.target.closest("[data-c]"); if (b) { cat = b.dataset.c; drawCats(); } });
@@ -143,24 +150,24 @@ export default {
     root = document.createElement("div");
     root.className = "px-3.5 pb-6";
     const guest = !ctx?.state?.isLoggedIn;
+    const sn = (ctx?.state?.storage?.ledger || "none") === "none";
     root.innerHTML = `
       <div class="h-1"></div>
-      <p class="mx-1 mb-3 text-xs font-bold leading-relaxed rounded-xl px-3 py-2 ${(ctx?.state?.storage?.ledger || "none") === "none" ? "bg-amber-100 text-amber-900" : "bg-emerald-100 text-emerald-900"}">
-        <i class="fa-solid ${(ctx?.state?.storage?.ledger || "none") === "none" ? "fa-user-secret" : "fa-cloud-arrow-up"}"></i> ${storageNote(ctx?.state?.storage?.ledger, guest, "帳目")}</p>
-      <div class="flex items-center justify-between gap-2 px-1 mb-3">
+      <p class="lg-note ${sn ? "warn" : "ok"}"><i class="fa-solid ${sn ? "fa-user-secret" : "fa-cloud-arrow-up"}"></i> ${storageNote(ctx?.state?.storage?.ledger, guest, "帳目")}</p>
+      <div class="lg-monthbar">
         <button data-tip="ledger-prev" data-prev aria-label="上個月" class="cal-nav"><i class="fa-solid fa-chevron-left"></i></button>
-        <span data-month class="text-lg font-black text-slate-800 dark:text-slate-100"></span>
+        <span data-month></span>
         <button data-tip="ledger-next" data-next aria-label="下個月" class="cal-nav"><i class="fa-solid fa-chevron-right"></i></button>
       </div>
-      <div data-sum class="grid grid-cols-3 gap-y-1 bg-white/95 dark:bg-slate-800/95 rounded-2xl p-4 soft-shadow-sm mx-1 mb-4"></div>
-      <div class="bg-white/95 dark:bg-slate-800/95 rounded-2xl p-4 soft-shadow-sm mx-1 mb-4">
-        <div class="flex bg-slate-100 dark:bg-slate-700 rounded-full p-1 mb-3">
-          <button data-tip="ledger-ct" data-ct="expense">支出分類</button><button data-tip="ledger-ct" data-ct="income">收入分類</button></div>
+      <div data-sum class="lg-card lg-book"></div>
+      <div class="lg-card lg-chart">
+        <div class="lg-tabs"><button data-tip="ledger-ct" data-ct="expense">支出分類</button><button data-tip="ledger-ct" data-ct="income">收入分類</button></div>
         <div data-chart></div>
       </div>
-      <div data-list class="space-y-4 px-1"></div>
+      <h3 class="lg-h"><i class="fa-solid fa-list-ul"></i> 流水帳</h3>
+      <div data-list class="space-y-3"></div>
       <div class="sticky bottom-24 flex justify-end pr-1 pt-4 pointer-events-none">
-        <button data-tip="ledger-add" data-add aria-label="記一筆" class="pointer-events-auto w-14 h-14 rounded-full theme-bg-primary text-white text-2xl soft-shadow-lg"><i class="fa-solid fa-plus"></i></button>
+        <button data-tip="ledger-add" data-add aria-label="記一筆" class="lg-fab"><i class="fa-solid fa-plus"></i> 記一筆</button>
       </div>`;
     el.appendChild(root);
     root.querySelector("[data-prev]").onclick = () => { month = shiftMonth(month, -1); render(); };
