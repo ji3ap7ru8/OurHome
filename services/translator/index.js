@@ -1,7 +1,7 @@
 // 翻譯機 — Stage 4：純前端 UI 與邏輯。
 // 訪客可用。不寫入任何永久儲存；離開頁面後輸入與結果保留在記憶體直到重新整理。
 import { showTipHint, closeTips } from "../../core/tips.js";
-import { LANGS, AUTO, langOf, PHRASES, phraseFor, googleUrl, MAX_CHARS, translatorApi } from "./data.js";
+import { LANGS, AUTO, langOf, googleUrl, MAX_CHARS, translatorApi } from "./data.js";
 
 const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
@@ -18,11 +18,8 @@ const canSpeak = typeof window !== "undefined" && "speechSynthesis" in window;
 const opts = (list, sel) => list.map((l) => `<option value="${l.code}" ${l.code === sel ? "selected" : ""}>${l.name}</option>`).join("");
 
 function render() {
-  const phrases = st.from === "zh-TW" ? PHRASES.filter((p) => phraseFor(p, st.to)) : [];
   root.innerHTML = `
-    <div class="px-4 pt-2 pb-28">
-      <h2 class="text-2xl font-black text-slate-800 dark:text-slate-100 mb-3 px-1"><i class="fa-solid fa-language theme-text-primary"></i> 翻譯機</h2>
-
+    <div class="px-4 pt-3 pb-28">
       <div class="flex items-center gap-2 mb-3">
         <select data-from aria-label="來源語言" class="flex-1 min-w-0 h-12 px-3 rounded-2xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold text-base soft-shadow-sm border-0">${opts([AUTO, ...LANGS], st.from)}</select>
         <button data-tip="tr-swap" data-swap aria-label="對調語言" class="w-12 h-12 shrink-0 rounded-full theme-bg-light theme-text-primary text-lg active:scale-90 transition"><i class="fa-solid fa-right-left"></i></button>
@@ -41,13 +38,6 @@ function render() {
 
       <div data-result-box></div>
 
-      ${phrases.length ? `
-      <div class="mt-5">
-        <p class="text-sm font-extrabold text-slate-600 dark:text-slate-300 px-1 mb-2"><i class="fa-solid fa-bolt theme-text-primary"></i> 快捷常用句（點一下直接翻譯，不用網路）</p>
-        <div class="flex flex-wrap gap-2">
-          ${phrases.map((p, i) => `<button data-tip="tr-phrase" data-tip-name="${esc(p.zh)}" data-phrase="${PHRASES.indexOf(p)}" class="px-4 h-11 rounded-full bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold text-base soft-shadow-sm active:scale-95 transition">${esc(p.zh)}</button>`).join("")}
-        </div>
-      </div>` : ""}
     </div>`;
   renderResult();
 }
@@ -73,7 +63,7 @@ function renderResult() {
     const detected = st.from === "auto" && st.detected ? `（偵測為：${esc(known ? known.name : st.detected)}）` : "";
     box.innerHTML = `
       <div class="bg-white/95 dark:bg-slate-800/95 rounded-3xl soft-shadow-md p-5 border-2 theme-border-primary">
-        <p class="text-xs font-extrabold theme-text-primary mb-2">${to.name}${detected}${st.offline ? " ・內建常用句" : ""}</p>
+        <p class="text-xs font-extrabold theme-text-primary mb-2">${to.name}${detected}</p>
         <p class="text-2xl font-black text-slate-900 dark:text-white leading-relaxed break-words select-text">${esc(st.result)}</p>
         <div class="flex flex-wrap gap-2 mt-4">
           ${canSpeak && to.speech ? `<button data-tip="tr-speak" data-speak class="h-11 px-4 rounded-full theme-bg-light theme-text-primary font-bold"><i class="fa-solid fa-volume-high"></i> 朗讀</button>` : ""}
@@ -134,15 +124,6 @@ function swap() {
   [st.from, st.to] = [st.to, st.from];
   st.text = st.result || st.text; // 把譯文帶回輸入框，方便回譯
   st.result = ""; st.status = "idle"; st.offline = false;
-  render();
-}
-
-function usePhrase(i) {
-  const p = PHRASES[i];
-  const t = phraseFor(p, st.to);
-  if (!t) return;
-  seq++; ctrl?.abort();
-  st.text = p.zh; st.result = t; st.status = "idle"; st.offline = true;
   render();
 }
 
@@ -213,8 +194,6 @@ function onClick(e) {
   if (q("[data-copy]")) return copy();
   if (q("[data-big]")) return showBig();
   if (q("[data-mic]")) return toggleMic();
-  const ph = q("[data-phrase]");
-  if (ph) return usePhrase(Number(ph.dataset.phrase));
 }
 
 function onInput(e) {

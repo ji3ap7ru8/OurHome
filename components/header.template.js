@@ -30,6 +30,9 @@ export const headerTemplate = `
                 <!-- 菜單頁專用：左側標題（其他頁隱藏） -->
                 <h2 id="headerMenuTitle" class="hidden items-center gap-2 text-2xl shrink-0 font-black leading-tight text-slate-800 dark:text-slate-100"><i class="fa-solid fa-bowl-food theme-text-primary"></i><span>菜單</span></h2>
 
+                <!-- 翻譯機頁專用：左側標題（其他頁隱藏） -->
+                <h2 id="headerTranslatorTitle" class="hidden items-center gap-2 text-2xl shrink-0 font-black leading-tight text-slate-800 dark:text-slate-100"><i class="fa-solid fa-language theme-text-primary"></i><span>翻譯機</span></h2>
+
                 <!-- 記帳本頁專用：左側標題（其他頁隱藏） -->
                 <h2 id="headerLedgerTitle" class="hidden items-center gap-2 text-2xl shrink-0 font-black leading-tight text-slate-800 dark:text-slate-100"><i class="fa-solid fa-wallet theme-text-primary"></i><span>記帳本</span></h2>
 

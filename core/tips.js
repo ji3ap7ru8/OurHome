@@ -632,7 +632,6 @@ const TIPS = {
   "tr-mic": { scene: tapScene("🎤 語音輸入"), text: "按一下開始說話，說完會變成文字；再按一次停止。" },
   "tr-clear": { scene: orderResetScene, text: "清除輸入的文字和翻譯結果。" },
   "tr-go": { scene: pillToast("翻譯", "譯文出來了", true), text: "按一下，把上面的文字翻譯成目標語言。" },
-  "tr-phrase": { scene: tapScene("常用句"), text: "點一下，直接翻譯「{name}」，不用網路。" },
   "tr-google": { scene: tapScene("用 Google 翻譯開啟"), text: "在新分頁用 Google 翻譯網頁開啟。" },
   "tr-speak": { scene: tapScene("🔊 朗讀"), text: "用聲音把翻譯結果唸出來。" },
   "tr-copy": { scene: pillToast("📋 複製", "已複製"), text: "複製翻譯結果，可以貼到 LINE 等地方。" },
