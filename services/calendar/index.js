@@ -5,6 +5,7 @@ import { state, on } from "../../core/store.js";
 import { gcalApi } from "../../core/gcal.js";
 import { attachSheetResize } from "../../components/bottom-sheet.js";
 import { showTipHint, closeTips } from "../../core/tips.js";
+import { showToast } from "../../core/toast.js";
 
 let root = null;
 let cur1 = new Date();       // 目前顯示的月份（mount 時會重設為本月 1 日）
@@ -414,13 +415,7 @@ function openBottomSheet(inner) {
   return m;
 }
 
-function toast(msg, isErr = false) {
-  const t = document.createElement("div");
-  t.className = "cal-toast" + (isErr ? " err" : "");
-  t.textContent = msg;
-  root.appendChild(t);
-  setTimeout(() => t.remove(), 2400);
-}
+function toast(msg, isErr = false) { showToast(msg, 2400, { error: isErr }); }
 
 export default {
   id: "家庭日曆",

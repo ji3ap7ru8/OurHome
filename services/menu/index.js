@@ -6,6 +6,7 @@ import { on, state } from "../../core/store.js";
 import { orderedMenus, setMenuItems } from "../../core/menu-model.js";
 import { takeOpenMenu } from "../../core/lobby-model.js";
 import { showTipHint, closeTips } from "../../core/tips.js";
+import { showToast } from "../../core/toast.js";
 
 let items = [];
 let loaded = false;
@@ -32,12 +33,7 @@ function fixImgs(scope) {
   }, { once: true }));
 }
 
-function toast(msg) {
-  if (!root) return;
-  const t = document.createElement("div");
-  t.className = "fixed top-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white font-bold px-5 py-3 rounded-full shadow-xl";
-  t.textContent = msg; root.appendChild(t); setTimeout(() => t.remove(), 2500);
-}
+function toast(msg, ms = 2500) { showToast(msg, ms); }
 
 const CARD = {
   l: { pad: "px-4 py-7", box: "w-20 h-20", icon: "text-3xl", name: "text-lg" },

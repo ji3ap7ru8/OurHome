@@ -7,6 +7,7 @@ import { canEnterBowl, getBowlEmails } from "../../core/bowl-emails.js";
 import { VACATION_COLOR, bowlApi } from "./data.js";
 import { openLineSendDialog, closeLineSendDialog } from "../../core/line-send.js";
 import { MAX_AHEAD, WINDOW, autoSchedule, clearFuture, daysGrid, isEmptyDay, owed, tally, toggleOff, toggleTask, ymd } from "./engine.js";
+import { showToast } from "../../core/toast.js";
 
 let members = [];
 let records = {};
@@ -31,11 +32,7 @@ const ICON = {
 const WD = ["日", "一", "二", "三", "四", "五", "六"];
 const weekday = (s) => { const [y, m, d] = s.split("-").map(Number); return WD[new Date(y, m - 1, d).getDay()]; };
 
-function toast(msg, ms = 2500) {
-  const t = document.createElement("div");
-  t.className = "fixed top-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white font-bold px-5 py-3 rounded-full shadow-xl max-w-[85vw] text-center";
-  t.textContent = msg; root?.appendChild(t); setTimeout(() => t.remove(), ms);
-}
+function toast(msg, ms = 2500) { showToast(msg, ms); }
 
 // ---------- 畫面 ----------
 // 頁面標題「換誰洗碗」已移到頂部列（components/header.js 的 headerBowlTitle）

@@ -4,6 +4,7 @@ import { memoApi, DEFAULT_CAT, catStyle } from "./data.js";
 import { state, on } from "../../core/store.js";
 import { isFirebaseConfigured } from "../../core/cloud.js";
 import { showTipHint, closeTips } from "../../core/tips.js";
+import { showToast } from "../../core/toast.js";
 
 let memos = [];
 let root = null;
@@ -74,11 +75,7 @@ function render() {
   }).join("") : `<div class="text-center py-14 text-slate-500 dark:text-slate-400 font-bold text-base leading-relaxed">${memos.length ? "找不到符合的記事" : "還沒有記事<br>按右上方「<i class=\"fa-solid fa-pen\"></i>」鉛筆圖示新增第一則"}</div>`;
 }
 
-function toast(msg) {
-  const t = document.createElement("div");
-  t.className = "fixed top-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white font-bold px-5 py-3 rounded-full shadow-xl max-w-[85vw] text-center";
-  t.textContent = msg; root?.appendChild(t); setTimeout(() => t.remove(), 2500);
-}
+function toast(msg, ms = 2500) { showToast(msg, ms); }
 
 function openForm(m = null) {
   const d = m || { title: "", content: "", category: DEFAULT_CAT, pinned: false };

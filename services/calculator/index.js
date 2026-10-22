@@ -2,6 +2,7 @@
 // 訪客可用（不設 requiresLogin）。不寫入任何永久儲存，離開頁面即清除。
 import { showTipHint, closeTips } from "../../core/tips.js";
 import { newState, press, applyDiscount, foldToPct, foldLabel, fmt, exprText, OPS } from "./engine.js";
+import { showToast } from "../../core/toast.js";
 
 const QUICK_FOLDS = [90, 85, 80, 70, 50]; // 實付百分比：9折、85折、8折、7折、5折
 const ROWS = [
@@ -83,16 +84,7 @@ function handleFold(pct) {
   render();
 }
 
-function toast(msg) {
-  const old = root.querySelector("[data-toast]");
-  if (old) old.remove();
-  const t = document.createElement("div");
-  t.dataset.toast = "";
-  t.className = "fixed left-1/2 -translate-x-1/2 bottom-28 z-[70] bg-slate-700 text-white font-bold px-4 py-2 rounded-xl";
-  t.textContent = msg;
-  root.appendChild(t);
-  setTimeout(() => t.remove(), 1600);
-}
+function toast(msg) { showToast(msg, 1600, { pos: "bottom" }); }
 
 function onClick(e) {
   const key = e.target.closest("[data-key]");

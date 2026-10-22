@@ -5,6 +5,7 @@ import { on, emit } from "../../core/store.js";
 import { takeLiveTranslate } from "../../core/lobby-model.js";
 import { holdAwake, releaseAwake } from "../../core/wakelock.js";
 import { LANGS, AUTO, langOf, googleUrl, MAX_CHARS, translatorApi } from "./data.js";
+import { showToast } from "../../core/toast.js";
 
 const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
@@ -479,16 +480,7 @@ function toggleMic() {
   try { rec.start(); listening = true; render(); } catch { listening = false; }
 }
 
-function toast(msg, ms = 1800) {
-  if (!root) return;
-  root.querySelector("[data-toast]")?.remove();
-  const t = document.createElement("div");
-  t.dataset.toast = "";
-  t.className = "fixed left-1/2 -translate-x-1/2 bottom-28 z-[70] bg-slate-700 text-white font-bold px-4 py-2 rounded-xl max-w-[85vw] text-center";
-  t.textContent = msg;
-  root.appendChild(t);
-  setTimeout(() => t.remove(), ms);
-}
+function toast(msg, ms = 1800) { if (!root) return; showToast(msg, ms, { pos: "bottom" }); }
 
 function togglePause() {
   if (!SR) return toast("此瀏覽器不支援語音辨識，請直接打字");

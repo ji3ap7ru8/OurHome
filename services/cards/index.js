@@ -4,6 +4,7 @@ import { code39Svg, isCode39 } from "./code39.js";
 import { state, on } from "../../core/store.js";
 import { showTipHint, closeTips } from "../../core/tips.js";
 import { orderedCards, setCardItems, takeOpenCard } from "../../core/cards-model.js";
+import { showToast } from "../../core/toast.js";
 
 let cards = [];
 let loaded = false;
@@ -151,12 +152,7 @@ async function run(fn) {
   catch (e) { toast(e.message || "儲存失敗，請稍後再試"); return false; }
 }
 
-function toast(msg) {
-  if (!root) return;
-  const t = document.createElement("div");
-  t.className = "fixed top-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white font-bold px-5 py-3 rounded-full shadow-xl";
-  t.textContent = msg; root.appendChild(t); setTimeout(() => t.remove(), 2500);
-}
+function toast(msg, ms = 2500) { showToast(msg, ms); }
 
 function renderDetail() {
   const c = cards.find((x) => x.id === view.id);

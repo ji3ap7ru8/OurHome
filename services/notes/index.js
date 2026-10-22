@@ -5,6 +5,7 @@ import { state } from "../../core/store.js";
 import { effectiveNickname } from "../../core/nickname.js";
 import { openLineSendDialog, closeLineSendDialog } from "../../core/line-send.js";
 import { showTipHint, closeTips } from "../../core/tips.js";
+import { showToast } from "../../core/toast.js";
 
 let notes = [];               // 目前畫面上的資料（由 refresh() 從 notesApi 取得）
 let loaded = false;
@@ -520,11 +521,7 @@ function openForm(n = null) {
   };
 }
 
-function toast(msg) {
-  const t = document.createElement("div");
-  t.className = "fixed top-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white font-bold px-5 py-3 rounded-full shadow-xl";
-  t.textContent = msg; root.appendChild(t); setTimeout(() => t.remove(), 2500);
-}
+function toast(msg, ms = 2500) { showToast(msg, ms); }
 
 export default {
   id: "家庭公告",

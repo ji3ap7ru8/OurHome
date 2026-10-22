@@ -5,6 +5,7 @@ import { state, on } from "../../core/store.js";
 import { isFirebaseConfigured } from "../../core/cloud.js";
 import { ledgerApi } from "./data.js";
 import { catsOf, catInfo, ymd, monthKey, shiftMonth, parseAmount, summarize, byCategory, groupByDay } from "./engine.js";
+import { showToast } from "../../core/toast.js";
 
 let rows = [];
 let root = null;
@@ -92,11 +93,7 @@ function render() {
     </section>`).join("") : '<div class="lg-empty"><i class="fa-solid fa-book-open"></i><p>這個月還沒有帳目<br>按右上角「記一筆」開始記帳</p></div>';
 }
 
-function toast(msg, err = false) {
-  const t = document.createElement("div");
-  t.className = `fixed top-6 left-1/2 -translate-x-1/2 z-[60] ${err ? "bg-red-600" : "bg-slate-900"} text-white font-bold px-5 py-3 rounded-full shadow-xl max-w-[85vw] text-center`;
-  t.textContent = msg; root?.appendChild(t); setTimeout(() => t.remove(), 2500);
-}
+function toast(msg, err = false) { showToast(msg, 2500, { error: err }); }
 
 function openForm(r = null) {
   const d = r || { type: "expense", amount: "", category: "", date: ymd(), note: "" };

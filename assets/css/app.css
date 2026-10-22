@@ -823,3 +823,33 @@ input:checked + .memo-pick { background: var(--primary-color); color: #fff; bord
 /* 隱藏的 radio / checkbox 固定在自己的 label 內，避免聚焦時瀏覽器跑去捲動外層（三星瀏覽器版面位移 Bug） */
 label:has(> input.sr-only) { position: relative; }
 label > input.sr-only { top: 0; left: 0; margin: 0; opacity: 0; pointer-events: none; }
+
+
+/* ===== 系統提示框（共用模板，core/notice.js）：顏色跟主題色走，深色模式自動切換 ===== */
+.sys-notice {
+  position: fixed; left: 50%; z-index: 95;
+  width: max-content; min-width: min(16rem, 90vw); max-width: min(94vw, 28rem);
+  display: flex; align-items: center; gap: .75rem;
+  padding: .75rem 1rem; border-radius: 1rem;
+  border: 2px solid var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 13%, #ffffff);
+  color: #1e293b; font-size: .875rem; font-weight: 800; line-height: 1.4;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, .22), 0 0 0 4px color-mix(in srgb, var(--primary-color) 26%, transparent);
+  opacity: 0; pointer-events: none;
+  transition: opacity .28s ease, transform .28s cubic-bezier(.16, 1, .3, 1);
+}
+.sys-notice--top { top: calc(env(safe-area-inset-top, 0px) + 12px); transform: translate(-50%, -14px); }
+.sys-notice--bottom { bottom: 7rem; transform: translate(-50%, 14px); }
+.sys-notice.is-in { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.sys-notice.dark { background: color-mix(in srgb, var(--primary-color) 24%, #0f172a); color: #f1f5f9; }
+.sys-notice__icon { flex: none; font-size: 1.5rem; color: var(--primary-color); }
+.sys-notice.dark .sys-notice__icon { color: color-mix(in srgb, var(--primary-color) 60%, #ffffff); }
+.sys-notice__text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.sys-notice__msg { font-weight: 700; }
+.sys-notice__btn { flex: none; padding: .5rem 1rem; border-radius: .75rem; border: 0; background: var(--primary-color); color: #fff; font-weight: 800; box-shadow: 0 2px 6px rgba(0, 0, 0, .18); }
+.sys-notice__btn:active { transform: scale(.95); }
+.sys-notice--err { border-color: #dc2626; background: #fef2f2; color: #7f1d1d; box-shadow: 0 12px 30px rgba(15, 23, 42, .22), 0 0 0 4px rgba(220, 38, 38, .22); }
+.sys-notice--err .sys-notice__icon { color: #dc2626; }
+.sys-notice--err.dark { background: color-mix(in srgb, #dc2626 26%, #0f172a); color: #fee2e2; }
+.sys-notice--err.dark .sys-notice__icon { color: #fca5a5; }
+@media (prefers-reduced-motion: reduce) { .sys-notice { transition: opacity .01s; } }
