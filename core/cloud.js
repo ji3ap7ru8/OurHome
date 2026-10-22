@@ -757,7 +757,7 @@ async function _exportBundle() {
   }
   const bundle = {
     app: "OurHome", version: 1, exportedAt: new Date().toISOString(),
-    settings: snapshotSettings(),
+    settings: (({ lineBotToken, ...rest }) => rest)(snapshotSettings()), // 備份檔不放 LINE Bot Token（避免檔案外流就被盜用）
     firebase: state.isLoggedIn ? { server: cfg.firebaseServer, private: cfg.firebasePrivate } : null,
     data,
   };
@@ -777,8 +777,10 @@ async function _importBundleFile(file) {
   try { bundle = JSON.parse(await file.text()); } catch { return showToast("檔案不是有效的 JSON"); }
   if (bundle?.app !== "OurHome") return showToast("這不是「我們的家」的資料包");
   const names = Object.keys(bundle.data || {});
-  if (!confirm(`要還原這份資料包嗎？\n含 ${names.length} 個資料集；同編號的資料會被覆蓋，其他資料不會被刪除。`)) return;
-  applySettings(bundle.settings);
+  const replacesFirebase = state.isLoggedIn && isCloudMode() && driveLoaded && !!(bundle.firebase?.server || bundle.firebase?.private);
+  if (!confirm(`要還原這份資料包嗎？\n含 ${names.length} 個資料集；同編號的資料會被覆蓋，其他資料不會被刪除。` + (replacesFirebase ? "\n\n⚠️ 這份檔案也會取代你目前的 Firebase 連線設定。只還原你自己匯出、確定來源可信的檔案。" : ""))) return;
+  // LINE Bot Token / 中繼站網址不從檔案還原（惡意檔案可把訊息導去別人的伺服器），請在設定裡自己填
+  applySettings((({ lineBotToken, lineRelayUrl, ...rest }) => rest)(bundle.settings || {}));
   let n = 0, skipped = [];
   for (const r of allRepos()) {
     const list = bundle.data?.[r.name];

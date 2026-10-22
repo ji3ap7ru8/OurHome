@@ -23,12 +23,32 @@ function injectStyle() {
   document.head.appendChild(s);
 }
 
+// 三星等部分瀏覽器：展開動畫後，捲動區只重畫到舊高度，下半部一片空白。
+// 動畫前後各強制重新繪製一次捲動區（先換成獨立圖層再還原），畫面就會補齊。
+function repaint(from) {
+  let el = from.parentElement;
+  while (el && !(el.scrollHeight > el.clientHeight && /(auto|scroll)/.test(getComputedStyle(el).overflowY))) el = el.parentElement;
+  const targets = [el, document.getElementById("bottomSheet")].filter(Boolean);
+  for (const t of targets) {
+    t.style.transform = "translateZ(0)";
+    void t.offsetHeight; // 強制 reflow
+    requestAnimationFrame(() => { t.style.transform = ""; });
+  }
+}
+function scheduleRepaint(body) {
+  requestAnimationFrame(() => repaint(body));
+  body.addEventListener("transitionend", () => repaint(body), { once: true });
+  setTimeout(() => repaint(body), 400); // 保險：transitionend 沒觸發時也補一次
+}
+
 function setOpen(trigger, open) {
   const key = trigger.dataset.accordionTrigger;
   const body = document.querySelector(`[data-accordion-body="${key}"]`);
   if (!body) return;
+  const was = body.classList.contains("is-open");
   trigger.setAttribute("aria-expanded", open ? "true" : "false");
   body.classList.toggle("is-open", open);
+  if (was !== open) scheduleRepaint(body);
 }
 
 // 以程式開關某張卡片（key = "personal" | "data"）；開啟時其餘自動收合。
