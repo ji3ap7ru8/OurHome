@@ -5,6 +5,7 @@
 //   - 各服務要挑哪幾筆、整理成什麼欄位：core/lobby-feed.js（可用 Node 測試）
 import { state, on } from "../core/store.js";
 import { showTipHint } from "../core/tips.js";
+import { showToast } from "../core/toast.js";
 import { lobbyOrdered, getMode, modeLabelOf, lobbyCards, lobbyMenus, lobbyMenusAll, ledgerParts } from "../core/lobby-model.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
 import { noteItems, memoItems, calendarItems, calendarFetchRange, CAL_EMPTY, bowlItems, cardItems } from "../core/lobby-feed.js";
@@ -175,12 +176,18 @@ const SECTIONS = {
         </button>`;
       }
       const zh = mode === "zh-en";
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const canSpeak = "speechSynthesis" in window;
       return `<div data-lob-tr="${zh ? "zh-en" : "en-zh"}" class="shrink-0 w-full space-y-2">
         <div class="flex items-end gap-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-white/70 dark:border-slate-700/70 p-2.5">
           <textarea data-lob-tr-in rows="2" maxlength="500" placeholder="${zh ? "輸入中文，翻成英文…" : "Type English, translate to 中文…"}" class="flex-1 min-w-0 bg-transparent resize-none outline-none text-base font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-400"></textarea>
-          <button type="button" data-lob-tr-go class="h-10 px-4 rounded-xl theme-bg-primary text-white font-black text-sm shrink-0 active:scale-95 transition"><i class="fa-solid fa-language"></i> 翻譯</button>
+          ${SR ? `<button type="button" data-lob-tr-mic data-tip="tr-mic" aria-label="語音輸入" class="w-10 h-10 rounded-full theme-bg-light theme-text-primary shrink-0 flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-microphone"></i></button>` : ""}
+          <button type="button" data-lob-tr-go data-tip="tr-go" class="h-10 px-4 rounded-xl theme-bg-primary text-white font-black text-sm shrink-0 active:scale-95 transition"><i class="fa-solid fa-language"></i> 翻譯</button>
         </div>
-        <p data-lob-tr-out class="hidden rounded-2xl border-2 theme-border-primary bg-white/80 dark:bg-slate-800/80 px-3 py-2.5 text-lg font-black text-slate-900 dark:text-white break-words select-text"></p>
+        <div data-lob-tr-box class="hidden flex items-start gap-2 rounded-2xl border-2 theme-border-primary bg-white/80 dark:bg-slate-800/80 px-3 py-2.5">
+          <p data-lob-tr-out class="flex-1 min-w-0 text-lg font-black text-slate-900 dark:text-white break-words select-text"></p>
+          ${canSpeak ? `<button type="button" data-lob-tr-speak data-tip="tr-speak" aria-label="朗讀" class="hidden w-10 h-10 rounded-full theme-bg-light theme-text-primary shrink-0 flex items-center justify-center active:scale-90 transition"><i class="fa-solid fa-volume-high"></i></button>` : ""}
+        </div>
       </div>`;
     },
   },
@@ -267,18 +274,74 @@ export function renderLobby(el /* , services */) {
     wired = true;
     const again = () => { if (state.route === "大廳") draw(false); };
     on("lobby:change", again);
-    document.addEventListener("click", async (e) => { // 大廳的翻譯機（中翻英 / 英翻中）
-      const go = e.target.closest?.("[data-lob-tr-go]");
-      if (!go) return;
-      const box = go.closest("[data-lob-tr]");
+    // 大廳的翻譯機（中翻英 / 英翻中）：翻譯、麥克風語音輸入、朗讀譯文
+    const dirOf = (box) => (box.dataset.lobTr === "zh-en" ? { from: "zh-TW", to: "en", fromSpeech: "zh-TW", toSpeech: "en-US" } : { from: "en", to: "zh-TW", fromSpeech: "en-US", toSpeech: "zh-TW" });
+    const micMsg = (err) => (err === "not-allowed" || err === "service-not-allowed") ? "麥克風被封鎖：請到瀏覽器網址列的設定，把「麥克風」改為允許後重新整理"
+      : err === "audio-capture" ? "找不到麥克風，請確認裝置有麥克風"
+      : err === "network" ? "此瀏覽器的語音辨識無法連線，請改用 Chrome 或 Edge"
+      : err === "no-speech" ? "沒有聽到聲音，請再試一次"
+      : err === "language-not-supported" ? "此瀏覽器不支援這個語言的語音辨識" : "無法使用麥克風，請確認已允許權限";
+    let lobRec = null;
+    const micState = (btn, on) => {
+      if (!btn) return;
+      btn.classList.toggle("theme-bg-primary", on); btn.classList.toggle("text-white", on); btn.classList.toggle("animate-pulse", on);
+      btn.classList.toggle("theme-bg-light", !on); btn.classList.toggle("theme-text-primary", !on);
+      btn.innerHTML = `<i class="fa-solid ${on ? "fa-stop" : "fa-microphone"}"></i>`;
+    };
+    const doTranslate = async (box) => {
       const text = box.querySelector("[data-lob-tr-in]").value.trim();
       const out = box.querySelector("[data-lob-tr-out]");
+      const outBox = box.querySelector("[data-lob-tr-box]");
+      const spk = box.querySelector("[data-lob-tr-speak]");
       if (!text) return;
-      const [from, to] = box.dataset.lobTr === "zh-en" ? ["zh-TW", "en"] : ["en", "zh-TW"];
-      out.classList.remove("hidden");
+      window.speechSynthesis?.cancel();
+      const { from, to } = dirOf(box);
+      outBox.classList.remove("hidden");
+      spk?.classList.add("hidden");
       out.textContent = "翻譯中…";
-      try { out.textContent = (await translatorApi.translate(text, from, to)).text; }
+      try { out.textContent = (await translatorApi.translate(text, from, to)).text; spk?.classList.remove("hidden"); }
       catch { out.textContent = "目前無法連線翻譯，請稍後再試"; }
+    };
+    document.addEventListener("click", async (e) => {
+      const go = e.target.closest?.("[data-lob-tr-go]");
+      if (go) return doTranslate(go.closest("[data-lob-tr]"));
+
+      const mic = e.target.closest?.("[data-lob-tr-mic]");
+      if (mic) {
+        const box = mic.closest("[data-lob-tr]");
+        if (lobRec) { lobRec.stop(); return; }
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) return showToast("此瀏覽器不支援語音辨識，請直接打字");
+        window.speechSynthesis?.cancel();
+        const rec = new SR();
+        rec.lang = dirOf(box).fromSpeech;
+        rec.interimResults = false;
+        let said = "";
+        rec.onresult = (ev) => { said = ev.results?.[0]?.[0]?.transcript || ""; };
+        rec.onerror = (ev) => showToast(micMsg(ev.error), 4500);
+        rec.onend = () => {
+          lobRec = null; micState(mic, false);
+          if (said && box.isConnected) {
+            const input = box.querySelector("[data-lob-tr-in]");
+            input.value = (input.value.trim() ? input.value.trim() + " " : "") + said;
+            doTranslate(box); // 說完直接翻譯
+          }
+        };
+        try { rec.start(); lobRec = rec; micState(mic, true); } catch { lobRec = null; micState(mic, false); }
+        return;
+      }
+
+      const spk = e.target.closest?.("[data-lob-tr-speak]");
+      if (spk && "speechSynthesis" in window) {
+        const box = spk.closest("[data-lob-tr]");
+        const synth = window.speechSynthesis;
+        if (synth.speaking) { synth.cancel(); return; } // 唸到一半再按 = 停止
+        const text = box.querySelector("[data-lob-tr-out]").textContent;
+        if (!text) return;
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = dirOf(box).toSpeech; u.rate = 0.9;
+        synth.speak(u);
+      }
     });
     on("apps:change", again);
   }
