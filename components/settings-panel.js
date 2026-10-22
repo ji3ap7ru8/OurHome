@@ -211,6 +211,7 @@ function renderTheme(theme) {
     $(id).className = theme.mode === mode ? THEME_BTN_ACTIVE : THEME_BTN_BASE;
   });
 
+  $("themeModeLabel").innerText = { light: "淺色", dark: "深色", system: "跟隨系統" }[theme.mode] || "淺色";
   $("colorSwatchName").innerText = theme.colorName;
   document.querySelectorAll('[data-action="set-color"]').forEach((btn) => {
     const selected = btn.dataset.name === theme.colorName;

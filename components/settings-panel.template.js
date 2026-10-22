@@ -153,11 +153,18 @@ export const settingsPanelTemplate = `
 
                         <div data-only="system" class="space-y-4">
 <!-- 2. 外觀主題 -->
-                        <div class="space-y-2">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-circle-half-stroke text-slate-400 text-sm w-4 text-center"></i>
-                                <span class="text-xs font-bold text-slate-700 dark:text-slate-200">外觀主題</span>
-                            </div>
+                        <div>
+                            <button type="button" data-tip="set-fold" data-tip-name="外觀主題" data-fold-trigger="themeFold" aria-expanded="false" class="w-full flex items-center justify-between gap-3 text-left">
+                                <span class="flex items-center gap-3">
+                                    <i class="fa-solid fa-circle-half-stroke text-slate-400 text-sm w-4 text-center"></i>
+                                    <span class="text-xs font-bold text-slate-700 dark:text-slate-200">外觀主題</span>
+                                </span>
+                                <span class="flex items-center gap-2">
+                                    <span id="themeModeLabel" class="text-[10px] theme-text-primary font-bold">淺色</span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 acc-arrow"></i>
+                                </span>
+                            </button>
+                            <div class="acc-body" data-fold-body="themeFold"><div class="acc-inner"><div class="pt-2 pb-1 px-1">
                             <div class="grid grid-cols-3 gap-2 pt-1">
                                 <button id="themeLightBtn" data-tip="set-theme-light" data-action="set-theme" data-theme="light" class="py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
                                     <i class="fa-regular fa-sun"></i> 淺色
@@ -169,19 +176,24 @@ export const settingsPanelTemplate = `
                                     <i class="fa-solid fa-desktop"></i> 跟隨系統
                                 </button>
                             </div>
+                            </div></div></div>
                         </div>
 
                         <hr class="border-slate-100 dark:border-slate-700/60">
 
                         <!-- 3. 外觀主色調 -->
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
+                        <div>
+                            <button type="button" data-tip="set-fold" data-tip-name="外觀主色調" data-fold-trigger="colorFold" aria-expanded="false" class="w-full flex items-center justify-between gap-3 text-left">
+                                <span class="flex items-center gap-3">
                                     <i class="fa-solid fa-palette text-slate-400 text-sm w-4 text-center"></i>
                                     <span class="text-xs font-bold text-slate-700 dark:text-slate-200">外觀主色調</span>
-                                </div>
-                                <span id="colorSwatchName" class="text-[10px] theme-text-primary font-bold">晨曦藍</span>
-                            </div>
+                                </span>
+                                <span class="flex items-center gap-2">
+                                    <span id="colorSwatchName" class="text-[10px] theme-text-primary font-bold">晨曦藍</span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 acc-arrow"></i>
+                                </span>
+                            </button>
+                            <div class="acc-body" data-fold-body="colorFold"><div class="acc-inner"><div class="pt-2 pb-1 px-1">
                             <div class="flex items-center justify-between pt-1 px-1">
                                 <button data-tip="set-color" data-tip-name="晨曦藍" data-action="set-color" data-primary="#0284c7" data-light="#e0f2fe" data-dark="#0369a1" data-name="晨曦藍" class="w-8 h-8 rounded-full bg-sky-500 hover:scale-110 active:scale-95 transition-all ring-2 ring-offset-2 ring-sky-500 dark:ring-offset-slate-800"></button>
                                 <button data-tip="set-color" data-tip-name="鼠尾草綠" data-action="set-color" data-primary="#059669" data-light="#d1fae5" data-dark="#047857" data-name="鼠尾草綠" class="w-8 h-8 rounded-full bg-emerald-600 hover:scale-110 active:scale-95 transition-all"></button>
@@ -189,19 +201,25 @@ export const settingsPanelTemplate = `
                                 <button data-tip="set-color" data-tip-name="薰衣草紫" data-action="set-color" data-primary="#7c3aed" data-light="#ede9fe" data-dark="#6d28d9" data-name="薰衣草紫" class="w-8 h-8 rounded-full bg-violet-600 hover:scale-110 active:scale-95 transition-all"></button>
                                 <button data-tip="set-color" data-tip-name="琥珀橘" data-action="set-color" data-primary="#d97706" data-light="#fef3c7" data-dark="#b45309" data-name="琥珀橘" class="w-8 h-8 rounded-full bg-amber-600 hover:scale-110 active:scale-95 transition-all"></button>
                             </div>
+                            </div></div></div>
                         </div>
 
                         <hr class="border-slate-100 dark:border-slate-700/60">
 
                         <!-- 4. 字體大小 -->
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
+                        <div>
+                            <button type="button" data-tip="set-fold" data-tip-name="字體大小" data-fold-trigger="fontFold" aria-expanded="false" class="w-full flex items-center justify-between gap-3 text-left">
+                                <span class="flex items-center gap-3">
                                     <i class="fa-solid fa-font text-slate-400 text-sm w-4 text-center"></i>
                                     <span class="text-xs font-bold text-slate-700 dark:text-slate-200">字體大小</span>
-                                </div>
-                                <span id="fontScaleLabel" class="text-xs theme-text-primary font-bold">100% (標準)</span>
-                            </div>
+                                </span>
+                                <span class="flex items-center gap-2">
+                                    <span id="fontScaleLabel" class="text-xs theme-text-primary font-bold">100% (標準)</span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 acc-arrow"></i>
+                                </span>
+                            </button>
+                            <div class="acc-body" data-fold-body="fontFold"><div class="acc-inner"><div class="pt-2 pb-1 px-1">
+                            <div class="space-y-3">
                             <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/40 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-700">
                                 <button data-tip="set-font-minus" data-action="font-step" data-delta="-5" class="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-sm flex items-center justify-center soft-shadow-sm hover:scale-105 active:scale-95 transition-all">
                                     <i class="fa-solid fa-minus text-xs"></i>
@@ -217,6 +235,8 @@ export const settingsPanelTemplate = `
                                 <span>長輩 (130%)</span>
                                 <span>特大 (150%)</span>
                             </div>
+                            </div>
+                            </div></div></div>
                         </div>
 
                         <hr class="border-slate-100 dark:border-slate-700/60">

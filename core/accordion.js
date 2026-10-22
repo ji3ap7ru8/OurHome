@@ -72,6 +72,7 @@ function onFoldClick(e) {
   const open = t.getAttribute("aria-expanded") !== "true";
   t.setAttribute("aria-expanded", open ? "true" : "false");
   body.classList.toggle("is-open", open);
+  scheduleRepaint(body);
 }
 
 function onClick(e) {
