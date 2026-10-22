@@ -6,6 +6,7 @@
 import { state, on } from "../core/store.js";
 import { showTipHint } from "../core/tips.js";
 import { showToast } from "../core/toast.js";
+import { micErrMsg, ensureMic } from "../core/mic.js";
 import { lobbyOrdered, getMode, modeLabelOf, lobbyCards, lobbyMenus, lobbyMenusAll, ledgerParts } from "../core/lobby-model.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
 import { noteItems, memoItems, calendarItems, calendarFetchRange, CAL_EMPTY, bowlItems, cardItems } from "../core/lobby-feed.js";
@@ -276,11 +277,6 @@ export function renderLobby(el /* , services */) {
     on("lobby:change", again);
     // 大廳的翻譯機（中翻英 / 英翻中）：翻譯、麥克風語音輸入、朗讀譯文
     const dirOf = (box) => (box.dataset.lobTr === "zh-en" ? { from: "zh-TW", to: "en", fromSpeech: "zh-TW", toSpeech: "en-US" } : { from: "en", to: "zh-TW", fromSpeech: "en-US", toSpeech: "zh-TW" });
-    const micMsg = (err) => (err === "not-allowed" || err === "service-not-allowed") ? "麥克風被封鎖：請到瀏覽器網址列的設定，把「麥克風」改為允許後重新整理"
-      : err === "audio-capture" ? "找不到麥克風，請確認裝置有麥克風"
-      : err === "network" ? "此瀏覽器的語音辨識無法連線，請改用 Chrome 或 Edge"
-      : err === "no-speech" ? "沒有聽到聲音，請再試一次"
-      : err === "language-not-supported" ? "此瀏覽器不支援這個語言的語音辨識" : "無法使用麥克風，請確認已允許權限";
     let lobRec = null;
     const micState = (btn, on) => {
       if (!btn) return;
@@ -309,16 +305,20 @@ export function renderLobby(el /* , services */) {
       const mic = e.target.closest?.("[data-lob-tr-mic]");
       if (mic) {
         const box = mic.closest("[data-lob-tr]");
-        if (lobRec) { lobRec.stop(); return; }
+        if (lobRec || mic.dataset.busy) { lobRec?.stop(); return; }
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SR) return showToast("此瀏覽器不支援語音辨識，請直接打字");
         window.speechSynthesis?.cancel();
+        mic.dataset.busy = "1"; // 等待權限詢問期間，避免連按
+        const why = await ensureMic();
+        delete mic.dataset.busy;
+        if (why) return showToast(why, 5500);
         const rec = new SR();
         rec.lang = dirOf(box).fromSpeech;
         rec.interimResults = false;
         let said = "";
         rec.onresult = (ev) => { said = ev.results?.[0]?.[0]?.transcript || ""; };
-        rec.onerror = (ev) => showToast(micMsg(ev.error), 4500);
+        rec.onerror = (ev) => { const m = micErrMsg(ev.error); if (m) showToast(m, 5000); };
         rec.onend = () => {
           lobRec = null; micState(mic, false);
           if (said && box.isConnected) {

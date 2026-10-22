@@ -6,6 +6,7 @@ import { takeLiveTranslate } from "../../core/lobby-model.js";
 import { holdAwake, releaseAwake } from "../../core/wakelock.js";
 import { LANGS, AUTO, langOf, googleUrl, MAX_CHARS, translatorApi } from "./data.js";
 import { showToast } from "../../core/toast.js";
+import { micErrMsg, ensureMic } from "../../core/mic.js";
 
 const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
@@ -184,25 +185,8 @@ async function liveTranslate(text, from) {
 
 const liveFrom = () => (st.from === "auto" ? "zh-TW" : st.from);
 
-// 語音辨識錯誤 → 白話說明；回傳 null 表示可忽略（會自動接續）
-function micErrMsg(err) {
-  if (err === "not-allowed" || err === "service-not-allowed" || err === "NotAllowedError") return "麥克風被封鎖：請點網址列左邊的鎖頭／設定圖示，把「麥克風」改為允許後重新整理";
-  if (err === "audio-capture" || err === "NotFoundError") return "找不到麥克風：請確認電腦已接上並選為預設輸入裝置";
-  if (err === "NotReadableError") return "麥克風被其他程式佔用，請關閉後再試";
-  if (err === "network") return "此瀏覽器的語音辨識服務無法連線（Brave、Firefox 等不支援），請改用 Chrome 或 Edge";
-  if (err === "language-not-supported") return "此瀏覽器不支援這個語言的語音辨識";
-  return null;
-}
-
-// 先主動要求麥克風權限（電腦版較容易看到詢問視窗，也能得到明確錯誤原因）
-async function checkMic() {
-  if (!navigator.mediaDevices?.getUserMedia) return null;
-  try {
-    const s = await navigator.mediaDevices.getUserMedia({ audio: true });
-    s.getTracks().forEach((t) => t.stop());
-    return null;
-  } catch (e) { return micErrMsg(e.name) || "無法開啟麥克風"; }
-}
+// 語音辨識錯誤說明、權限檢查：共用 core/mic.js（micErrMsg 回傳 null = 可忽略，會自動接續）
+const checkMic = ensureMic;
 
 function startLive() {
   if (!SR || !live.on) return;
@@ -465,9 +449,11 @@ function openBig() {
   updateBig();
 }
 
-function toggleMic() {
+async function toggleMic() {
   if (!SR) return;
   if (listening) { rec?.stop(); return; }
+  const why = await ensureMic();
+  if (why) return toast(why, 5000);
   rec = new SR();
   rec.lang = st.from === "auto" ? "zh-TW" : langOf(st.from).speech;
   rec.interimResults = false;
