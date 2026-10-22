@@ -89,6 +89,29 @@ export function collapseAllAccordions() {
   document.querySelectorAll("[data-accordion-trigger]").forEach((t) => setOpen(t, false));
 }
 
+// 點選畫面下方（尚未捲進可視範圍）的 radio 選項時，瀏覽器會為了「讓被聚焦的隱藏 radio 可見」
+// 去捲動外層容器（連 overflow:hidden 的也會被捲），三星瀏覽器就會整個版面位移、下半部空白。
+// 做法：按下前記住所有外層的捲動位置，聚焦後立刻還原。
+let snap = null;
+const collect = (el) => {
+  const list = [];
+  for (let n = el; n; n = n.parentElement) list.push([n, n.scrollTop, n.scrollLeft]);
+  list.push([document.scrollingElement, document.scrollingElement?.scrollTop || 0, document.scrollingElement?.scrollLeft || 0]);
+  return list;
+};
+const restore = () => { if (snap) for (const [n, t, l] of snap) { if (n && (n.scrollTop !== t || n.scrollLeft !== l)) { n.scrollTop = t; n.scrollLeft = l; } } };
+function onPointerDown(e) {
+  const lab = e.target.closest?.("label");
+  snap = lab && lab.querySelector("input.sr-only") ? collect(lab) : null;
+}
+function onFocusIn(e) {
+  if (!snap || !e.target.matches?.("input.sr-only")) return;
+  restore();
+  requestAnimationFrame(restore);
+  setTimeout(restore, 60);
+  setTimeout(() => { restore(); snap = null; }, 350);
+}
+
 let started = false;
 export function initAccordion() {
   if (started) return;
@@ -96,4 +119,6 @@ export function initAccordion() {
   injectStyle();
   document.addEventListener("click", onClick);
   document.addEventListener("click", onFoldClick);
+  document.addEventListener("pointerdown", onPointerDown, true);
+  document.addEventListener("focusin", onFocusIn, true);
 }

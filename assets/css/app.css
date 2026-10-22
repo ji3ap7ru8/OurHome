@@ -818,3 +818,8 @@ input:checked + .memo-pick { background: var(--primary-color); color: #fff; bord
 /* 大廳「記帳本」區塊：沿用記帳頁的結餘卡，寬度鋪滿 */
 .lob-lg { margin: 0 !important; flex: none; width: 100%; scroll-snap-align: start; }
 .lob-lg .lg-cols b { font-size: 1.25rem; }
+
+
+/* 隱藏的 radio / checkbox 固定在自己的 label 內，避免聚焦時瀏覽器跑去捲動外層（三星瀏覽器版面位移 Bug） */
+label:has(> input.sr-only) { position: relative; }
+label > input.sr-only { top: 0; left: 0; margin: 0; opacity: 0; pointer-events: none; }
