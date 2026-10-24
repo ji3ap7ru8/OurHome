@@ -14,7 +14,7 @@ function ensureBox() {
 }
 
 function syncVisibility() {
-  chips.forEach((c) => c.el.classList.toggle("hidden", state.route === c.route));
+  chips.forEach((c) => c.el.classList.toggle("hidden", state.route === c.route || !!c.hideWhen?.()));
 }
 
 export function setChip(id, data) {
@@ -32,6 +32,8 @@ export function setChip(id, data) {
       old.text = data.text;
     }
     old.el.classList.toggle("opacity-70", !!data.dim);
+    old.hideWhen = data.hideWhen;
+    syncVisibility();
     return;
   }
   const el = document.createElement("button");
@@ -44,8 +46,10 @@ export function setChip(id, data) {
   textEl.textContent = data.text;
   el.addEventListener("click", data.onClick);
   ensureBox().appendChild(el);
-  chips.set(id, { el, textEl, route: data.route, text: data.text });
+  chips.set(id, { el, textEl, route: data.route, text: data.text, hideWhen: data.hideWhen });
   syncVisibility();
 }
 
 on("route:change", syncVisibility);
+on("lobby:change", syncVisibility); // 大廳設定 / 啟用停用改變時，重新判斷要不要顯示
+on("apps:change", syncVisibility);

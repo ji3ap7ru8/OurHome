@@ -1,42 +1,14 @@
 // 碼表 — 純前端 UI，運算邏輯在 engine.js。
 // 訪客可用（不設 requiresLogin）。不寫入任何永久儲存；重新整理即重置。
-// 計時狀態放在模組層級：切換到其他服務時碼表仍會繼續跑，Dock 上方會出現小膠囊。
+// 計時狀態在 shared.js：切換到其他服務時碼表仍會繼續跑，Dock 上方會出現小膠囊。
 import { showTipHint, closeTips } from "../../core/tips.js";
-import { createStopwatch, fmtStopwatch } from "./engine.js";
-import { setChip } from "../../core/chips.js";
-import { holdAwake, releaseAwake } from "../../core/wakelock.js";
-import { navigate } from "../../core/router.js";
-
-const ID = "碼表";
-const sw = createStopwatch();
+import { fmtStopwatch } from "./engine.js";
+import { sw, ID, refreshChip, syncBackground } from "./shared.js"; // 計時器與背景小膠囊在 shared.js（大廳的碼表小卡共用同一個）
 
 let root = null;
 let raf = null;
-let chipId = null;
 let confirmReset = false;
 let confirmId = null;
-
-/* ---------- 背景小膠囊 ---------- */
-
-function refreshChip() {
-  if (sw.status === "idle") return setChip(ID, null);
-  setChip(ID, {
-    icon: "fa-solid fa-stopwatch",
-    text: `${sw.status === "paused" ? "暫停 " : ""}${fmtStopwatch(sw.elapsed()).replace(/\.\d+$/, "")}`,
-    aria: `碼表${sw.status === "paused" ? "已暫停" : "計時中"}，點一下回到碼表`,
-    route: ID,
-    dim: sw.status === "paused",
-    onClick: () => navigate(ID),
-  });
-}
-
-function syncBackground() {
-  clearInterval(chipId);
-  chipId = sw.status === "running" ? setInterval(refreshChip, 500) : null;
-  if (sw.status === "running") holdAwake(ID);
-  else releaseAwake(ID);
-  refreshChip();
-}
 
 /* ---------- 畫面 ---------- */
 

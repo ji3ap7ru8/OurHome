@@ -1,7 +1,8 @@
 // 大廳：歡迎頁 + 「已選擇要顯示」的服務簡略資訊。
 //   - 哪些服務、什麼順序、各自顯示什麼：由 ︙ 大廳設定（顯示管理 / 大廳排序 / 各列的「>」）決定，資料規則在 core/lobby-model.js
 //   - 每個服務只佔一個區塊、一行可水平滑動的小卡；點區塊標題會進入該服務。小卡只有「生活圖卡」可以點：直接打開那一張圖卡，其餘服務的小卡只顯示資訊
-//   - 目前有簡略資訊的服務：家庭公告、家庭日曆、換誰洗碗、生活圖卡（其餘服務暫時不顯示）
+//   - 目前有簡略資訊的服務：家庭公告、家庭日曆、換誰洗碗、生活圖卡、碼表（其餘服務暫時不顯示）
+//   - 碼表：大廳只有 開始 / 暫停 / 清除，和碼表頁共用同一個計時器（services/stopwatch/shared.js），碼表頁在跑的時候大廳也會一起跑秒
 //   - 各服務要挑哪幾筆、整理成什麼欄位：core/lobby-feed.js（可用 Node 測試）
 import { state, on } from "../core/store.js";
 import { showTipHint } from "../core/tips.js";
@@ -21,6 +22,9 @@ import { ledgerApi } from "../services/ledger/data.js";
 import { summarize, monthKey } from "../services/ledger/engine.js";
 import { translatorApi } from "../services/translator/data.js";
 import { canEnterBowl } from "../core/bowl-emails.js";
+import { registerActions } from "../core/actions.js";
+import { fmtStopwatch } from "../services/stopwatch/engine.js";
+import { sw, syncBackground } from "../services/stopwatch/shared.js";
 
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const safeImg = (u) => (/^https:\/\//i.test(u || "") ? u : "");
@@ -192,6 +196,20 @@ const SECTIONS = {
       </div>`;
     },
   },
+  碼表: {
+    // 大廳的碼表：只有 開始 / 暫停 / 清除；和碼表頁共用同一個計時器，所以碼表頁在跑的時候，這裡也一起跑秒
+    load: async () => null,
+    after: () => startSwLoop(),
+    build() {
+      const run = sw.status === "running";
+      const idle = sw.status === "idle";
+      return `<div class="shrink-0 w-full rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-white/70 dark:border-slate-700/70 px-3.5 py-3 flex items-center gap-3" role="timer" aria-label="碼表">
+        <span data-lob-sw-time class="flex-1 min-w-0 whitespace-nowrap font-black tabular-nums text-slate-900 dark:text-white leading-none ${sw.status === "paused" ? "opacity-60" : ""}" style="font-size:clamp(1.5rem,8vw,1.9rem)">${fmtStopwatch(sw.elapsed())}</span>
+        <button type="button" data-action="lob-sw" data-op="toggle" class="h-11 px-4 rounded-full theme-bg-primary text-white font-black text-base shrink-0 active:scale-95 transition"><i class="fa-solid ${run ? "fa-pause" : "fa-play"} mr-1"></i>${run ? "暫停" : sw.status === "paused" ? "繼續" : "開始"}</button>
+        <button type="button" data-action="lob-sw" data-op="reset" ${idle ? "disabled" : ""} class="h-11 px-4 rounded-full font-black text-base shrink-0 active:scale-95 transition ${idle ? "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500" : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100"}">清除</button>
+      </div>`;
+    },
+  },
   生活圖卡: {
     login: true,
     load: () => cardsApi.list(),
@@ -212,6 +230,20 @@ const SECTIONS = {
   },
 };
 
+/* ---------- 碼表：跑秒 ---------- */
+let swRaf = null;
+function swLoop() {
+  swRaf = null;
+  const els = document.querySelectorAll("[data-lob-sw-time]");
+  if (!els.length) return; // 離開大廳（小卡不在畫面上）就停
+  const t = fmtStopwatch(sw.elapsed());
+  els.forEach((e) => { e.textContent = t; });
+  if (sw.status === "running") swRaf = requestAnimationFrame(swLoop);
+}
+function startSwLoop() {
+  if (!swRaf && sw.status === "running") swRaf = requestAnimationFrame(swLoop);
+}
+
 /* ---------- 畫面 ---------- */
 let raw = {};      // 這次進大廳讀回來的原始資料（改大廳設定時直接用，不重讀）
 let seq = 0;       // 每次重畫 +1：舊的非同步結果不會蓋掉新畫面
@@ -221,7 +253,7 @@ const modeLabel = (a) => (a.id === "生活圖卡" ? `已選 ${lobbyCards().lengt
 
 function shell(a) {
   // 除了「生活圖卡」（小卡直接打開那張圖卡），其餘服務點區塊任何地方都跳到該服務頁
-  const whole = a.id === "生活圖卡" || a.id === "菜單" || a.id === "翻譯機" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
+  const whole = a.id === "生活圖卡" || a.id === "菜單" || a.id === "翻譯機" || a.id === "碼表" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
   return `<section id="lobbySec-${esc(a.id)}" ${whole} class="glass-card rounded-3xl py-3${whole ? " cursor-pointer" : ""}">
     <button type="button" ${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" class="w-full flex items-center gap-2 px-4 text-left">
       <span class="w-7 h-7 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-xs")}</span>
@@ -246,6 +278,7 @@ async function fill(a, my, refetch) {
   try {
     if (refetch || !(a.id in raw)) raw[a.id] = await S.load();
     show(S.build(raw[a.id], a.id));
+    S.after?.();
   } catch (e) {
     show(msg("讀取失敗：" + (e?.message || "請稍後再試")));
   }
@@ -344,6 +377,15 @@ export function renderLobby(el /* , services */) {
       }
     });
     on("apps:change", again);
+    registerActions({
+      "lob-sw": (el) => {
+        if (el.dataset.op === "reset") sw.reset();
+        else if (sw.status === "running") sw.pause();
+        else sw.start();
+        syncBackground();
+        fill({ id: "碼表" }, seq, false); // 只重畫碼表區塊，不影響其他區塊（例如翻譯機輸入到一半的字）
+      },
+    });
   }
   draw(true);
   showTipHint("lobby");
