@@ -502,6 +502,42 @@ input[type=range] {
 .dark .bgk { fill: color-mix(in srgb, var(--primary-color) 13%, transparent); stroke: color-mix(in srgb, var(--primary-color) 34%, transparent); }
 .dark .bgk-t { fill: color-mix(in srgb, var(--primary-color) 40%, transparent); }
 
+/* ===== 計算機按鍵：圓形 + 明顯外框 + 底部厚度（跟背景分開）；三星式排版 ===== */
+.ck { height: 3.6rem; border: 2px solid; border-radius: 9999px; font-size: 1.6rem; font-weight: 900; line-height: 1; user-select: none; -webkit-tap-highlight-color: transparent; transition: transform .08s ease, box-shadow .08s ease; }
+.ck:active { transform: translateY(2px) scale(.97); box-shadow: none !important; }
+.ck-num { background: #fff; color: #1e293b; border-color: #94a3b8; box-shadow: 0 3px 0 #cbd5e1; }
+.ck-fn { background: #e2e8f0; color: #334155; border-color: #94a3b8; box-shadow: 0 3px 0 #cbd5e1; font-size: 1.35rem; }
+.ck-op { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-color); box-shadow: 0 3px 0 color-mix(in srgb, var(--primary-color) 45%, transparent); }
+.ck-eq { background: var(--primary-color); color: #fff; border-color: var(--primary-dark); box-shadow: 0 3px 0 var(--primary-dark); }
+.ck-sci { height: 2.9rem; font-size: 1.1rem; background: color-mix(in srgb, var(--primary-light) 55%, #fff); color: #334155; border-color: color-mix(in srgb, var(--primary-color) 55%, #94a3b8); box-shadow: 0 2px 0 color-mix(in srgb, var(--primary-color) 30%, transparent); }
+.ck-sci-mode { background: var(--primary-color); color: #fff; border-color: var(--primary-dark); }
+.ck-fold { height: 2.9rem; border-radius: .9rem; font-size: 1rem; background: #fef3c7; color: #92400e; border-color: #f59e0b; box-shadow: 0 2px 0 #fcd34d; }
+.ck-fold-dash { border-style: dashed; background: transparent; box-shadow: none; }
+.dark .ck-num { background: #1e293b; color: #f1f5f9; border-color: #64748b; box-shadow: 0 3px 0 #0f172a; }
+.dark .ck-fn { background: #334155; color: #f1f5f9; border-color: #64748b; box-shadow: 0 3px 0 #0f172a; }
+.dark .ck-op { background: color-mix(in srgb, var(--primary-color) 22%, #1e293b); color: #fff; border-color: var(--primary-color); box-shadow: 0 3px 0 #0f172a; }
+.dark .ck-eq { box-shadow: 0 3px 0 #0f172a; }
+.dark .ck-sci { background: #1e293b; color: #f1f5f9; border-color: color-mix(in srgb, var(--primary-color) 60%, #64748b); box-shadow: 0 2px 0 #0f172a; }
+.dark .ck-sci-mode { background: var(--primary-color); color: #fff; }
+.dark .ck-fold { background: rgba(120, 53, 15, .45); color: #fde68a; border-color: #d97706; box-shadow: 0 2px 0 #0f172a; }
+.dark .ck-fold-dash { background: transparent; }
+/* 工具列（紀錄／科學／折扣／分數／刪除） */
+.ct { height: 2.6rem; padding: 0 .75rem; display: inline-flex; align-items: center; justify-content: center; gap: .35rem; border: 2px solid #94a3b8; border-radius: 9999px; background: rgba(255, 255, 255, .9); color: #475569; font-size: .85rem; font-weight: 800; -webkit-tap-highlight-color: transparent; transition: transform .08s ease; }
+.ct:active { transform: scale(.95); }
+.ct-on { background: var(--primary-color); border-color: var(--primary-dark); color: #fff; }
+.ct-back { width: 3.2rem; padding: 0; font-size: 1.1rem; color: var(--primary-dark); border-color: var(--primary-color); background: var(--primary-light); }
+.dark .ct { background: rgba(30, 41, 59, .9); border-color: #64748b; color: #e2e8f0; }
+.dark .ct-on { background: var(--primary-color); border-color: var(--primary-color); color: #fff; }
+.dark .ct-back { background: color-mix(in srgb, var(--primary-color) 22%, #1e293b); color: #fff; border-color: var(--primary-color); }
+.calc-main { max-height: 6.2rem; overflow-y: auto; min-height: 3.4rem; }
+.hist-list { max-height: 11rem; overflow-y: auto; }
+.hist-item { width: 100%; display: flex; flex-direction: column; align-items: flex-end; padding: .45rem .75rem; border-radius: .9rem; text-align: right; }
+.hist-item:active { background: var(--primary-light); }
+.hist-expr { font-size: .8rem; font-weight: 600; color: #94a3b8; word-break: break-all; }
+.hist-res { font-size: 1.35rem; font-weight: 900; color: #0f172a; }
+.dark .hist-res { color: #f8fafc; }
+.dark .hist-item:active { background: color-mix(in srgb, var(--primary-color) 22%, #1e293b); }
+
 /* ===== 家庭日曆：左上角日曆切換（家庭日曆 / Google 日曆 / 全部） ===== */
 .cal-src { display: inline-flex; align-items: center; gap: .5rem; max-width: 100%; height: 2.5rem; padding: 0 .9rem; border-radius: 1rem; font-size: .95rem; font-weight: 800; color: var(--primary-dark); background: #fff; border: 1.5px solid var(--primary-color); box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-color) 28%, transparent); }
 .dark .cal-src { background: #1e293b; color: #f1f5f9; }

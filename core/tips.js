@@ -648,6 +648,12 @@ const TIPS = {
   "calc-fold": { scene: tapScene("打折"), text: "先輸入原價，再按「{name}」，就算出打折後要付的錢。" },
   "calc-fold-custom": { scene: tapScene("其他"), text: "折數不在旁邊的按鈕裡，按這裡自己輸入。" },
   "calc-fold-go": { scene: tapScene("套用"), text: "輸入折數（例如 6.5 或 65）後按套用。" },
+  "calc-tool-hist": { scene: tapScene("紀錄"), text: "打開／收起計算紀錄，點一筆可以把答案帶回目前的算式。" },
+  "calc-tool-sci": { scene: tapScene("科學"), text: "打開／收起科學功能：sin、cos、tan、log、ln、開根號、平方、次方、階乘、π、e。括號在主鍵盤的「( )」。" },
+  "calc-tool-disc": { scene: tapScene("折扣"), text: "打開／收起打折快算，先輸入原價再按幾折。" },
+  "calc-tool-frac": { scene: tapScene("分數"), text: "開啟後，答案能換成分數就顯示分數，例如 0.75 會顯示 3/4；再按一次關閉。" },
+  "calc-deg": { scene: tapScene("DEG"), text: "切換三角函數的角度單位：DEG 是「度」（sin 30 = 0.5），RAD 是「弧度」。" },
+  "calc-hist-clear": { scene: tapScene("清除"), text: "清除所有計算紀錄。" },
   // ---- 計時器 ----
   "tm-alarm-stop": { scene: tapScene("關閉"), text: "時間到了，按這裡關掉鬧鈴。" },
   "tm-alarm-more": { scene: tapScene("再 1 分鐘"), text: "還沒好，再多倒數 1 分鐘。" },
