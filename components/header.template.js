@@ -36,6 +36,9 @@ export const headerTemplate = `
                 <!-- 碼表頁專用：左側標題（其他頁隱藏） -->
                 <h2 id="headerStopwatchTitle" class="hidden items-center gap-2 text-2xl shrink-0 font-black leading-tight text-slate-800 dark:text-slate-100"><i class="fa-solid fa-stopwatch theme-text-primary"></i><span>碼表</span></h2>
 
+                <!-- 計時器頁專用：左側標題（其他頁隱藏） -->
+                <h2 id="headerTimerTitle" class="hidden items-center gap-2 text-2xl shrink-0 font-black leading-tight text-slate-800 dark:text-slate-100"><i class="fa-solid fa-hourglass-half theme-text-primary"></i><span>計時器</span></h2>
+
                 <!-- 記帳本頁專用：左側標題（其他頁隱藏） -->
                 <h2 id="headerLedgerTitle" class="hidden items-center gap-2 text-2xl shrink-0 font-black leading-tight text-slate-800 dark:text-slate-100"><i class="fa-solid fa-wallet theme-text-primary"></i><span>記帳本</span></h2>
 

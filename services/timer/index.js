@@ -185,14 +185,14 @@ function controls() {
 }
 
 function options() {
-  const sw = (key, on, text) => `
-    <button data-tip="tm-toggle" data-tip-name="${text}" data-toggle="${key}" role="switch" aria-checked="${on}" class="flex items-center justify-between w-full px-1 py-2 text-base font-bold text-slate-700 dark:text-slate-200">
+  const sw = (key, on, text, label) => `
+    <button data-tip="tm-toggle" data-tip-name="${label}" data-toggle="${key}" role="switch" aria-checked="${on}" class="flex items-center justify-between w-full px-1 py-2 text-base font-bold text-slate-700 dark:text-slate-200">
       <span>${text}</span>
       <span class="w-12 h-7 rounded-full p-0.5 transition ${on ? "theme-bg-primary" : "bg-slate-300 dark:bg-slate-600"}"><span class="block w-6 h-6 rounded-full bg-white transition ${on ? "translate-x-5" : ""}"></span></span>
     </button>`;
   return `<div class="mt-5 bg-white/80 dark:bg-slate-800/80 rounded-2xl px-4 py-1 soft-shadow-sm">
-    ${sw("sound", soundOn, '<i class="fa-solid fa-volume-high theme-text-primary mr-2"></i>響鈴聲音')}
-    ${wakeLockSupported() ? sw("awake", awakeOn, '<i class="fa-solid fa-sun theme-text-primary mr-2"></i>計時中螢幕保持亮著') : ""}
+    ${sw("sound", soundOn, '<i class="fa-solid fa-volume-high theme-text-primary mr-2"></i>響鈴聲音', '響鈴聲音')}
+    ${wakeLockSupported() ? sw("awake", awakeOn, '<i class="fa-solid fa-sun theme-text-primary mr-2"></i>計時中螢幕保持亮著', '計時中螢幕保持亮著') : ""}
   </div>
   <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-3 px-1 leading-relaxed">離開這一頁，計時仍會繼續；時間到會全螢幕提醒。請勿關閉或重新整理網頁，也建議不要讓手機鎖屏太久。</p>`;
 }
@@ -203,7 +203,6 @@ function render() {
   const st = timer.status;
   root.innerHTML = `
     <div class="px-4 pt-2 pb-28">
-      <h2 class="text-2xl font-black text-slate-800 dark:text-slate-100 mb-3 px-1"><i class="fa-solid fa-hourglass-half theme-text-primary"></i> 計時器</h2>
       ${st === "idle" ? stepperPanel() : `<div class="mb-5">${ringSvg()}</div>`}
       ${controls()}
       ${options()}

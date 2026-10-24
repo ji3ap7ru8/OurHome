@@ -445,6 +445,38 @@ input[type=range] {
 .dark .bgw-a { stroke: color-mix(in srgb, var(--primary-color) 52%, transparent); }
 .dark .bgw-d { fill: color-mix(in srgb, var(--primary-color) 46%, transparent); }
 
+/* ===== 計時器頁：淡色底 + 沙漏 / 倒數圓環（全部由主題色 / 深淺色推算，換主題就跟著變） ===== */
+#appContainer[data-view="timer"] #bgShapes { opacity: 0 !important; }
+#appContainer[data-view="timer"] > .overflow-y-auto {
+    background-color: color-mix(in srgb, var(--primary-light) 30%, #f8fafc) !important;
+    background-image:
+        radial-gradient(90% 36% at 100% 0%, color-mix(in srgb, var(--primary-color) 13%, transparent), transparent 70%),
+        radial-gradient(90% 34% at 0% 100%, color-mix(in srgb, var(--primary-color) 13%, transparent), transparent 70%) !important;
+}
+#appContainer.dark[data-view="timer"] > .overflow-y-auto {
+    background-color: color-mix(in srgb, var(--primary-dark) 14%, #0f172a) !important;
+    background-image:
+        radial-gradient(90% 36% at 100% 0%, color-mix(in srgb, var(--primary-color) 19%, transparent), transparent 70%),
+        radial-gradient(90% 34% at 0% 100%, color-mix(in srgb, var(--primary-color) 16%, transparent), transparent 70%) !important;
+}
+.bg-timer-layer {
+    position: sticky; top: 0; height: var(--app-h); margin-bottom: calc(-1 * var(--app-h)); flex: none; overflow: hidden;
+    opacity: 0; transition: opacity .3s ease;
+}
+.bg-timer-layer svg { width: 100%; height: 100%; display: block; }
+#appContainer[data-view="timer"] .bg-timer-layer { opacity: 1; }
+.bgh-r { fill: color-mix(in srgb, var(--primary-color) 7%, transparent); stroke: color-mix(in srgb, var(--primary-color) 20%, transparent); stroke-width: 16; }
+.bgh-r.thin { fill: none; stroke-width: 4; }
+.bgh-a { fill: none; stroke: color-mix(in srgb, var(--primary-color) 36%, transparent); stroke-width: 16; stroke-linecap: round; }
+.bgh-d { fill: color-mix(in srgb, var(--primary-color) 30%, transparent); }
+.bgh { fill: color-mix(in srgb, var(--primary-color) 8%, transparent); stroke: color-mix(in srgb, var(--primary-color) 30%, transparent); stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+.bgh .bgh-sand { fill: color-mix(in srgb, var(--primary-color) 28%, transparent); stroke: none; }
+.dark .bgh-r { fill: color-mix(in srgb, var(--primary-color) 12%, transparent); stroke: color-mix(in srgb, var(--primary-color) 32%, transparent); }
+.dark .bgh-a { stroke: color-mix(in srgb, var(--primary-color) 52%, transparent); }
+.dark .bgh-d { fill: color-mix(in srgb, var(--primary-color) 44%, transparent); }
+.dark .bgh { fill: color-mix(in srgb, var(--primary-color) 13%, transparent); stroke: color-mix(in srgb, var(--primary-color) 46%, transparent); }
+.dark .bgh .bgh-sand { fill: color-mix(in srgb, var(--primary-color) 42%, transparent); }
+
 /* ===== 家庭日曆：左上角日曆切換（家庭日曆 / Google 日曆 / 全部） ===== */
 .cal-src { display: inline-flex; align-items: center; gap: .5rem; max-width: 100%; height: 2.5rem; padding: 0 .9rem; border-radius: 1rem; font-size: .95rem; font-weight: 800; color: var(--primary-dark); background: #fff; border: 1.5px solid var(--primary-color); box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-color) 28%, transparent); }
 .dark .cal-src { background: #1e293b; color: #f1f5f9; }

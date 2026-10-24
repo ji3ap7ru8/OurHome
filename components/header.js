@@ -29,9 +29,10 @@ function renderRoute(id) {
   const menu = id === "菜單";
   const tr = id === "翻譯機"; // 翻譯機頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「翻譯機」標題
   const sw = id === "碼表"; // 碼表頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「碼表」標題
+  const tm = id === "計時器"; // 計時器頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「計時器」標題
   const ledger = id === "記帳"; // 記帳本頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「記帳本」標題
-  document.getElementById("headerUser")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr || sw);
-  document.getElementById("headerPaletteBtn")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr || sw);
+  document.getElementById("headerUser")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr || sw || tm);
+  document.getElementById("headerPaletteBtn")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr || sw || tm);
   const mn = id === "菜單"; // 菜單頁：左側改放「菜單」標題，右側多一個 ︙ 菜單設定
   const ls = document.getElementById("headerLiveSwitch");
   ls?.classList.toggle("hidden", !tr);
@@ -45,6 +46,9 @@ function renderRoute(id) {
   const ma = document.getElementById("headerMenuBtn");
   ma?.classList.toggle("hidden", !mn);
   ma?.classList.toggle("flex", mn);
+  const tmt = document.getElementById("headerTimerTitle");
+  tmt?.classList.toggle("hidden", !tm);
+  tmt?.classList.toggle("flex", tm);
   const swt = document.getElementById("headerStopwatchTitle");
   swt?.classList.toggle("hidden", !sw);
   swt?.classList.toggle("flex", sw);
