@@ -1,12 +1,16 @@
 // 倒數計時器 — 純前端 UI，運算邏輯在 engine.js。
 // 訪客可用（不設 requiresLogin）。不寫入任何永久儲存；重新整理即重置。
 // 計時狀態放在模組層級：切換到其他服務時仍會繼續倒數，時間到會全螢幕提醒。
+// 大廳的計時器小卡（components/lobby.js）透過 timerApi 操作同一個計時器；狀態改變時發出 "timer:change"，大廳就跟著重畫。
 import { showTipHint, closeTips } from "../../core/tips.js";
 import { createTimer, fmtClock, fmtSpoken, fromHMS, splitHMS, PRESETS } from "./engine.js";
 import { unlockAudio, startAlarm, stopAlarm } from "../../core/alarm.js";
 import { holdAwake, releaseAwake, wakeLockSupported } from "../../core/wakelock.js";
 import { setChip } from "../../core/chips.js";
 import { navigate } from "../../core/router.js";
+import { state, emit } from "../../core/store.js";
+import { isShown } from "../../core/lobby-model.js";
+import { isEnabled } from "../../core/apps-model.js";
 
 const ID = "計時器";
 const RING_R = 110;
@@ -55,7 +59,11 @@ function syncSideEffects() {
   if (timer.status === "running" && awakeOn) holdAwake(ID);
   else releaseAwake(ID);
   refreshChip();
+  emit("timer:change"); // 大廳的計時器小卡同步
 }
+
+// 大廳有顯示計時器小卡時，在大廳不需要再顯示背景小膠囊
+const hideOnLobby = () => state.route === "大廳" && isEnabled(ID) && isShown(ID);
 
 function refreshChip() {
   const st = timer.status;
@@ -65,6 +73,7 @@ function refreshChip() {
       text: `${st === "paused" ? "暫停 " : ""}${fmtClock(timer.remaining())}`,
       aria: `計時器${st === "paused" ? "已暫停" : "計時中"}，剩 ${fmtSpoken(timer.remaining())}，點一下回到計時器`,
       route: ID,
+      hideWhen: hideOnLobby,
       dim: st === "paused",
       onClick: () => navigate(ID),
     });
@@ -79,6 +88,7 @@ function onFinish() {
   startAlarm({ sound: soundOn, seconds: 60 });
   showAlarm();
   if (root) render();
+  emit("timer:change");
 }
 
 /* ---------- 全螢幕「時間到」提醒 ---------- */
@@ -118,6 +128,7 @@ function hideAlarm(stopSound) {
   alarmEl?.remove();
   alarmEl = null;
   if (root) render();
+  emit("timer:change");
 }
 
 /* ---------- 畫面 ---------- */
@@ -323,6 +334,27 @@ function onVisible() {
   if (!document.hidden) tick(); // 從背景切回來立刻校正並檢查是否已到時間
 }
 document.addEventListener("visibilitychange", onVisible);
+
+// 給大廳的計時器小卡用：只有「開始 / 暫停 / 加時間 / 清除」，邏輯和計時器頁完全相同
+export const timerApi = {
+  timer,
+  press(op, ms = 0) {
+    if (timer.status === "done") return; // 時間到的全螢幕提醒要先關閉
+    if (op === "toggle") {
+      if (timer.status === "running") timer.pause();
+      else { unlockAudio(); if (!timer.start()) return; } // 在使用者點擊當下解鎖，鬧鈴才響得出來
+    } else if (op === "preset") {
+      if (timer.status !== "idle") return;
+      timer.setDuration(timer.setMs + ms); // 連續點會累加
+    } else if (op === "cancel") {
+      if (timer.status === "idle") { timer.setDuration(0); timer.label = ""; }
+      else timer.reset();
+    }
+    syncSideEffects();
+    if (root) render();
+    emit("timer:change");
+  },
+};
 
 export default {
   id: ID,

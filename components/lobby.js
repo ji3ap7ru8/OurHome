@@ -2,6 +2,7 @@
 //   - 哪些服務、什麼順序、各自顯示什麼：由 ︙ 大廳設定（顯示管理 / 大廳排序 / 各列的「>」）決定，資料規則在 core/lobby-model.js
 //   - 每個服務只佔一個區塊、一行可水平滑動的小卡；點區塊標題會進入該服務。小卡只有「生活圖卡」可以點：直接打開那一張圖卡，其餘服務的小卡只顯示資訊
 //   - 目前有簡略資訊的服務：家庭公告、家庭日曆、換誰洗碗、生活圖卡、碼表（其餘服務暫時不顯示）
+//   - 計時器：大廳可加時間（1/3/5/10/15/30 分，連點累加）、開始 / 暫停 / 清除，和計時器頁共用同一個計時器；倒數時小卡外框是倒數進度環（越來越短），最後 10 秒開始繞圈
 //   - 碼表：大廳只有 開始 / 暫停 / 清除，和碼表頁共用同一個計時器（services/stopwatch/shared.js），碼表頁在跑的時候大廳也會一起跑秒
 //   - 各服務要挑哪幾筆、整理成什麼欄位：core/lobby-feed.js（可用 Node 測試）
 import { state, on } from "../core/store.js";
@@ -25,6 +26,8 @@ import { canEnterBowl } from "../core/bowl-emails.js";
 import { registerActions } from "../core/actions.js";
 import { fmtStopwatch } from "../services/stopwatch/engine.js";
 import { sw, syncBackground } from "../services/stopwatch/shared.js";
+import { timerApi } from "../services/timer/index.js";
+import { fmtClock, fmtSpoken, PRESETS } from "../services/timer/engine.js";
 
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const safeImg = (u) => (/^https:\/\//i.test(u || "") ? u : "");
@@ -196,6 +199,35 @@ const SECTIONS = {
       </div>`;
     },
   },
+  計時器: {
+    // 大廳的計時器：和計時器頁共用同一個計時器。外框 = 倒數進度環（剩餘越少弧線越短），最後 10 秒弧線開始繞著外框轉圈、越轉越快
+    load: async () => null,
+    after: () => { layoutTm(); startTmLoop(); },
+    build() {
+      const t = timerApi.timer;
+      const st = t.status;
+      const idle = st === "idle", run = st === "running", paused = st === "paused", done = st === "done";
+      const sub = done ? "時間到了！" : paused ? "已暫停" : run ? (t.label || "倒數中") : "點下面的時間累加";
+      const goOff = done || (idle && t.setMs <= 0);
+      const cancelOff = done || (idle && t.setMs <= 0);
+      const btn = "h-11 px-3.5 rounded-full font-black text-base shrink-0 active:scale-95 transition";
+      return `<div data-lob-tm-card class="relative shrink-0 w-full rounded-2xl bg-white/80 dark:bg-slate-800/80 px-3.5 py-3 space-y-3" role="timer" aria-label="計時器，${esc(fmtSpoken(t.remaining()))}">
+        <svg data-lob-tm-svg class="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
+          <rect data-lob-tm-track fill="none" stroke-width="3.5" class="stroke-slate-200 dark:stroke-slate-700"/>
+          <rect data-lob-tm-arc fill="none" stroke-width="3.5" stroke-linecap="round" pathLength="100" stroke="var(--primary-color)" style="display:none"/>
+        </svg>
+        <div class="relative flex items-center gap-2.5">
+          <span class="flex-1 min-w-0">
+            <span data-lob-tm-time class="block whitespace-nowrap font-black tabular-nums text-slate-900 dark:text-white leading-none ${paused ? "opacity-60" : ""}" style="font-size:clamp(1.5rem,8vw,1.9rem)">${fmtClock(t.remaining())}</span>
+            <span class="block truncate text-xs font-bold mt-1 ${done ? "text-rose-500" : "text-slate-400 dark:text-slate-500"}">${esc(sub)}</span>
+          </span>
+          <button type="button" data-action="lob-tm" data-op="toggle" ${goOff ? "disabled" : ""} class="${btn} ${goOff ? "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500" : "theme-bg-primary text-white"}"><i class="fa-solid ${run ? "fa-pause" : "fa-play"} mr-1"></i>${run ? "暫停" : paused ? "繼續" : "開始"}</button>
+          <button type="button" data-action="lob-tm" data-op="cancel" ${cancelOff ? "disabled" : ""} class="${btn} ${tmArmed && !idle ? "bg-red-500 text-white" : cancelOff ? "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500" : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100"}">${tmArmed && !idle ? "再按一次" : idle ? "清除" : "取消"}</button>
+        </div>
+        ${idle ? `<div class="relative grid grid-cols-6 gap-1.5">${PRESETS.map((p) => `<button type="button" data-action="lob-tm" data-op="preset" data-ms="${p.ms}" aria-label="加 ${esc(p.label)}" class="h-10 px-0 rounded-xl font-black text-sm whitespace-nowrap active:scale-95 transition bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200">${esc(p.label)}</button>`).join("")}</div>` : ""}
+      </div>`;
+    },
+  },
   碼表: {
     // 大廳的碼表：只有 開始 / 暫停 / 清除；和碼表頁共用同一個計時器，所以碼表頁在跑的時候，這裡也一起跑秒
     load: async () => null,
@@ -244,6 +276,71 @@ function startSwLoop() {
   if (!swRaf && sw.status === "running") swRaf = requestAnimationFrame(swLoop);
 }
 
+/* ---------- 計時器：外框倒數進度環 ---------- */
+const SPIN_MS = 10_000; // 剩餘不到這個時間，弧線開始繞圈（短計時最多只轉後半段）
+const RX = 15;          // 小卡圓角（rounded-2xl = 16px，外框內縮半個線寬）
+let tmRaf = null;
+let tmSpin = 0;         // 轉圈的位置（外框長度的 0~100）
+let tmLast = 0;
+let tmArmed = false;    // 「取消」要按兩次的確認狀態
+let tmArmId = null;
+const tmGeo = { s0: 0 };
+
+// 依小卡目前的大小畫出外框（弧線從上方正中央開始，順時針）
+function layoutTm() {
+  const card = document.querySelector("[data-lob-tm-card]");
+  if (!card) return;
+  const w = card.clientWidth, h = card.clientHeight;
+  if (!w || !h || card.dataset.wh === `${w}x${h}`) return;
+  card.dataset.wh = `${w}x${h}`;
+  const W = w - 3.5, H = h - 3.5;
+  card.querySelectorAll("rect").forEach((r) => {
+    r.setAttribute("x", 1.75); r.setAttribute("y", 1.75); r.setAttribute("width", W); r.setAttribute("height", H); r.setAttribute("rx", RX); r.setAttribute("pathLength", 100);
+  });
+  const per = 2 * (W - 2 * RX) + 2 * (H - 2 * RX) + 2 * Math.PI * RX;
+  tmGeo.s0 = ((W / 2 - RX) / per) * 100; // 外框路徑從左上圓角結束處開始，這是「上方正中央」的位置
+}
+
+function paintTm(dt) {
+  const card = document.querySelector("[data-lob-tm-card]");
+  if (!card) return false;
+  layoutTm();
+  const t = timerApi.timer;
+  const rem = t.remaining();
+  const label = card.querySelector("[data-lob-tm-time]");
+  const txt = fmtClock(rem);
+  if (label && label.textContent !== txt) label.textContent = txt;
+  const arc = card.querySelector("[data-lob-tm-arc]");
+  if (!arc) return true;
+  if (t.status !== "running" && t.status !== "paused") { arc.style.display = "none"; tmSpin = 0; return true; }
+  const p = t.progress();
+  const final = t.status === "running" && rem <= Math.min(SPIN_MS, t.totalMs / 2);
+  if (final) { // 越接近結束轉得越快：每秒 0.5 圈 → 2 圈
+    const near = 1 - rem / Math.min(SPIN_MS, t.totalMs / 2);
+    tmSpin = (tmSpin + (50 + near * 150) * (dt / 1000)) % 100;
+  } else tmSpin = 0;
+  const len = Math.min(99.5, Math.max(final ? 4 : 0.8, p * 100)); // 弧線長度 = 剩餘比例（最後階段至少留一小段才看得到在轉）
+  arc.style.display = "";
+  arc.setAttribute("stroke-dasharray", `${len.toFixed(2)} ${(100 - len).toFixed(2)}`);
+  arc.setAttribute("stroke-dashoffset", (-(tmGeo.s0 + tmSpin)).toFixed(2));
+  arc.setAttribute("opacity", t.status === "paused" ? 0.45 : 1);
+  return true;
+}
+
+function tmLoop(ts) {
+  tmRaf = null;
+  const dt = tmLast ? Math.min(100, ts - tmLast) : 16;
+  tmLast = ts;
+  if (!paintTm(dt)) { tmLast = 0; return; } // 離開大廳（小卡不在畫面上）就停
+  if (timerApi.timer.status === "running") tmRaf = requestAnimationFrame(tmLoop);
+  else tmLast = 0;
+}
+function startTmLoop() {
+  tmLast = 0;
+  paintTm(16);
+  if (!tmRaf && timerApi.timer.status === "running") tmRaf = requestAnimationFrame(tmLoop);
+}
+
 /* ---------- 畫面 ---------- */
 let raw = {};      // 這次進大廳讀回來的原始資料（改大廳設定時直接用，不重讀）
 let seq = 0;       // 每次重畫 +1：舊的非同步結果不會蓋掉新畫面
@@ -253,7 +350,7 @@ const modeLabel = (a) => (a.id === "生活圖卡" ? `已選 ${lobbyCards().lengt
 
 function shell(a) {
   // 除了「生活圖卡」（小卡直接打開那張圖卡），其餘服務點區塊任何地方都跳到該服務頁
-  const whole = a.id === "生活圖卡" || a.id === "菜單" || a.id === "翻譯機" || a.id === "碼表" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
+  const whole = a.id === "生活圖卡" || a.id === "菜單" || a.id === "翻譯機" || a.id === "碼表" || a.id === "計時器" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
   return `<section id="lobbySec-${esc(a.id)}" ${whole} class="glass-card rounded-3xl py-3${whole ? " cursor-pointer" : ""}">
     <button type="button" ${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" class="w-full flex items-center gap-2 px-4 text-left">
       <span class="w-7 h-7 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-xs")}</span>
@@ -377,7 +474,21 @@ export function renderLobby(el /* , services */) {
       }
     });
     on("apps:change", again);
+    const refillTm = () => { if (state.route === "大廳") fill({ id: "計時器" }, seq, false); }; // 只重畫計時器區塊
+    on("timer:change", refillTm); // 計時器頁 / 時間到 / 大廳按鈕改變狀態時，大廳同步
     registerActions({
+      "lob-tm": (el) => {
+        const op = el.dataset.op;
+        clearTimeout(tmArmId);
+        if (op === "cancel" && timerApi.timer.status !== "idle" && !tmArmed) { // 取消進行中的計時要按兩次，避免誤觸
+          tmArmed = true;
+          tmArmId = setTimeout(() => { tmArmed = false; refillTm(); }, 3000);
+          return refillTm();
+        }
+        tmArmed = false;
+        timerApi.press(op, Number(el.dataset.ms) || 0);
+        refillTm();
+      },
       "lob-sw": (el) => {
         if (el.dataset.op === "reset") sw.reset();
         else if (sw.status === "running") sw.pause();
