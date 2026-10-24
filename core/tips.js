@@ -651,7 +651,7 @@ const TIPS = {
   // ---- 計時器 ----
   "tm-alarm-stop": { scene: tapScene("關閉"), text: "時間到了，按這裡關掉鬧鈴。" },
   "tm-alarm-more": { scene: tapScene("再 1 分鐘"), text: "還沒好，再多倒數 1 分鐘。" },
-  "tm-preset": { scene: tapScene("常用時間"), text: "點一下，直接設成「{name}」。" },
+  "tm-preset": { scene: tapScene("常用時間"), text: "點一下，加上「{name}」；連續點可以累加。" },
   "tm-idea": { scene: tapScene("提醒"), text: "點一下，把「{name}」填進「要提醒什麼」。" },
   "tm-clear": { scene: orderResetScene, text: "把設定的時間歸零，重新設定。" },
   "tm-start": { scene: tapScene("▶ 開始"), text: "按一下開始倒數；先設定好時間才能按。" },

@@ -155,8 +155,8 @@ function stepperPanel() {
         ${col("s", s, "秒")}
       </div>
     </div>
-    <div class="grid grid-cols-6 gap-2 mb-4">
-      ${PRESETS.map((p) => `<button data-tip="tm-preset" data-tip-name="${p.label}" data-preset="${p.ms}" class="col-span-2 h-12 rounded-xl font-black text-base active:scale-95 transition ${timer.setMs === p.ms ? "theme-bg-primary text-white" : "bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200"}">${p.label}</button>`).join("")}
+    <div class="grid grid-cols-6 gap-1.5 mb-4">
+      ${PRESETS.map((p) => `<button data-tip="tm-preset" data-tip-name="${p.label}" data-preset="${p.ms}" aria-label="加 ${p.label}" class="h-12 px-0 rounded-xl font-black text-sm whitespace-nowrap active:scale-95 transition bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200">${p.label}</button>`).join("")}
     </div>
     <div class="mb-4">
       <input data-label type="text" maxlength="20" value="${esc(timer.label)}" placeholder="要提醒什麼？（可不填）" class="w-full h-12 px-4 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-bold text-base">
@@ -269,7 +269,7 @@ function onClick(e) {
   }
   const preset = e.target.closest("[data-preset]");
   if (preset) {
-    timer.setDuration(Number(preset.dataset.preset));
+    timer.setDuration(timer.setMs + Number(preset.dataset.preset)); // 連續點會累加（上限 99:59:59，超過由 engine 自動限制）
     return render();
   }
   const idea = e.target.closest("[data-idea]");
