@@ -1,7 +1,7 @@
 // 大廳：歡迎頁 + 「已選擇要顯示」的服務簡略資訊。
 //   - 哪些服務、什麼順序、各自顯示什麼：由 ︙ 大廳設定（顯示管理 / 大廳排序 / 各列的「>」）決定，資料規則在 core/lobby-model.js
 //   - 每個服務只佔一個區塊、一行可水平滑動的小卡；點區塊標題會進入該服務。小卡只有「生活圖卡」可以點：直接打開那一張圖卡，其餘服務的小卡只顯示資訊
-//   - 目前有簡略資訊的服務：家庭公告、家庭日曆、換誰洗碗、生活圖卡、碼表（其餘服務暫時不顯示）
+//   - 目前有簡略資訊的服務：家庭公告、家庭日曆、換誰洗碗、生活圖卡、碼表、計時器、計算機（精簡版）等（其餘服務暫時不顯示）
 //   - 計時器：大廳可加時間（1/3/5/10/15/30 分，連點累加）、開始 / 暫停 / 清除，和計時器頁共用同一個計時器；倒數時小卡外框是倒數進度環（越來越短），最後 10 秒開始繞圈
 //   - 碼表：大廳只有 開始 / 暫停 / 清除，和碼表頁共用同一個計時器（services/stopwatch/shared.js），碼表頁在跑的時候大廳也會一起跑秒
 //   - 各服務要挑哪幾筆、整理成什麼欄位：core/lobby-feed.js（可用 Node 測試）
@@ -11,6 +11,7 @@ import { showToast } from "../core/toast.js";
 import { micErrMsg, ensureMic } from "../core/mic.js";
 import { lobbyOrdered, getMode, modeLabelOf, lobbyCards, lobbyMenus, lobbyMenusAll, lobbyQuick, lobbyQuickAll, quickItems, QUICK_ID, ledgerParts } from "../core/lobby-model.js";
 import { openBrowserWindow } from "../core/browser-window.js";
+import { newState as newCalc, press as pressCalc, exprText, preview as calcPreview, fmt as calcFmt } from "../services/calculator/engine.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
 import { noteItems, memoItems, calendarItems, calendarFetchRange, CAL_EMPTY, bowlItems, cardItems } from "../core/lobby-feed.js";
 import { notesApi, PALETTE as NOTE_PALETTE } from "../services/notes/data.js";
@@ -263,6 +264,30 @@ const SECTIONS = {
   },
 };
 
+/* ---------- 計算機（精簡版）：5 欄 × 4 列，和計算機頁共用同一個運算引擎；算式只保留在大廳這次瀏覽 ---------- */
+let lobCalc = newCalc();
+const CALC_KEYS = [["7", "8", "9", "÷", "C"], ["4", "5", "6", "×", "⌫"], ["1", "2", "3", "−", "()"], ["0", ".", "%", "+", "="]];
+const CALC_CLS = (k) => (k === "=" ? "ck-eq" : ["÷", "×", "−", "+"].includes(k) ? "ck-op" : ["C", "⌫", "()", "%"].includes(k) ? "ck-fn" : "ck-num");
+const CALC_NAME = { C: "全部清除", "⌫": "刪除一格", "()": "括號", "%": "百分比", "÷": "除", "×": "乘", "−": "減", "+": "加", "=": "等於" };
+SECTIONS["計算機"] = {
+  load: async () => null,
+  after() { const m = document.querySelector("[data-lob-calc-main]"); if (m) m.scrollLeft = m.scrollWidth; }, // 算式太長時，讓最新輸入的那一端留在畫面內
+  build() {
+    const s = lobCalc;
+    const prev = s.done || s.error ? null : calcPreview(s);
+    const above = s.error ? "" : s.done ? s.lastExpr : prev != null ? `＝ ${calcFmt(prev)}` : "";
+    const big = s.error ? s.error : s.done ? calcFmt(s.cur) : exprText(s) || "0";
+    const size = s.error || big.length > 22 ? "1.1rem" : big.length > 14 ? "1.4rem" : "1.8rem";
+    return `<div class="shrink-0 w-full space-y-2">
+      <div class="rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-white/70 dark:border-slate-700/70 px-3.5 py-2 text-right" aria-live="polite">
+        <div class="h-4 text-[11px] font-semibold text-slate-400 dark:text-slate-500 truncate">${above ? esc(above) : "&nbsp;"}</div>
+        <div data-lob-calc-main class="overflow-x-auto no-scrollbar whitespace-nowrap font-black leading-tight ${s.error ? "text-red-500" : "text-slate-900 dark:text-white"}" style="font-size:${size}">${esc(big)}</div>
+      </div>
+      <div class="grid grid-cols-5 gap-1.5">${CALC_KEYS.flat().map((k) => `<button type="button" data-action="lob-calc" data-key="${esc(k)}" data-tip="${/^[\d.]$/.test(k) ? "calc-key" : k === "C" ? "calc-clear" : k === "=" ? "calc-eq" : "calc-op"}" data-tip-name="${CALC_NAME[k] || k}" aria-label="${CALC_NAME[k] || k}" class="ck ck-mini ${CALC_CLS(k)}">${k === "()" ? "( )" : k === "⌫" ? '<i class="fa-solid fa-delete-left"></i>' : k}</button>`).join("")}</div>
+    </div>`;
+  },
+};
+
 /* ---------- 擴充插件：外部選單（擴充插件）集中在一張可左右滑動的圖卡 ---------- */
 SECTIONS[QUICK_ID] = {
   load: async () => null,
@@ -366,7 +391,7 @@ const modeLabel = (a) => (a.id === QUICK_ID ? (lobbyQuickAll() ? "全部" : `已
 function shell(a) {
   // 除了「生活圖卡」（小卡直接打開那張圖卡），其餘服務點區塊任何地方都跳到該服務頁
   const goto = a.id === QUICK_ID ? "應用程式" : a.id; // 擴充插件沒有自己的頁面，標題點了去「所有應用」
-  const whole = a.id === QUICK_ID || a.id === "生活圖卡" || a.id === "菜單" || a.id === "翻譯機" || a.id === "碼表" || a.id === "計時器" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
+  const whole = a.id === QUICK_ID || a.id === "生活圖卡" || a.id === "菜單" || a.id === "翻譯機" || a.id === "碼表" || a.id === "計時器" || a.id === "計算機" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
   return `<section id="lobbySec-${esc(a.id)}" ${whole} class="glass-card rounded-3xl py-3${whole ? " cursor-pointer" : ""}">
     <button type="button" ${nav(goto)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" class="w-full flex items-center gap-2 px-4 text-left">
       <span class="w-7 h-7 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-xs")}</span>
@@ -510,6 +535,10 @@ export function renderLobby(el /* , services */) {
         tmArmed = false;
         timerApi.press(op, Number(el.dataset.ms) || 0);
         refillTm();
+      },
+      "lob-calc": (el) => {
+        pressCalc(lobCalc, el.dataset.key);
+        fill({ id: "計算機" }, seq, false); // 只重畫計算機區塊
       },
       "lob-sw": (el) => {
         if (el.dataset.op === "reset") sw.reset();
