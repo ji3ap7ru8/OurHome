@@ -18,7 +18,7 @@ export const state = {
   theme: { mode: "light", colorName: "晨曦藍", fontScale: FONT_SCALE.default },
   appsView: { mode: "card", size: "m", cols: 2 }, // 所有應用頁瀏覽格式：card/list、l/m/s、2/3/4（登入後隨系統設定存 Google 雲端硬碟）
   apps: { sort: "default", order: [], plugins: [], disabled: [...DEFAULT_OFF_APPS] }, // 所有應用頁：排序方式（default/name/custom）、自訂編號順序（id 陣列）、擴充插件（{id,url,name}）、停用的應用（id 陣列，預設＝換誰洗碗、LINE推播關閉）。登入後隨系統設定存到雲端硬碟
-  lobby: { shown: [], order: [], mode: {}, cards: [], menus: [], quick: [] }, // 大廳設定：shown 大廳要顯示的服務 id（預設空＝全部關閉）、order 大廳自己的服務順序（空＝跟「所有應用」排序相同）、mode 各服務在大廳的顯示方式（沒設定＝用預設）、cards 大廳要顯示的生活圖卡 id（空＝都不顯示）、menus 大廳要顯示的菜單 id（空＝全部）、quick 「快捷服務」要包含的擴充插件 id（空＝全部外部插件）；登入後隨系統設定存 Google 雲端硬碟
+  lobby: { shown: [], order: [], mode: {}, cards: [], menus: [], quick: [] }, // 大廳設定：shown 大廳要顯示的服務 id（預設空＝全部關閉）、order 大廳自己的服務順序（空＝跟「所有應用」排序相同）、mode 各服務在大廳的顯示方式（沒設定＝用預設）、cards 大廳要顯示的生活圖卡 id（空＝都不顯示）、menus 大廳要顯示的菜單 id（空＝全部）、quick 「擴充插件」要包含的擴充插件 id（空＝全部外部插件）；登入後隨系統設定存 Google 雲端硬碟
   cardsView: { mode: "card", size: "m", cols: 2 }, // 生活圖卡頁瀏覽格式：card/list、l/m/s、2/3（登入後隨系統設定存 Google 雲端硬碟）
   cardsSort: { sort: "default", order: [] }, // 生活圖卡排序：default/name/custom、自訂編號順序（圖卡 id 陣列）
   menuView: { mode: "card", size: "m", cols: 2 }, // 菜單頁瀏覽格式（同生活圖卡；登入後隨系統設定存雲端）

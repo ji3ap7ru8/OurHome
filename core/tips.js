@@ -545,7 +545,7 @@ const TIPS = {
   "lobby-reset": { scene: orderResetScene, text: "還原成跟「所有應用」一樣的順序。" },
   "lobby-dclose": { scene: calCloseScene, text: "按 ✕，關閉這個小視窗。" },
   "lobby-quick": { scene: cardOpenScene, text: "點一下，打開這個外部選單（依插件設定在懸浮視窗或新分頁開啟）。左右滑動可以看到更多。" },
-  "lobby-quick-pick": { scene: linePickScene, text: "選「全部外部選單」，或點選單打勾，可以選好幾個，大廳的快捷服務就只顯示勾選的。" },
+  "lobby-quick-pick": { scene: linePickScene, text: "選「全部外部選單」，或點選單打勾，可以選好幾個，大廳的擴充插件就只顯示勾選的。" },
   "lobby-card-pick": { scene: linePickScene, text: "點圖卡打勾，可以選好幾張，大廳就會顯示。" },
   "lobby-locked": { scene: storeScene("🔒", "已鎖定"), text: "帳密安全性：帳密庫只能存到個人 Google 雲端；到「儲存位置」把帳密庫設為 Google 雲端後才能開啟。" },
   "lobby-mode": { scene: noteAuthorScene, text: "點選項，決定大廳顯示哪些內容。" },

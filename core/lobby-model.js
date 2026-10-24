@@ -1,5 +1,5 @@
 // 大廳設定的資料與規則（不碰 DOM，可直接用 Node 測試）：
-//   - 顯示管理：列出「已啟用」的應用（擴充插件統一收進「快捷服務」一項）（順序同所有應用的排序方式），可個別開/關大廳要不要顯示；預設全部關閉
+//   - 顯示管理：列出「已啟用」的應用（擴充插件統一收進「擴充插件」一項）（順序同所有應用的排序方式），可個別開/關大廳要不要顯示；預設全部關閉
 //   - 大廳排序：只排「已啟用 + 大廳有開啟」的應用；state.lobby.order 是完整順序，空 = 跟所有應用排序相同
 // 狀態只在記憶體；登入後由 core/cloud.js 隨「系統設定」存取 Google 雲端硬碟（lobby:change 觸發自動存檔）。
 import { state, emit } from "./store.js";
@@ -7,10 +7,11 @@ import { orderedApps, defaultApps } from "./apps-model.js";
 
 const commit = (extra) => emit("lobby:change", { shown: [...state.lobby.shown], order: [...state.lobby.order], mode: { ...state.lobby.mode }, cards: [...state.lobby.cards], menus: [...state.lobby.menus], quick: [...state.lobby.quick], ...extra });
 
-// 快捷服務：大廳的一個特別區塊，把「擴充插件（外部選單）」集中在一張可左右滑動的圖卡裡。
+// 擴充插件：大廳的一個特別區塊，把「擴充插件（外部選單）」集中在一張可左右滑動的圖卡裡。
 // 擴充插件不再各自出現在大廳設定，統一由這一項管理；它預設排在所有服務最後面。
-export const QUICK_ID = "快捷服務";
-export const QUICK_APP = { id: QUICK_ID, name: QUICK_ID, icon: "fa-solid fa-bolt", iconUrl: "", plugin: false, quick: true };
+export const QUICK_ID = "快捷服務"; // 內部代號：已存進雲端設定的 id，不要改；畫面上顯示的名稱是下面的 name
+export const QUICK_NAME = "擴充插件";
+export const QUICK_APP = { id: QUICK_ID, name: QUICK_NAME, icon: "fa-solid fa-bolt", iconUrl: "", plugin: false, quick: true };
 const quickPlugins = () => orderedApps().filter((a) => a.plugin); // 已啟用的擴充插件（依所有應用的排序）
 export const hasQuickPlugins = () => quickPlugins().length > 0;
 
@@ -67,7 +68,7 @@ export function toggleLobbyMenu(id, existing) {
   commit();
   return true;
 }
-// 快捷服務：第一個選項「全部」（單選，空陣列 = 全部外部選單）；其餘是每個擴充插件（可複選）。全部勾選或全部取消 = 回到「全部」
+// 擴充插件：第一個選項「全部」（單選，空陣列 = 全部外部選單）；其餘是每個擴充插件（可複選）。全部勾選或全部取消 = 回到「全部」
 export const lobbyQuick = () => [...state.lobby.quick];
 export const lobbyQuickAll = () => !state.lobby.quick.length;
 export const quickCandidates = () => quickPlugins();
@@ -80,7 +81,7 @@ export function toggleLobbyQuick(id, existing) {
   commit();
   return true;
 }
-// 大廳「快捷服務」實際要顯示的插件：沒特別勾選 = 全部；以前勾選的都已不存在 → 也當作全部
+// 大廳「擴充插件」實際要顯示的插件：沒特別勾選 = 全部；以前勾選的都已不存在 → 也當作全部
 export function quickItems() {
   const all = quickPlugins();
   if (lobbyQuickAll()) return all;
@@ -179,7 +180,7 @@ export function applyLobby(s) {
     for (const id of Array.isArray(arr) ? arr : []) if (typeof id === "string" && known.has(id) && !out.includes(id)) out.push(id);
     return out;
   };
-  // 舊版擴充插件各自可以顯示在大廳：改成統一由「快捷服務」管理（舊設定自動搬過來：開啟的插件變成快捷服務要包含的插件）
+  // 舊版擴充插件各自可以顯示在大廳：改成統一由「擴充插件」管理（舊設定自動搬過來：開啟的插件變成擴充插件要包含的插件）
   const shownRaw = clean(s.shown);
   const legacy = shownRaw.filter((id) => pluginIds.has(id));
   const shown = shownRaw.filter((id) => !pluginIds.has(id));
@@ -188,7 +189,7 @@ export function applyLobby(s) {
   const orderRaw = clean(s.order);
   const firstPlugin = orderRaw.findIndex((id) => pluginIds.has(id));
   const order = orderRaw.filter((id) => !pluginIds.has(id));
-  if (firstPlugin >= 0 && !order.includes(QUICK_ID)) order.splice(Math.min(firstPlugin, order.length), 0, QUICK_ID); // 快捷服務接手第一個插件原本的位置
+  if (firstPlugin >= 0 && !order.includes(QUICK_ID)) order.splice(Math.min(firstPlugin, order.length), 0, QUICK_ID); // 擴充插件接手第一個插件原本的位置
   state.lobby.order = order;
   const mode = {};
   for (const id of Object.keys(LOBBY_MODES)) { // 只收認得的服務與選項，其餘忽略（舊設定檔沒有 mode = 全部用預設）

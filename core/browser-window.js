@@ -9,6 +9,7 @@ const MARGIN = 8;
 
 let win = null;
 let onEsc = null;
+let noteTimer = null;
 
 // Google 首頁預設禁止嵌入；「webhp?igu=1」是 Google 自己留給 iframe 的入口（未實測，若失效請改用新分頁）
 function frameUrl(url) {
@@ -25,6 +26,7 @@ function frameUrl(url) {
 
 export function closeBrowserWindow() {
   if (!win) return;
+  clearTimeout(noteTimer);
   const f = win.querySelector("iframe");
   if (f) f.src = "about:blank"; // 清掉頁面，不留任何狀態
   win.remove();
@@ -56,14 +58,20 @@ export function openBrowserWindow({ title = "", url }) {
       <button type="button" data-fw="max" aria-label="放大／縮小" class="fwin-btn"><i class="fa-solid fa-expand"></i></button>
       <button type="button" data-fw="close" aria-label="關閉" class="fwin-btn fwin-x"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <div class="fwin-note">無痕模式：關閉視窗就清除。若畫面空白或顯示拒絕連線，是對方網站不允許嵌入，請按右上「↗」用新分頁開啟。</div>
     <iframe class="fwin-frame" title="${esc(title || url)}" referrerpolicy="no-referrer" allow="clipboard-write; fullscreen"
       sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads"></iframe>
+    <div class="fwin-note" role="status">無痕模式：關閉視窗就清除。若畫面空白或顯示拒絕連線，是對方網站不允許嵌入，請按右上「↗」用新分頁開啟。</div>
     <div class="fwin-grip" data-fw="resize" aria-hidden="true"></div>`;
   const frame = win.querySelector("iframe");
   frame.setAttribute("credentialless", ""); // 先設屬性再給網址，才會套用
   frame.src = frameUrl(url);
   document.body.appendChild(win);
+
+  // 提示浮在網頁上方，顯示約 5 秒後淡出並移除（點一下也會立刻收起）
+  const note = win.querySelector(".fwin-note");
+  const hideNote = () => { clearTimeout(noteTimer); note.classList.add("fwin-note-out"); setTimeout(() => note.remove(), 400); };
+  noteTimer = setTimeout(hideNote, 5000);
+  note.addEventListener("click", hideNote);
 
   const apply = () => {
     win.style.left = geo.x + "px"; win.style.top = geo.y + "px";

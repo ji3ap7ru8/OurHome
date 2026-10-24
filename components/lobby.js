@@ -263,7 +263,7 @@ const SECTIONS = {
   },
 };
 
-/* ---------- 快捷服務：外部選單（擴充插件）集中在一張可左右滑動的圖卡 ---------- */
+/* ---------- 擴充插件：外部選單（擴充插件）集中在一張可左右滑動的圖卡 ---------- */
 SECTIONS[QUICK_ID] = {
   load: async () => null,
   build() {
@@ -365,7 +365,7 @@ const modeLabel = (a) => (a.id === QUICK_ID ? (lobbyQuickAll() ? "全部" : `已
 
 function shell(a) {
   // 除了「生活圖卡」（小卡直接打開那張圖卡），其餘服務點區塊任何地方都跳到該服務頁
-  const goto = a.id === QUICK_ID ? "應用程式" : a.id; // 快捷服務沒有自己的頁面，標題點了去「所有應用」
+  const goto = a.id === QUICK_ID ? "應用程式" : a.id; // 擴充插件沒有自己的頁面，標題點了去「所有應用」
   const whole = a.id === QUICK_ID || a.id === "生活圖卡" || a.id === "菜單" || a.id === "翻譯機" || a.id === "碼表" || a.id === "計時器" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
   return `<section id="lobbySec-${esc(a.id)}" ${whole} class="glass-card rounded-3xl py-3${whole ? " cursor-pointer" : ""}">
     <button type="button" ${nav(goto)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" class="w-full flex items-center gap-2 px-4 text-left">
@@ -445,7 +445,7 @@ export function renderLobby(el /* , services */) {
       catch { out.textContent = "目前無法連線翻譯，請稍後再試"; }
     };
     document.addEventListener("click", async (e) => {
-      const quick = e.target.closest?.("[data-lob-quick]"); // 快捷服務：懸浮視窗插件在站內開視窗
+      const quick = e.target.closest?.("[data-lob-quick]"); // 擴充插件：懸浮視窗插件在站內開視窗
       if (quick) {
         const p = quickItems().find((x) => x.id === quick.dataset.lobQuick);
         if (p?.inApp) { e.preventDefault(); openBrowserWindow({ title: p.name, url: p.url }); }

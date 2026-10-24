@@ -173,14 +173,14 @@ function paintMenus() {
         <span class="flex-1 min-w-0 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">${esc(c.name || "（未命名）")}</span>${tick(!all && on.has(c.id))}
       </button>`).join("")}</div>${menuState === "loading" ? '<p class="text-[11px] text-slate-400 text-center py-1">讀取菜單中…</p>' : menuState === "err" ? '<p class="text-[11px] text-slate-400 text-center py-1">讀取菜單失敗（請確認已登入並連線）。仍可選「全部」。</p>' : menuList.length ? "" : '<p class="text-[11px] text-slate-400 text-center py-1">還沒有新增任何菜單，請先到「菜單」新增。</p>'}`;
 }
-// 快捷服務：「全部」（單選）+ 每個外部選單（擴充插件，可複選）
+// 擴充插件：「全部」（單選）+ 每個外部選單（擴充插件，可複選）
 function paintQuick() {
   const body = document.getElementById("lobbyDetailBody");
   if (!body) return;
   const list = quickCandidates();
   const all = lobbyQuickAll();
   const on = new Set(lobbyQuick());
-  body.innerHTML = `<p class="text-[10px] text-slate-400">快捷服務要包含哪些外部選單（全部為單選，其他可複選）</p>
+  body.innerHTML = `<p class="text-[10px] text-slate-400">擴充插件要包含哪些外部選單（全部為單選，其他可複選）</p>
       <div class="space-y-1.5 max-h-[50vh] overflow-y-auto">
       <button type="button" role="radio" aria-checked="${all}" data-tip="lobby-quick-pick" data-action="lobby-quick-toggle" data-quick-id="all" class="${CHOICE}">
         <span class="flex-1 text-sm font-bold text-slate-700 dark:text-slate-200">全部外部選單</span>${tick(all)}
