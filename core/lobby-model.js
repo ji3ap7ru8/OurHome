@@ -1,11 +1,18 @@
 // 大廳設定的資料與規則（不碰 DOM，可直接用 Node 測試）：
-//   - 顯示管理：列出「已啟用」的應用（順序同所有應用的排序方式），可個別開/關大廳要不要顯示；預設全部關閉
+//   - 顯示管理：列出「已啟用」的應用（擴充插件統一收進「快捷服務」一項）（順序同所有應用的排序方式），可個別開/關大廳要不要顯示；預設全部關閉
 //   - 大廳排序：只排「已啟用 + 大廳有開啟」的應用；state.lobby.order 是完整順序，空 = 跟所有應用排序相同
 // 狀態只在記憶體；登入後由 core/cloud.js 隨「系統設定」存取 Google 雲端硬碟（lobby:change 觸發自動存檔）。
 import { state, emit } from "./store.js";
 import { orderedApps, defaultApps } from "./apps-model.js";
 
-const commit = (extra) => emit("lobby:change", { shown: [...state.lobby.shown], order: [...state.lobby.order], mode: { ...state.lobby.mode }, cards: [...state.lobby.cards], menus: [...state.lobby.menus], ...extra });
+const commit = (extra) => emit("lobby:change", { shown: [...state.lobby.shown], order: [...state.lobby.order], mode: { ...state.lobby.mode }, cards: [...state.lobby.cards], menus: [...state.lobby.menus], quick: [...state.lobby.quick], ...extra });
+
+// 快捷服務：大廳的一個特別區塊，把「擴充插件（外部選單）」集中在一張可左右滑動的圖卡裡。
+// 擴充插件不再各自出現在大廳設定，統一由這一項管理；它預設排在所有服務最後面。
+export const QUICK_ID = "快捷服務";
+export const QUICK_APP = { id: QUICK_ID, name: QUICK_ID, icon: "fa-solid fa-bolt", iconUrl: "", plugin: false, quick: true };
+const quickPlugins = () => orderedApps().filter((a) => a.plugin); // 已啟用的擴充插件（依所有應用的排序）
+export const hasQuickPlugins = () => quickPlugins().length > 0;
 
 // 各服務在大廳的顯示方式（第一個選項是預設）。沒有列在這裡的服務 = 暫時沒有選項，只保留「>」
 export const LOBBY_MODES = {
@@ -60,6 +67,27 @@ export function toggleLobbyMenu(id, existing) {
   commit();
   return true;
 }
+// 快捷服務：第一個選項「全部」（單選，空陣列 = 全部外部選單）；其餘是每個擴充插件（可複選）。全部勾選或全部取消 = 回到「全部」
+export const lobbyQuick = () => [...state.lobby.quick];
+export const lobbyQuickAll = () => !state.lobby.quick.length;
+export const quickCandidates = () => quickPlugins();
+export function toggleLobbyQuick(id, existing) {
+  if (id === "all") { if (!state.lobby.quick.length) return false; state.lobby.quick = []; commit(); return true; }
+  if (!existing.includes(id)) return false;
+  const on = new Set(state.lobby.quick.filter((x) => existing.includes(x)));
+  on.has(id) ? on.delete(id) : on.add(id);
+  state.lobby.quick = on.size === existing.length ? [] : existing.filter((x) => on.has(x));
+  commit();
+  return true;
+}
+// 大廳「快捷服務」實際要顯示的插件：沒特別勾選 = 全部；以前勾選的都已不存在 → 也當作全部
+export function quickItems() {
+  const all = quickPlugins();
+  if (lobbyQuickAll()) return all;
+  const pick = new Set(state.lobby.quick);
+  const items = all.filter((p) => pick.has(p.id));
+  return items.length ? items : all;
+}
 // 翻譯機：大廳點「即時翻譯」→ 進入翻譯機後自動開啟即時翻譯
 let liveWanted = false;
 export const requestLiveTranslate = (v) => { liveWanted = !!v; };
@@ -85,11 +113,11 @@ export const isLocked = (id) => id === "帳密庫" && state.storage?.vault !== "
 export const isShown = (id) => !isLocked(id) && state.lobby.shown.includes(id); // 預設全部關閉，要在「顯示管理」自己開
 
 // 顯示管理清單：已啟用的應用，依「所有應用」目前的排序方式
-export const lobbyCandidates = () => orderedApps();
+export const lobbyCandidates = () => [...orderedApps().filter((a) => !a.plugin), ...(hasQuickPlugins() ? [QUICK_APP] : [])];
 
 // 所有應用（含停用）依大廳順序排好；沒有編號的接在後面，維持所有應用的順序
 function fullOrder() {
-  const base = orderedApps(undefined, true);
+  const base = [...orderedApps(undefined, true).filter((a) => !a.plugin), QUICK_APP];
   const rank = new Map(state.lobby.order.map((id, i) => [id, i]));
   return base.map((a, i) => [a, i]).sort((x, y) => (rank.get(x[0].id) ?? 1e9) - (rank.get(y[0].id) ?? 1e9) || x[1] - y[1]).map((x) => x[0]);
 }
@@ -138,19 +166,30 @@ export function resetLobbyOrder() {
 }
 
 /* ---------- 存取雲端硬碟設定 ---------- */
-export const snapshotLobby = () => ({ shown: [...state.lobby.shown], order: [...state.lobby.order], mode: { ...state.lobby.mode }, cards: [...state.lobby.cards], menus: [...state.lobby.menus] });
+export const snapshotLobby = () => ({ shown: [...state.lobby.shown], order: [...state.lobby.order], mode: { ...state.lobby.mode }, cards: [...state.lobby.cards], menus: [...state.lobby.menus], quick: [...state.lobby.quick] });
 
 // 套用雲端讀到的設定：欄位一律檢查，不認得的 id 直接略過（舊設定檔沒有 lobby 時不動）
 export function applyLobby(s) {
   if (!s || typeof s !== "object") return;
-  const known = new Set(defaultApps().map((a) => a.id));
+  const apps = defaultApps();
+  const known = new Set([...apps.map((a) => a.id), QUICK_ID]);
+  const pluginIds = new Set(apps.filter((a) => a.plugin).map((a) => a.id));
   const clean = (arr) => {
     const out = [];
     for (const id of Array.isArray(arr) ? arr : []) if (typeof id === "string" && known.has(id) && !out.includes(id)) out.push(id);
     return out;
   };
-  state.lobby.shown = clean(s.shown); // 舊設定檔只有 hidden（舊版預設全部顯示）→ 沒有 shown = 回到新預設：全部關閉
-  state.lobby.order = clean(s.order);
+  // 舊版擴充插件各自可以顯示在大廳：改成統一由「快捷服務」管理（舊設定自動搬過來：開啟的插件變成快捷服務要包含的插件）
+  const shownRaw = clean(s.shown);
+  const legacy = shownRaw.filter((id) => pluginIds.has(id));
+  const shown = shownRaw.filter((id) => !pluginIds.has(id));
+  if (legacy.length && !shown.includes(QUICK_ID)) shown.push(QUICK_ID);
+  state.lobby.shown = shown; // 舊設定檔只有 hidden（舊版預設全部顯示）→ 沒有 shown = 回到新預設：全部關閉
+  const orderRaw = clean(s.order);
+  const firstPlugin = orderRaw.findIndex((id) => pluginIds.has(id));
+  const order = orderRaw.filter((id) => !pluginIds.has(id));
+  if (firstPlugin >= 0 && !order.includes(QUICK_ID)) order.splice(Math.min(firstPlugin, order.length), 0, QUICK_ID); // 快捷服務接手第一個插件原本的位置
+  state.lobby.order = order;
   const mode = {};
   for (const id of Object.keys(LOBBY_MODES)) { // 只收認得的服務與選項，其餘忽略（舊設定檔沒有 mode = 全部用預設）
     const v = s.mode && typeof s.mode === "object" ? s.mode[id] : null;
@@ -163,6 +202,9 @@ export function applyLobby(s) {
   const menus = [];
   for (const id of Array.isArray(s.menus) ? s.menus : []) if (typeof id === "string" && id && id.length < 200 && !menus.includes(id) && menus.length < 200) menus.push(id);
   state.lobby.menus = menus;
+  const quick = [];
+  for (const id of Array.isArray(s.quick) ? s.quick : legacy) if (typeof id === "string" && id && id.length < 200 && !quick.includes(id) && quick.length < 200) quick.push(id); // 插件 id 是動態的，這裡只檢查格式
+  state.lobby.quick = quick;
   commit();
 }
 
@@ -172,5 +214,6 @@ export function resetLobby() {
   state.lobby.mode = {};
   state.lobby.cards = [];
   state.lobby.menus = [];
+  state.lobby.quick = [];
   commit();
 }

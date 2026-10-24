@@ -9,7 +9,7 @@ import { menuApi } from "../services/menu/data.js";
 import { memoApi } from "../services/memo/data.js";
 import { showToast } from "../core/toast.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
-import { lobbyCandidates, lobbyOrdered, isShown, setShown, moveLobby, resetLobbyOrder, modeOptions, getMode, setMode, ledgerParts, ledgerToggle, lobbyCards, toggleLobbyCard, lobbyMenus, lobbyMenusAll, toggleLobbyMenu, isLocked, LOCKED_MSG } from "../core/lobby-model.js";
+import { lobbyCandidates, lobbyOrdered, isShown, setShown, moveLobby, resetLobbyOrder, modeOptions, getMode, setMode, ledgerParts, ledgerToggle, lobbyCards, toggleLobbyCard, lobbyMenus, lobbyMenusAll, toggleLobbyMenu, lobbyQuick, lobbyQuickAll, toggleLobbyQuick, quickCandidates, QUICK_ID, isLocked, LOCKED_MSG } from "../core/lobby-model.js";
 
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const $ = (id) => document.getElementById(id);
@@ -17,7 +17,6 @@ const ROW = "flex items-center gap-2 rounded-xl border border-slate-200 dark:bor
 const ARROW = "w-8 h-8 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 flex items-center justify-center text-xs active:scale-95 disabled:opacity-30 disabled:active:scale-100 transition";
 const MODAL = "fixed inset-0 z-[80] flex items-center justify-center p-6 bg-slate-900/40";
 const NUM = "w-14 shrink-0 py-1.5 pl-2 pr-0 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm font-black text-center theme-text-primary";
-const EXTERNAL = '<span class="text-[9px] font-bold bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded-full shrink-0">外部</span>';
 
 let focusId = null; // 剛被移動的服務：重畫後捲到它的位置
 
@@ -29,6 +28,7 @@ export function mountLobbySettings() {
     "lobby-detail-close": () => closeDetail(),
     "lobby-card-toggle": (el) => { toggleLobbyCard(el.dataset.cardId, cardList.map((c) => c.id)); paintCards(); },
     "lobby-menu-toggle": (el) => { toggleLobbyMenu(el.dataset.menuId, menuList.map((c) => c.id)); paintMenus(); },
+    "lobby-quick-toggle": (el) => { toggleLobbyQuick(el.dataset.quickId, quickCandidates().map((p) => p.id)); paintQuick(); },
     "lobby-ledger-pick": (el) => { setMode("記帳", ledgerToggle(getMode("記帳"), el.dataset.value)); paintLedger(); }, // 記帳本：全部單選、其餘可複選
     "lobby-mode-pick": (el) => { setMode(el.dataset.id, el.dataset.value); closeDetail(); },
     "lobby-order-reset": () => { if (confirm("要把大廳順序還原成跟「所有應用」相同嗎？")) resetLobbyOrder(); },
@@ -75,7 +75,6 @@ function renderShow() {
     <button type="button" role="switch" aria-checked="${on}" data-tip="lobby-toggle" data-tip-name="${esc(a.name)}" data-action="lobby-toggle" data-id="${esc(a.id)}" class="w-full text-left ${ROW} active:scale-[.98] transition">
       <span class="w-8 h-8 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-sm")}</span>
       <span class="flex-1 min-w-0 text-xs font-bold text-slate-700 dark:text-slate-200 truncate">${esc(a.name)}</span>
-      ${a.plugin ? EXTERNAL : ""}
       <span class="relative inline-block w-9 h-5 rounded-full shrink-0 transition-colors ${on ? "theme-bg-primary" : "bg-slate-300 dark:bg-slate-600"}"><span class="absolute top-[2px] left-[2px] h-4 w-4 rounded-full bg-white transition-transform ${on ? "translate-x-4" : ""}"></span></span>
     </button>`;
         }).join("")
@@ -100,8 +99,7 @@ function renderOrder() {
         <select data-tip="lobby-num" data-change="lobby-order-num" data-id="${esc(a.id)}" aria-label="${esc(a.name)} 的編號" class="${NUM}">${list.map((_, k) => `<option value="${k + 1}"${k === i ? " selected" : ""}>${k + 1}</option>`).join("")}</select>
         <span class="w-8 h-8 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-sm")}</span>
         <span class="flex-1 min-w-0 text-xs font-bold text-slate-700 dark:text-slate-200 truncate">${esc(a.name)}</span>
-        ${a.plugin ? EXTERNAL : ""}
-        ${a.plugin ? "" : `<button type="button" data-tip="lobby-detail" data-tip-name="${esc(a.name)}" data-action="lobby-detail" data-id="${esc(a.id)}" aria-label="${esc(a.name)} 的大廳顯示設定" class="${ARROW}"><i class="fa-solid fa-chevron-right"></i></button>`}
+        ${`<button type="button" data-tip="lobby-detail" data-tip-name="${esc(a.name)}" data-action="lobby-detail" data-id="${esc(a.id)}" aria-label="${esc(a.name)} 的大廳顯示設定" class="${ARROW}"><i class="fa-solid fa-chevron-right"></i></button>`}
       </div>`).join("")}</div>
     ${state.lobby.order.length ? '<button type="button" data-tip="lobby-reset" data-action="lobby-order-reset" class="w-full py-2 rounded-xl border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 text-xs font-bold text-center active:scale-95 transition"><i class="fa-solid fa-rotate-left mr-1"></i>還原成跟「所有應用」相同</button>' : ""}`
       : '<p class="text-[11px] text-slate-400 text-center py-3">大廳目前沒有要顯示的服務，請先在「顯示管理」開啟。</p>';
@@ -175,6 +173,24 @@ function paintMenus() {
         <span class="flex-1 min-w-0 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">${esc(c.name || "（未命名）")}</span>${tick(!all && on.has(c.id))}
       </button>`).join("")}</div>${menuState === "loading" ? '<p class="text-[11px] text-slate-400 text-center py-1">讀取菜單中…</p>' : menuState === "err" ? '<p class="text-[11px] text-slate-400 text-center py-1">讀取菜單失敗（請確認已登入並連線）。仍可選「全部」。</p>' : menuList.length ? "" : '<p class="text-[11px] text-slate-400 text-center py-1">還沒有新增任何菜單，請先到「菜單」新增。</p>'}`;
 }
+// 快捷服務：「全部」（單選）+ 每個外部選單（擴充插件，可複選）
+function paintQuick() {
+  const body = document.getElementById("lobbyDetailBody");
+  if (!body) return;
+  const list = quickCandidates();
+  const all = lobbyQuickAll();
+  const on = new Set(lobbyQuick());
+  body.innerHTML = `<p class="text-[10px] text-slate-400">快捷服務要包含哪些外部選單（全部為單選，其他可複選）</p>
+      <div class="space-y-1.5 max-h-[50vh] overflow-y-auto">
+      <button type="button" role="radio" aria-checked="${all}" data-tip="lobby-quick-pick" data-action="lobby-quick-toggle" data-quick-id="all" class="${CHOICE}">
+        <span class="flex-1 text-sm font-bold text-slate-700 dark:text-slate-200">全部外部選單</span>${tick(all)}
+      </button>${list.map((p) => `
+      <button type="button" role="checkbox" aria-checked="${!all && on.has(p.id)}" data-tip="lobby-quick-pick" data-action="lobby-quick-toggle" data-quick-id="${esc(p.id)}" class="${CHOICE}">
+        <span class="w-8 h-8 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(p, "text-sm")}</span>
+        <span class="flex-1 min-w-0 text-sm font-bold text-slate-700 dark:text-slate-200 truncate">${esc(p.name || "（未命名）")}</span>${tick(!all && on.has(p.id))}
+      </button>`).join("")}</div>${list.length ? "" : '<p class="text-[11px] text-slate-400 text-center py-1">還沒有新增任何外部選單，請先到「所有應用設定 → 擴充插件」新增。</p>'}`;
+  fixAppIcons(body);
+}
 async function loadMenus() {
   menuState = "loading"; menuList = [];
   paintMenus(); // 「全部」不用等資料，先顯示出來
@@ -189,7 +205,7 @@ async function loadMenus() {
 
 function openDetail(id) {
   const a = lobbyOrdered().find((x) => x.id === id);
-  if (!a || a.plugin) return;
+  if (!a) return;
   closeDetail();
   const opts = modeOptions(id);
   const cur = getMode(id);
@@ -200,7 +216,7 @@ function openDetail(id) {
       </button>`).join("");
   const body = opts.length
     ? choices(opts)
-    : isCards || id === "菜單" ? "" : '<p class="text-[11px] text-slate-400 text-center py-3">這個服務暫時沒有可設定的項目。</p>';
+    : isCards || id === "菜單" || id === QUICK_ID ? "" : '<p class="text-[11px] text-slate-400 text-center py-3">這個服務暫時沒有可設定的項目。</p>';
   const box = document.createElement("div");
   box.id = "lobbyDetail";
   box.className = MODAL;
@@ -220,6 +236,7 @@ function openDetail(id) {
   fixAppIcons(box);
   if (isCards) loadCards();
   if (id === "菜單") loadMenus();
+  if (id === QUICK_ID) paintQuick();
   if (id === "記帳") paintLedger();
   if (id === "個人記事本") loadMemoChoices(opts, choices); // 補上目前有的每個分類
 }

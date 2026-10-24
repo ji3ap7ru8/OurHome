@@ -9,7 +9,8 @@ import { state, on } from "../core/store.js";
 import { showTipHint } from "../core/tips.js";
 import { showToast } from "../core/toast.js";
 import { micErrMsg, ensureMic } from "../core/mic.js";
-import { lobbyOrdered, getMode, modeLabelOf, lobbyCards, lobbyMenus, lobbyMenusAll, ledgerParts } from "../core/lobby-model.js";
+import { lobbyOrdered, getMode, modeLabelOf, lobbyCards, lobbyMenus, lobbyMenusAll, lobbyQuick, lobbyQuickAll, quickItems, QUICK_ID, ledgerParts } from "../core/lobby-model.js";
+import { openBrowserWindow } from "../core/browser-window.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
 import { noteItems, memoItems, calendarItems, calendarFetchRange, CAL_EMPTY, bowlItems, cardItems } from "../core/lobby-feed.js";
 import { notesApi, PALETTE as NOTE_PALETTE } from "../services/notes/data.js";
@@ -262,6 +263,20 @@ const SECTIONS = {
   },
 };
 
+/* ---------- 快捷服務：外部選單（擴充插件）集中在一張可左右滑動的圖卡 ---------- */
+SECTIONS[QUICK_ID] = {
+  load: async () => null,
+  build() {
+    const items = quickItems();
+    if (!items.length) return msg("還沒有外部選單（所有應用 ︙ 設定 → 擴充插件）");
+    // 懸浮視窗的插件：攔截點擊在站內開視窗（見下方 click 監聽）；否則就是一般連結，開新分頁
+    return items.map((p) => `<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" data-lob-quick="${esc(p.id)}" data-tip="lobby-quick" title="${esc(p.url)}" class="shrink-0 snap-start w-24 rounded-2xl px-2 py-3 flex flex-col items-center gap-1.5 bg-white/60 dark:bg-slate-800/60 border border-white/70 dark:border-slate-700/70 active:scale-95 transition">
+        <span class="w-12 h-12 rounded-xl theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(p, "text-xl")}</span>
+        <span class="w-full text-center text-xs font-black leading-tight text-slate-800 dark:text-slate-100 break-all line-clamp-2">${esc(p.name)}</span>
+      </a>`).join("");
+  },
+};
+
 /* ---------- 碼表：跑秒 ---------- */
 let swRaf = null;
 function swLoop() {
@@ -346,13 +361,14 @@ let raw = {};      // 這次進大廳讀回來的原始資料（改大廳設定�
 let seq = 0;       // 每次重畫 +1：舊的非同步結果不會蓋掉新畫面
 let wired = false;
 
-const modeLabel = (a) => (a.id === "生活圖卡" ? `已選 ${lobbyCards().length} 張` : a.id === "菜單" ? (lobbyMenusAll() ? "全部" : `已選 ${lobbyMenus().length} 份`) : modeLabelOf(a.id));
+const modeLabel = (a) => (a.id === QUICK_ID ? (lobbyQuickAll() ? "全部" : `已選 ${lobbyQuick().length} 個`) : a.id === "生活圖卡" ? `已選 ${lobbyCards().length} 張` : a.id === "菜單" ? (lobbyMenusAll() ? "全部" : `已選 ${lobbyMenus().length} 份`) : modeLabelOf(a.id));
 
 function shell(a) {
   // 除了「生活圖卡」（小卡直接打開那張圖卡），其餘服務點區塊任何地方都跳到該服務頁
-  const whole = a.id === "生活圖卡" || a.id === "菜單" || a.id === "翻譯機" || a.id === "碼表" || a.id === "計時器" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
+  const goto = a.id === QUICK_ID ? "應用程式" : a.id; // 快捷服務沒有自己的頁面，標題點了去「所有應用」
+  const whole = a.id === QUICK_ID || a.id === "生活圖卡" || a.id === "菜單" || a.id === "翻譯機" || a.id === "碼表" || a.id === "計時器" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
   return `<section id="lobbySec-${esc(a.id)}" ${whole} class="glass-card rounded-3xl py-3${whole ? " cursor-pointer" : ""}">
-    <button type="button" ${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" class="w-full flex items-center gap-2 px-4 text-left">
+    <button type="button" ${nav(goto)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" class="w-full flex items-center gap-2 px-4 text-left">
       <span class="w-7 h-7 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-xs")}</span>
       <span class="text-sm font-black text-slate-800 dark:text-slate-100 truncate">${esc(a.name)}</span>
       <span class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 truncate">${esc(modeLabel(a))}</span>
@@ -429,6 +445,12 @@ export function renderLobby(el /* , services */) {
       catch { out.textContent = "目前無法連線翻譯，請稍後再試"; }
     };
     document.addEventListener("click", async (e) => {
+      const quick = e.target.closest?.("[data-lob-quick]"); // 快捷服務：懸浮視窗插件在站內開視窗
+      if (quick) {
+        const p = quickItems().find((x) => x.id === quick.dataset.lobQuick);
+        if (p?.inApp) { e.preventDefault(); openBrowserWindow({ title: p.name, url: p.url }); }
+        return;
+      }
       const go = e.target.closest?.("[data-lob-tr-go]");
       if (go) return doTranslate(go.closest("[data-lob-tr]"));
 
