@@ -66,7 +66,7 @@ export function normalizeIconUrl(input) {
   if (u.username || u.password) return { error: "圖示連結裡不能包含帳號或密碼" };
   return { iconUrl: u.href };
 }
-const makePlugin = (p) => ({ id: p.id, url: p.url, name: cleanTitle(p.name) || pluginName(p.url), iconUrl: p.iconUrl || "", icon: PLUGIN_ICON, plugin: true });
+const makePlugin = (p) => ({ id: p.id, url: p.url, name: cleanTitle(p.name) || pluginName(p.url), iconUrl: p.iconUrl || "", inApp: p.inApp !== false, icon: PLUGIN_ICON, plugin: true }); // inApp：懸浮視窗（預設；舊設定檔沒這欄位也視為 true）；false＝新分頁
 const newId = () => "plg_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 /* ---------- 清單 ---------- */
@@ -150,7 +150,7 @@ export function resetOrder() {
 
 /* ---------- 插件 ---------- */
 // 回傳 { plugin } 或 { error }
-export function addPlugin(title, text, iconText = "") {
+export function addPlugin(title, text, iconText = "", inApp = true) {
   const name = cleanTitle(title);
   if (!name) return { error: "請先輸入標題" };
   const r = normalizeUrl(text);
@@ -159,8 +159,8 @@ export function addPlugin(title, text, iconText = "") {
   if (ic.error) return ic;
   const dup = state.apps.plugins.find((p) => p.url === r.url);
   if (dup) return { error: `這個網址已經新增過了（${makePlugin(dup).name}）` };
-  const p = { id: newId(), url: r.url, name, iconUrl: ic.iconUrl };
-  state.apps.plugins.push({ id: p.id, url: p.url, name: p.name, iconUrl: p.iconUrl });
+  const p = { id: newId(), url: r.url, name, iconUrl: ic.iconUrl, inApp: inApp !== false };
+  state.apps.plugins.push({ id: p.id, url: p.url, name: p.name, iconUrl: p.iconUrl, inApp: p.inApp });
   // 自訂排序中：新插件排在最後，並補上編號
   if (state.apps.order.length) state.apps.order.push(p.id);
   commit({ added: p.id });
@@ -168,7 +168,7 @@ export function addPlugin(title, text, iconText = "") {
 }
 
 // 編輯插件（只在 ︙ 所有應用設定 →「擴充插件」進行）：標題、網址、圖示連結。回傳 { plugin } 或 { error }
-export function updatePlugin(id, title, text, iconText = "") {
+export function updatePlugin(id, title, text, iconText = "", inApp = true) {
   const cur = state.apps.plugins.find((p) => p.id === id);
   if (!cur) return { error: "找不到這個插件" };
   const name = cleanTitle(title);
@@ -179,7 +179,7 @@ export function updatePlugin(id, title, text, iconText = "") {
   if (ic.error) return ic;
   const dup = state.apps.plugins.find((p) => p.id !== id && p.url === r.url);
   if (dup) return { error: `這個網址已經新增過了（${makePlugin(dup).name}）` };
-  cur.name = name; cur.url = r.url; cur.iconUrl = ic.iconUrl; // id 不變 → 排序編號、啟用狀態都保留
+  cur.name = name; cur.url = r.url; cur.iconUrl = ic.iconUrl; cur.inApp = inApp !== false; // id 不變 → 排序編號、啟用狀態都保留
   commit({ edited: id });
   return { plugin: makePlugin(cur) };
 }
@@ -201,7 +201,7 @@ export const snapshotApps = () => ({
   order: [...state.apps.order],
   disabled: [...state.apps.disabled], // 管理應用：停用的應用 id
   defaultsApplied: [...DEFAULT_OFF_APPS], // 已處理過「預設關閉」的應用 id：舊設定檔沒有的才會被補成關閉，之後使用者開啟就不會再被關掉
-  plugins: state.apps.plugins.map((p) => ({ id: p.id, url: p.url, name: p.name, iconUrl: p.iconUrl || "" })),
+  plugins: state.apps.plugins.map((p) => ({ id: p.id, url: p.url, name: p.name, iconUrl: p.iconUrl || "", inApp: p.inApp !== false })),
 });
 
 // 套用雲端讀到的設定：欄位一律檢查，壞掉的項目直接略過（不會讓整頁壞掉）
@@ -217,7 +217,7 @@ export function applyApps(s) {
     if (r.error || seen.has(r.url)) continue;
     seen.add(r.url);
     // 舊設定檔沒有標題時，退回用網址產生的名稱
-    plugins.push({ id: typeof p.id === "string" && p.id ? p.id : newId(), url: r.url, name: cleanTitle(p?.name) || pluginName(r.url), iconUrl: normalizeIconUrl(p?.iconUrl).iconUrl || "" }); // 舊設定檔沒有圖示連結 = 預設圖示；壞掉的連結直接忽略
+    plugins.push({ id: typeof p.id === "string" && p.id ? p.id : newId(), url: r.url, name: cleanTitle(p?.name) || pluginName(r.url), iconUrl: normalizeIconUrl(p?.iconUrl).iconUrl || "", inApp: p?.inApp !== false }); // 舊設定檔沒有圖示連結 = 預設圖示；壞掉的連結直接忽略
   }
   state.apps.plugins = plugins;
   const known = new Set(defaultApps().map((a) => a.id));

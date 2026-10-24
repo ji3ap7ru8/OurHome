@@ -202,12 +202,13 @@ function renderPlugins() {
 // 清單只顯示網域（完整網址太長不好看；點開插件時用完整網址）
 const hostOf = (url) => { try { return new URL(url).host.replace(/^www\./i, ""); } catch { return ""; } };
 
-const $f = () => ({ title: document.getElementById("pluginTitle"), url: document.getElementById("pluginUrl"), icon: document.getElementById("pluginIcon") });
+const $f = () => ({ title: document.getElementById("pluginTitle"), url: document.getElementById("pluginUrl"), icon: document.getElementById("pluginIcon"), inApp: document.getElementById("pluginInApp") });
 
 // 新增 / 儲存變更 共用同一組欄位（編輯時欄位會帶入該插件的資料）
 function submitPlugin() {
-  const { title, url, icon } = $f();
-  const r = editingId ? updatePlugin(editingId, title?.value, url?.value, icon?.value) : addPlugin(title?.value, url?.value, icon?.value);
+  const { title, url, icon, inApp } = $f();
+  const win = inApp ? inApp.checked : true;
+  const r = editingId ? updatePlugin(editingId, title?.value, url?.value, icon?.value, win) : addPlugin(title?.value, url?.value, icon?.value, win);
   if (r.error) {
     showToast(r.error);
     (r.error.startsWith("請先輸入標題") ? title : r.error.startsWith("圖示") ? icon : url)?.focus();
@@ -231,11 +232,12 @@ function setEditUi(on, name = "") {
 function startEdit(id) {
   const p = state.apps.plugins.find((x) => x.id === id);
   if (!p) return;
-  const { title, url, icon } = $f();
+  const { title, url, icon, inApp } = $f();
   editingId = id;
   title.value = p.name || "";
   url.value = p.url || "";
   icon.value = p.iconUrl || "";
+  if (inApp) inApp.checked = p.inApp !== false;
   setEditUi(true, p.name || pluginName(p.url));
   renderPlugins();
   document.getElementById("pluginBox")?.scrollIntoView({ block: "nearest" });
@@ -245,10 +247,11 @@ function startEdit(id) {
 function endEdit() {
   const was = editingId;
   editingId = null;
-  const { title, url, icon } = $f();
+  const { title, url, icon, inApp } = $f();
   if (title) title.value = "";
   if (url) url.value = "";
   if (icon) icon.value = "";
+  if (inApp) inApp.checked = true;
   setEditUi(false);
   if (was) renderPlugins();
 }

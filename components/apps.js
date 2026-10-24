@@ -4,6 +4,7 @@ import { state } from "../core/store.js";
 import { orderedApps } from "../core/apps-model.js";
 import { appIcon, fixAppIcons } from "../core/app-icon.js";
 import { showTipHint } from "../core/tips.js";
+import { openBrowserWindow } from "../core/browser-window.js";
 
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
@@ -33,9 +34,9 @@ export function renderApps(el, services) {
     const locked = svc?.requiresLogin && !state.isLoggedIn;
     const badge = f.plugin ? "外部" : !svc ? "即將推出" : locked ? "需登入" : "";
     const dim = svc || f.plugin ? "" : "opacity-60";
-    // 插件：直接開新分頁（noopener，不讓對方網頁控制本頁）；內建服務：走路由
+    // 插件：inApp＝站內懸浮視窗（點擊被攔截；保留 href 讓長按/右鍵仍可用新分頁開）；否則開新分頁（noopener，不讓對方網頁控制本頁）。內建服務：走路由
     const open = f.plugin
-      ? (cls, inner) => `<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer" title="${esc(f.url)}" data-tip="apps-plugin" class="${cls}">${inner}</a>`
+      ? (cls, inner) => `<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer" title="${esc(f.url)}" data-tip="apps-plugin"${f.inApp ? ` data-plugin-float="${esc(f.id)}"` : ""} class="${cls}">${inner}</a>`
       : (cls, inner) => `<button data-action="nav" data-feature="${esc(f.id)}" data-tip="apps-open" class="${cls}">${inner}</button>`;
     const name = esc(f.name);
     const icon = `<span class="${c.box} rounded-2xl theme-bg-light overflow-hidden flex items-center justify-center shrink-0 ${list ? "" : c.gap}">${appIcon(f, c.icon)}</span>`;
@@ -44,7 +45,7 @@ export function renderApps(el, services) {
         ${icon}
         <span class="flex-1 min-w-0 ${c.text} font-bold text-slate-800 dark:text-slate-100 truncate">${name}</span>
         ${badge ? `<span class="text-[0.65rem] font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full shrink-0">${badge}</span>` : ""}
-        <i class="fa-solid ${f.plugin ? "fa-arrow-up-right-from-square" : "fa-chevron-right"} text-xs text-slate-300 dark:text-slate-500 shrink-0"></i>`);
+        <i class="fa-solid ${f.plugin ? (f.inApp ? "fa-window-restore" : "fa-arrow-up-right-from-square") : "fa-chevron-right"} text-xs text-slate-300 dark:text-slate-500 shrink-0"></i>`);
     }
     return open(`relative min-w-0 bg-white/90 dark:bg-slate-800/90 rounded-3xl ${c.pad} flex flex-col items-center soft-shadow-sm active:scale-95 transition ${dim}`, `
         ${badge ? `<span class="absolute top-1.5 right-1.5 text-[0.6rem] font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded-full">${badge}</span>` : ""}
@@ -57,5 +58,14 @@ export function renderApps(el, services) {
       <div class="${list ? "flex flex-col" : "grid " + (GRID_COLS[cols] || GRID_COLS[2])} ${gap}">${html}</div>
     </div>`;
   fixAppIcons(el); // 插件圖示連不上 → 換回預設圖示
+  // 懸浮視窗插件：攔截點擊，改在站內開視窗（用 onclick 指定，重畫時不會重複綁定）
+  el.onclick = (e) => {
+    const a = e.target.closest("[data-plugin-float]");
+    if (!a) return;
+    const p = items.find((x) => x.id === a.dataset.pluginFloat);
+    if (!p) return;
+    e.preventDefault();
+    openBrowserWindow({ title: p.name, url: p.url });
+  };
   showTipHint("apps");
 }
