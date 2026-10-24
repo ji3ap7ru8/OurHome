@@ -63,8 +63,6 @@ function render() {
   const big = "h-16 rounded-full text-2xl font-black active:scale-95 transition";
   root.innerHTML = `
     <div class="px-4 pt-2 pb-28">
-      <h2 class="text-2xl font-black text-slate-800 dark:text-slate-100 mb-3 px-1"><i class="fa-solid fa-stopwatch theme-text-primary"></i> 碼表</h2>
-
       <div class="bg-white/95 dark:bg-slate-800/95 rounded-3xl soft-shadow-md px-4 py-7 mb-4 text-center" role="timer" aria-label="碼表">
         <div data-main class="font-black tabular-nums text-slate-900 dark:text-white leading-none ${st === "paused" ? "opacity-60" : ""}" style="font-size:clamp(2.4rem,13vw,3.6rem)">${fmtStopwatch(sw.elapsed())}</div>
         <div data-split class="mt-3 text-lg font-bold tabular-nums theme-text-primary ${sw.laps.length ? "" : "invisible"}">本圈 ${fmtStopwatch(sw.currentSplit())}</div>

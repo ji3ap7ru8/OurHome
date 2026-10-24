@@ -414,6 +414,37 @@ input[type=range] {
 .dark .bgt { fill: color-mix(in srgb, var(--primary-color) 14%, transparent); stroke: color-mix(in srgb, var(--primary-color) 34%, transparent); }
 .dark .bgt-t { fill: color-mix(in srgb, var(--primary-color) 34%, transparent); }
 
+/* ===== 碼表頁：淡色底 + 錶盤刻度圓環（全部由主題色 / 深淺色推算，換主題就跟著變） ===== */
+#appContainer[data-view="stopwatch"] #bgShapes { opacity: 0 !important; }
+#appContainer[data-view="stopwatch"] > .overflow-y-auto {
+    background-color: color-mix(in srgb, var(--primary-light) 30%, #f8fafc) !important;
+    background-image:
+        radial-gradient(90% 36% at 0% 0%, color-mix(in srgb, var(--primary-color) 12%, transparent), transparent 70%),
+        radial-gradient(90% 34% at 100% 100%, color-mix(in srgb, var(--primary-color) 14%, transparent), transparent 70%) !important;
+}
+#appContainer.dark[data-view="stopwatch"] > .overflow-y-auto {
+    background-color: color-mix(in srgb, var(--primary-dark) 14%, #0f172a) !important;
+    background-image:
+        radial-gradient(90% 36% at 0% 0%, color-mix(in srgb, var(--primary-color) 18%, transparent), transparent 70%),
+        radial-gradient(90% 34% at 100% 100%, color-mix(in srgb, var(--primary-color) 16%, transparent), transparent 70%) !important;
+}
+.bg-stopwatch-layer {
+    position: sticky; top: 0; height: var(--app-h); margin-bottom: calc(-1 * var(--app-h)); flex: none; overflow: hidden;
+    opacity: 0; transition: opacity .3s ease;
+}
+.bg-stopwatch-layer svg { width: 100%; height: 100%; display: block; }
+#appContainer[data-view="stopwatch"] .bg-stopwatch-layer { opacity: 1; }
+.bgw-f { fill: color-mix(in srgb, var(--primary-color) 8%, transparent); stroke: none; }
+.bgw-s { fill: none; stroke: color-mix(in srgb, var(--primary-color) 22%, transparent); stroke-width: 5; }
+.bgw-t { fill: none; stroke: color-mix(in srgb, var(--primary-color) 26%, transparent); }
+.bgw-a { fill: none; stroke: color-mix(in srgb, var(--primary-color) 38%, transparent); stroke-width: 9; stroke-linecap: round; }
+.bgw-d { fill: color-mix(in srgb, var(--primary-color) 32%, transparent); stroke: none; }
+.dark .bgw-f { fill: color-mix(in srgb, var(--primary-color) 13%, transparent); }
+.dark .bgw-s { stroke: color-mix(in srgb, var(--primary-color) 34%, transparent); }
+.dark .bgw-t { stroke: color-mix(in srgb, var(--primary-color) 38%, transparent); }
+.dark .bgw-a { stroke: color-mix(in srgb, var(--primary-color) 52%, transparent); }
+.dark .bgw-d { fill: color-mix(in srgb, var(--primary-color) 46%, transparent); }
+
 /* ===== 家庭日曆：左上角日曆切換（家庭日曆 / Google 日曆 / 全部） ===== */
 .cal-src { display: inline-flex; align-items: center; gap: .5rem; max-width: 100%; height: 2.5rem; padding: 0 .9rem; border-radius: 1rem; font-size: .95rem; font-weight: 800; color: var(--primary-dark); background: #fff; border: 1.5px solid var(--primary-color); box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-color) 28%, transparent); }
 .dark .cal-src { background: #1e293b; color: #f1f5f9; }

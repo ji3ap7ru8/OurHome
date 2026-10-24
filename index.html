@@ -122,6 +122,37 @@
             </svg>
         </div>
 
+        <!-- 「碼表」頁專用背景：錶盤刻度圓環 + 指針 + 弧線（顏色全由主題色推算，見 app.css） -->
+        <div id="bgStopwatch" class="bg-stopwatch-layer pointer-events-none z-0" aria-hidden="true">
+            <svg viewBox="0 0 390 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <g class="bgw">
+                    <!-- 右上：大錶盤（60 小刻度 + 12 大刻度 + 指針） -->
+                    <circle class="bgw-f" cx="338" cy="96" r="128"/>
+                    <circle class="bgw-s" cx="338" cy="96" r="128"/>
+                    <circle class="bgw-t" cx="338" cy="96" r="112" stroke-width="14" stroke-dasharray="2.4 9.33"/>
+                    <circle class="bgw-t big" cx="338" cy="96" r="112" stroke-width="24" stroke-dasharray="3.6 55.04" transform="rotate(-90 338 96)"/>
+                    <path class="bgw-a" d="M338 96 L338 20"/>
+                    <path class="bgw-a" d="M338 96 L384 130" stroke-width="7"/>
+                    <circle class="bgw-d" cx="338" cy="96" r="9"/>
+                    <!-- 左中：小錶盤 -->
+                    <circle class="bgw-f" cx="26" cy="420" r="84"/>
+                    <circle class="bgw-s" cx="26" cy="420" r="84"/>
+                    <circle class="bgw-t" cx="26" cy="420" r="70" stroke-width="12" stroke-dasharray="2.2 5.13"/>
+                    <path class="bgw-a" d="M26 420 L74 392"/>
+                    <circle class="bgw-d" cx="26" cy="420" r="7"/>
+                    <!-- 左下：進度弧線圓環 -->
+                    <circle class="bgw-s" cx="64" cy="706" r="92" stroke-width="16"/>
+                    <circle class="bgw-a" cx="64" cy="706" r="92" stroke-width="16" fill="none" stroke-dasharray="330 600" transform="rotate(-70 64 706)"/>
+                    <!-- 右下：小圓點與圓環 -->
+                    <circle class="bgw-f" cx="340" cy="640" r="52"/>
+                    <circle class="bgw-s" cx="340" cy="640" r="52"/>
+                    <circle class="bgw-d" cx="212" cy="772" r="14"/>
+                    <circle class="bgw-d" cx="364" cy="372" r="10"/>
+                    <circle class="bgw-d" cx="150" cy="300" r="7"/>
+                </g>
+            </svg>
+        </div>
+
         <!-- 「應用程式」頁專用背景：點陣 + 主題色光暈 + 圓環（只在該頁顯示，見 app.css） -->
         <div id="bgApps" class="bg-apps-layer overflow-hidden pointer-events-none z-0"></div>
 

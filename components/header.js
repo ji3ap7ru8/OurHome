@@ -28,9 +28,10 @@ function renderRoute(id) {
   const memo = id === "個人記事本"; // 我的筆記頁：不顯示大頭貼 / 名稱 / 信箱，左側改放「我的筆記」標題，右側多一個儲存位置下拉選單 // 換誰洗碗頁：不顯示大頭貼 / 名稱 / 信箱，個人化（調色盤）換成 ︙ 換誰洗碗設定
   const menu = id === "菜單";
   const tr = id === "翻譯機"; // 翻譯機頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「翻譯機」標題
+  const sw = id === "碼表"; // 碼表頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「碼表」標題
   const ledger = id === "記帳"; // 記帳本頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「記帳本」標題
-  document.getElementById("headerUser")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr);
-  document.getElementById("headerPaletteBtn")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr);
+  document.getElementById("headerUser")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr || sw);
+  document.getElementById("headerPaletteBtn")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr || sw);
   const mn = id === "菜單"; // 菜單頁：左側改放「菜單」標題，右側多一個 ︙ 菜單設定
   const ls = document.getElementById("headerLiveSwitch");
   ls?.classList.toggle("hidden", !tr);
@@ -44,6 +45,9 @@ function renderRoute(id) {
   const ma = document.getElementById("headerMenuBtn");
   ma?.classList.toggle("hidden", !mn);
   ma?.classList.toggle("flex", mn);
+  const swt = document.getElementById("headerStopwatchTitle");
+  swt?.classList.toggle("hidden", !sw);
+  swt?.classList.toggle("flex", sw);
   const lt = document.getElementById("headerLedgerTitle");
   lt?.classList.toggle("hidden", !ledger);
   lt?.classList.toggle("flex", ledger);
