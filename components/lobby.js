@@ -295,9 +295,9 @@ SECTIONS[QUICK_ID] = {
     const items = quickItems();
     if (!items.length) return msg("還沒有外部選單（所有應用 ︙ 設定 → 擴充插件）");
     // 懸浮視窗的插件：攔截點擊在站內開視窗（見下方 click 監聽）；否則就是一般連結，開新分頁
-    return items.map((p) => `<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" data-lob-quick="${esc(p.id)}" data-tip="lobby-quick" title="${esc(p.url)}" class="shrink-0 snap-start w-24 rounded-2xl px-2 py-3 flex flex-col items-center gap-1.5 bg-white/60 dark:bg-slate-800/60 border border-white/70 dark:border-slate-700/70 active:scale-95 transition">
-        <span class="w-12 h-12 rounded-xl theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(p, "text-xl")}</span>
-        <span class="w-full text-center text-xs font-black leading-tight text-slate-800 dark:text-slate-100 break-all line-clamp-2">${esc(p.name)}</span>
+    return items.map((p) => `<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" data-lob-quick="${esc(p.id)}" data-tip="lobby-quick" title="${esc(p.url)}" class="shrink-0 snap-start w-20 rounded-2xl px-1.5 py-1.5 flex flex-col items-center gap-1 bg-white/60 dark:bg-slate-800/60 border border-white/70 dark:border-slate-700/70 active:scale-95 transition">
+        <span class="w-10 h-10 rounded-xl theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(p, "text-lg")}</span>
+        <span class="w-full text-center text-[11px] font-black leading-tight text-slate-800 dark:text-slate-100 break-all line-clamp-2">${esc(p.name)}</span>
       </a>`).join("");
   },
 };
@@ -392,14 +392,14 @@ function shell(a) {
   // 除了「生活圖卡」（小卡直接打開那張圖卡），其餘服務點區塊任何地方都跳到該服務頁
   const goto = a.id === QUICK_ID ? "應用程式" : a.id; // 擴充插件沒有自己的頁面，標題點了去「所有應用」
   const whole = a.id === QUICK_ID || a.id === "生活圖卡" || a.id === "菜單" || a.id === "翻譯機" || a.id === "碼表" || a.id === "計時器" || a.id === "計算機" ? "" : `${nav(a.id)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" role="link" tabindex="-1"`;
-  return `<section id="lobbySec-${esc(a.id)}" ${whole} class="glass-card rounded-3xl py-3${whole ? " cursor-pointer" : ""}">
+  return `<section id="lobbySec-${esc(a.id)}" ${whole} class="glass-card rounded-3xl ${a.id === QUICK_ID ? "py-2" : "py-3"}${whole ? " cursor-pointer" : ""}">
     <button type="button" ${nav(goto)} data-tip="lobby-sec" data-tip-name="${esc(a.name)}" class="w-full flex items-center gap-2 px-4 text-left">
       <span class="w-7 h-7 rounded-lg theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(a, "text-xs")}</span>
       <span class="text-sm font-black text-slate-800 dark:text-slate-100 truncate">${esc(a.name)}</span>
       <span class="text-[11px] font-semibold text-slate-400 dark:text-slate-500 truncate">${esc(modeLabel(a))}</span>
       <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 dark:text-slate-600 ml-auto shrink-0"></i>
     </button>
-    <div data-strip class="flex gap-2 overflow-x-auto no-scrollbar snap-x px-4 ${a.id === "家庭日曆" ? "pt-5" : "pt-2"} pb-1">${msg("讀取中…")}</div>
+    <div data-strip class="flex gap-2 overflow-x-auto no-scrollbar snap-x px-4 ${a.id === QUICK_ID ? "lob-center pt-1 pb-0.5" : `${a.id === "家庭日曆" ? "pt-5" : "pt-2"} pb-1`}">${msg("讀取中…")}</div>
   </section>`;
 }
 

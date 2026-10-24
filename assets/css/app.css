@@ -996,3 +996,7 @@ label > input.sr-only { top: 0; left: 0; margin: 0; opacity: 0; pointer-events: 
 .fwin-frame { flex: 1; width: 100%; min-height: 0; border: 0; background: #fff; }
 .fwin-grip { position: absolute; right: 0; bottom: 0; width: 1.6rem; height: 1.6rem; cursor: nwse-resize; touch-action: none; background: linear-gradient(135deg, transparent 55%, var(--primary-color) 55%, var(--primary-color) 63%, transparent 63%, transparent 72%, var(--primary-color) 72%, var(--primary-color) 80%, transparent 80%); }
 .dark .fwin { background: #0f172a; }
+
+/* 大廳「擴充插件」：圖示列置中；插件太多要左右滑動時，用 auto 邊界而不是 justify-center，才不會左邊被切掉 */
+.lob-center > :first-child { margin-left: auto; }
+.lob-center > :last-child { margin-right: auto; }
