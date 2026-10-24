@@ -17,11 +17,15 @@ export const availableFeatures = [
   { id: "翻譯機",   name: "翻譯機",   icon: "fa-solid fa-language",       action: "service" },
   { id: "計時器",   name: "計時器",   icon: "fa-solid fa-hourglass-half", action: "service" },
   { id: "碼表",     name: "碼表",     icon: "fa-solid fa-stopwatch",      action: "service" },
+  { id: "LINE推播", name: "LINE推播", icon: "fa-brands fa-line",          action: "service" },
   { id: "設定",     name: "設定",     icon: "fa-solid fa-gear",           action: "settings" },
   { id: "最新提醒", name: "最新提醒", icon: "fa-solid fa-bell",           action: "notification" },
   { id: "網頁狀態", name: "網頁狀態", icon: "fa-solid fa-server",         action: "status" },
   { id: "登出",     name: "登出",     icon: "fa-solid fa-right-from-bracket", action: "logout" },
 ];
+
+// 管理應用：這些應用「預設關閉」（要到 ︙ 所有應用設定 → 管理應用 手動開啟）
+export const DEFAULT_OFF_APPS = ["換誰洗碗", "LINE推播"];
 
 export const DEFAULT_SHORTCUTS = ["家庭公告", "生活圖卡", "大廳", "應用程式", "設定"];
 

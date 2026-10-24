@@ -5,9 +5,9 @@
 // 內建服務與插件都用同一份排序，所以自訂排序可以把插件排在任何位置。
 // 狀態只在記憶體；登入後由 core/cloud.js 隨「系統設定」存取 Google 雲端硬碟（apps:change / apps:view 觸發自動存檔）。
 // 所有應用設定的參數（格式大小、排序方式、自訂編號、插件、停用的應用）都在 snapshotApps() 裡。
-// 管理應用：state.apps.disabled 是「停用的應用 id」，預設空陣列＝全部啟用；停用的應用不出現在所有應用頁，也不能放進底欄快捷功能。
+// 管理應用：state.apps.disabled 是「停用的應用 id」，預設是 DEFAULT_OFF_APPS（換誰洗碗、LINE推播）；停用的應用不出現在所有應用頁，也不能放進底欄快捷功能。
 import { state, emit } from "./store.js";
-import { availableFeatures } from "./config.js";
+import { availableFeatures, DEFAULT_OFF_APPS } from "./config.js";
 
 export const SORTS = ["default", "name", "custom"];
 export const DEFAULT_VIEW = { mode: "card", size: "m", cols: 2 };
@@ -199,7 +199,8 @@ export const snapshotApps = () => ({
   view: { ...state.appsView }, // 格式大小：圖卡/清單、大小、每行數量
   sort: state.apps.sort,
   order: [...state.apps.order],
-  disabled: [...state.apps.disabled], // 管理應用：停用的應用 id（空 = 全部啟用）
+  disabled: [...state.apps.disabled], // 管理應用：停用的應用 id
+  defaultsApplied: [...DEFAULT_OFF_APPS], // 已處理過「預設關閉」的應用 id：舊設定檔沒有的才會被補成關閉，之後使用者開啟就不會再被關掉
   plugins: state.apps.plugins.map((p) => ({ id: p.id, url: p.url, name: p.name, iconUrl: p.iconUrl || "" })),
 });
 
@@ -226,6 +227,9 @@ export function applyApps(s) {
   // 停用清單：只留下還存在的應用（舊設定檔沒有這欄 = 全部啟用）
   const disabled = [];
   for (const id of Array.isArray(s.disabled) ? s.disabled : []) if (typeof id === "string" && known.has(id) && !disabled.includes(id)) disabled.push(id);
+  // 預設關閉的應用：設定檔還沒處理過的（舊設定檔 / 新增的應用）補成關閉；已處理過的以使用者設定為準
+  const applied = Array.isArray(s.defaultsApplied) ? s.defaultsApplied : [];
+  for (const id of DEFAULT_OFF_APPS) if (!applied.includes(id) && known.has(id) && !disabled.includes(id)) disabled.push(id);
   state.apps.disabled = disabled;
   state.apps.sort = SORTS.includes(s.sort) && (s.sort !== "custom" || order.length) ? s.sort : "default";
   commit();
@@ -236,6 +240,6 @@ export function resetApps() {
   state.apps.sort = "default";
   state.apps.order = [];
   state.apps.plugins = [];
-  state.apps.disabled = [];
+  state.apps.disabled = [...DEFAULT_OFF_APPS];
   commit();
 }

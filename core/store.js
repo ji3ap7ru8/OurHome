@@ -2,7 +2,7 @@
 // 刻意只放在記憶體：依「無痕隱私」原則，不使用 Cookie / localStorage。
 // 唯一例外：開啟「自動登入」時，才會記住 Google 帳號（名稱/信箱/頭貼，見 core/autologin.js），關閉開關或登出即清除。
 
-import { DEFAULT_SHORTCUTS, FONT_SCALE } from "./config.js";
+import { DEFAULT_SHORTCUTS, DEFAULT_OFF_APPS, FONT_SCALE } from "./config.js";
 
 export const state = {
   isLoggedIn: false,
@@ -17,7 +17,7 @@ export const state = {
   dockVisible: true, // 底部快捷列開關（預設開）；關閉後只在大廳頁操作，其他頁只留「回大廳」小按鈕；隨系統設定存雲端
   theme: { mode: "light", colorName: "晨曦藍", fontScale: FONT_SCALE.default },
   appsView: { mode: "card", size: "m", cols: 2 }, // 所有應用頁瀏覽格式：card/list、l/m/s、2/3/4（登入後隨系統設定存 Google 雲端硬碟）
-  apps: { sort: "default", order: [], plugins: [], disabled: [] }, // 所有應用頁：排序方式（default/name/custom）、自訂編號順序（id 陣列）、擴充插件（{id,url,name}）、停用的應用（id 陣列，預設空＝全部啟用）。登入後隨系統設定存到雲端硬碟
+  apps: { sort: "default", order: [], plugins: [], disabled: [...DEFAULT_OFF_APPS] }, // 所有應用頁：排序方式（default/name/custom）、自訂編號順序（id 陣列）、擴充插件（{id,url,name}）、停用的應用（id 陣列，預設＝換誰洗碗、LINE推播關閉）。登入後隨系統設定存到雲端硬碟
   lobby: { shown: [], order: [], mode: {}, cards: [], menus: [] }, // 大廳設定：shown 大廳要顯示的服務 id（預設空＝全部關閉）、order 大廳自己的服務順序（空＝跟「所有應用」排序相同）、mode 各服務在大廳的顯示方式（沒設定＝用預設）、cards 大廳要顯示的生活圖卡 id（空＝都不顯示）；登入後隨系統設定存 Google 雲端硬碟
   cardsView: { mode: "card", size: "m", cols: 2 }, // 生活圖卡頁瀏覽格式：card/list、l/m/s、2/3（登入後隨系統設定存 Google 雲端硬碟）
   cardsSort: { sort: "default", order: [] }, // 生活圖卡排序：default/name/custom、自訂編號順序（圖卡 id 陣列）

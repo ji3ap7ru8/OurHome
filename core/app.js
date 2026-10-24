@@ -32,6 +32,7 @@ import bowl from "../services/bowl/index.js";
 import menu from "../services/menu/index.js";
 import duty from "../services/duty/index.js";
 import vault from "../services/vault/index.js";
+import linepush from "../services/linepush/index.js";
 
 export function bootstrap() {
   initActions(document);
@@ -76,6 +77,7 @@ export function bootstrap() {
   registerService(menu);
   registerService(duty);
   registerService(vault);
+  registerService(linepush);
   initRouter();
   navigate("大廳");
 
