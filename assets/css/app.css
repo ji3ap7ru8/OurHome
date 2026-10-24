@@ -477,6 +477,31 @@ input[type=range] {
 .dark .bgh { fill: color-mix(in srgb, var(--primary-color) 13%, transparent); stroke: color-mix(in srgb, var(--primary-color) 46%, transparent); }
 .dark .bgh .bgh-sand { fill: color-mix(in srgb, var(--primary-color) 42%, transparent); }
 
+/* ===== 計算機頁：淡色底 + 按鍵方塊 / 運算符號（全部由主題色 / 深淺色推算，換主題就跟著變） ===== */
+#appContainer[data-view="calculator"] #bgShapes { opacity: 0 !important; }
+#appContainer[data-view="calculator"] > .overflow-y-auto {
+    background-color: color-mix(in srgb, var(--primary-light) 30%, #f8fafc) !important;
+    background-image:
+        radial-gradient(90% 34% at 0% 0%, color-mix(in srgb, var(--primary-color) 12%, transparent), transparent 70%),
+        radial-gradient(90% 34% at 100% 100%, color-mix(in srgb, var(--primary-color) 14%, transparent), transparent 70%) !important;
+}
+#appContainer.dark[data-view="calculator"] > .overflow-y-auto {
+    background-color: color-mix(in srgb, var(--primary-dark) 14%, #0f172a) !important;
+    background-image:
+        radial-gradient(90% 34% at 0% 0%, color-mix(in srgb, var(--primary-color) 18%, transparent), transparent 70%),
+        radial-gradient(90% 34% at 100% 100%, color-mix(in srgb, var(--primary-color) 16%, transparent), transparent 70%) !important;
+}
+.bg-calc-layer {
+    position: sticky; top: 0; height: var(--app-h); margin-bottom: calc(-1 * var(--app-h)); flex: none; overflow: hidden;
+    opacity: 0; transition: opacity .3s ease;
+}
+.bg-calc-layer svg { width: 100%; height: 100%; display: block; }
+#appContainer[data-view="calculator"] .bg-calc-layer { opacity: 1; }
+.bgk { fill: color-mix(in srgb, var(--primary-color) 8%, transparent); stroke: color-mix(in srgb, var(--primary-color) 22%, transparent); stroke-width: 4; }
+.bgk-t { fill: color-mix(in srgb, var(--primary-color) 26%, transparent); font-family: "Noto Sans TC", Inter, sans-serif; }
+.dark .bgk { fill: color-mix(in srgb, var(--primary-color) 13%, transparent); stroke: color-mix(in srgb, var(--primary-color) 34%, transparent); }
+.dark .bgk-t { fill: color-mix(in srgb, var(--primary-color) 40%, transparent); }
+
 /* ===== 家庭日曆：左上角日曆切換（家庭日曆 / Google 日曆 / 全部） ===== */
 .cal-src { display: inline-flex; align-items: center; gap: .5rem; max-width: 100%; height: 2.5rem; padding: 0 .9rem; border-radius: 1rem; font-size: .95rem; font-weight: 800; color: var(--primary-dark); background: #fff; border: 1.5px solid var(--primary-color); box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-color) 28%, transparent); }
 .dark .cal-src { background: #1e293b; color: #f1f5f9; }

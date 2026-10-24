@@ -175,6 +175,31 @@
             </svg>
         </div>
 
+        <!-- 「計算機」頁專用背景：按鍵方塊 + 運算符號 + 點點（顏色全由主題色推算，見 app.css） -->
+        <div id="bgCalc" class="bg-calc-layer pointer-events-none z-0" aria-hidden="true">
+            <svg viewBox="0 0 390 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                <g class="bgk">
+                    <rect x="236" y="36" width="92" height="92" rx="26" transform="rotate(10 282 82)"/>
+                    <rect x="330" y="132" width="84" height="84" rx="24" transform="rotate(-8 372 174)"/>
+                    <rect x="-36" y="300" width="104" height="104" rx="30" transform="rotate(-12 16 352)"/>
+                    <rect x="300" y="430" width="96" height="96" rx="28" transform="rotate(14 348 478)"/>
+                    <rect x="20" y="600" width="88" height="88" rx="26" transform="rotate(8 64 644)"/>
+                    <rect x="236" y="690" width="100" height="100" rx="30" transform="rotate(-10 286 740)"/>
+                    <circle cx="150" cy="24" r="30"/><circle cx="106" cy="520" r="22"/><circle cx="360" cy="640" r="18"/>
+                </g>
+                <g class="bgk-t" font-weight="900" text-anchor="middle">
+                    <text x="282" y="106" font-size="64">+</text>
+                    <text x="372" y="196" font-size="62">÷</text>
+                    <text x="16" y="386" font-size="70">×</text>
+                    <text x="348" y="508" font-size="64">=</text>
+                    <text x="64" y="670" font-size="62">−</text>
+                    <text x="286" y="772" font-size="64">%</text>
+                    <text x="150" y="34" font-size="34">7</text>
+                    <text x="106" y="528" font-size="26">0</text>
+                </g>
+            </svg>
+        </div>
+
         <!-- 「應用程式」頁專用背景：點陣 + 主題色光暈 + 圓環（只在該頁顯示，見 app.css） -->
         <div id="bgApps" class="bg-apps-layer overflow-hidden pointer-events-none z-0"></div>
 

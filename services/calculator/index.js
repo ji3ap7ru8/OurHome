@@ -39,7 +39,6 @@ function render() {
 
   root.innerHTML = `
     <div class="px-4 pt-2 pb-28">
-      <h2 class="text-2xl font-black text-slate-800 dark:text-slate-100 mb-3 px-1"><i class="fa-solid fa-calculator theme-text-primary"></i> 計算機</h2>
 
       <div class="bg-white/95 dark:bg-slate-800/95 rounded-3xl soft-shadow-md px-5 py-4 mb-3 text-right" aria-live="polite">
         <div class="h-6 text-base font-semibold text-slate-400 dark:text-slate-500 truncate">${expr || "&nbsp;"}</div>
