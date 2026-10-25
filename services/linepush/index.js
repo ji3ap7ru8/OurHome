@@ -33,6 +33,7 @@ const CARD_BGS = [["#ffffff", "珍珠白"], ["#f0f9ff", "粉藍色"], ["#f0fdf4"
 function render() {
   if (!root) return;
   root.innerHTML = `<div class="px-5 pt-1 pb-6 space-y-4">${view === "lobby" ? lobbyHTML() : editorHTML()}</div>`;
+  syncHeader();
   if (view === "editor") { fillEditor(); showStep(); refreshPreview(); }
 }
 
@@ -88,11 +89,9 @@ function editorHTML() {
   const authors = [...names.map((n) => `<option value="${esc(n)}" ${n === def ? "selected" : ""}>${esc(n)}</option>`), `<option value="" ${def ? "" : "selected"}>不使用</option>`].join("");
   const card = "rounded-2xl bg-white/85 dark:bg-slate-800/85 border border-white/70 dark:border-slate-700/70 p-3.5 space-y-3 soft-shadow-sm";
   return `
-    <div class="flex items-center justify-between gap-2">
+    <div class="flex items-center gap-2">
       <button type="button" data-lp="back" class="px-3 py-2 rounded-xl bg-white/85 dark:bg-slate-800/85 border border-slate-200 dark:border-slate-700 text-xs font-black text-slate-600 dark:text-slate-200 active:scale-95 transition"><i class="fa-solid fa-arrow-left mr-1"></i>返回模版</button>
-      <button type="button" data-lp="clear" class="px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-xs font-black text-rose-500 active:scale-95 transition"><i class="fa-solid fa-eraser mr-1"></i>清除內容</button>
     </div>
-    <h3 id="lpEditorTitle" class="text-base font-black text-slate-800 dark:text-slate-100"></h3>
 
     <div class="sticky top-0 z-20 -mx-5 px-5 py-1.5 bg-white/70 dark:bg-slate-900/80 backdrop-blur">
       <div class="rounded-2xl overflow-hidden shadow-md" style="background:#849cb8">
@@ -166,7 +165,6 @@ function showStep() {
 function fillEditor() {
   const t = activeTpl;
   const set = (id, v) => { const el = $(id); if (el) el.value = v; };
-  $("lpEditorTitle").textContent = t.name;
   set("fieldTitle", t.title || "");
   set("fieldSubtitle", t.subtitle || "");
   set("fieldContent", t.content || "");
@@ -212,11 +210,24 @@ function configureForm(id) {
 
 function autoResize(el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; }
 
-function clearFields() {
-  ["fieldTitle", "fieldSubtitle", "fieldContent", "fieldButton", "fieldButtonUrl", "fieldImage", "fieldPkgId", "fieldStickerId", "fieldTagText", "fieldCountHours", "fieldCountMins", "fieldCountSecs"].forEach((id) => { const el = $(id); if (el) el.value = ""; });
-  if ($("fieldStars")) $("fieldStars").value = "5";
-  root.querySelectorAll("textarea").forEach(autoResize);
+// 恢復預設：內容與顏色都回到這款模版的範例
+function resetDefaults() {
+  if (view !== "editor" || !activeTpl) return;
+  activeTpl = JSON.parse(JSON.stringify(templates.find((t) => t.id === activeTpl.id)));
+  fillEditor();
+  $("primaryColor").value = "#0867d7";
+  $("btnTextColor").value = "#ffffff";
   refreshPreview();
+  showToast("已恢復成範例內容");
+}
+
+// 頂部列：編輯頁時，左邊標題換成模版名稱、右邊多一顆「恢復預設」；回到清單就換回原樣
+function syncHeader() {
+  const name = $("headerLineName"), sub = $("headerLineSub"), btn = $("headerLineResetBtn");
+  const edit = view === "editor" && !!activeTpl;
+  if (name) name.textContent = edit ? activeTpl.name : "LINE推播";
+  if (sub) sub.style.display = edit ? "none" : "";
+  if (btn) { btn.classList.toggle("hidden", !edit); btn.classList.toggle("flex", edit); }
 }
 
 /* ---------- 讀表單 → 訊息 ---------- */
@@ -268,7 +279,6 @@ function onClick(e) {
   if (a === "cat") { category = el.dataset.id; render(); }
   else if (a === "use") { activeTpl = JSON.parse(JSON.stringify(templates.find((t) => t.id === el.dataset.id))); view = "editor"; step = 1; render(); root.closest(".overflow-y-auto")?.scrollTo?.({ top: 0 }); }
   else if (a === "back") { view = "lobby"; activeTpl = null; render(); }
-  else if (a === "clear") clearFields();
   else if (a === "palette") { $("primaryColor").value = el.dataset.color; $("btnTextColor").value = "#ffffff"; refreshPreview(); }
   else if (a === "cardbg") { const c = el.dataset.color; $("cardBgColor").value = c; $("textColor").value = c === "#1e293b" ? "#ffffff" : "#111111"; refreshPreview(); }
   else if (a === "next") { step++; showStep(); toTop(); }
@@ -299,8 +309,9 @@ export default {
     root.addEventListener("click", onClick);
     root.addEventListener("input", onInput);
     root.addEventListener("change", onInput);
+    $("headerLineResetBtn")?.addEventListener("click", resetDefaults);
     offBot = on("linebotids:change", () => { if (view === "lobby") render(); }); // 設定改了（例如剛登入讀到雲端設定），更新提醒
     render();
   },
-  unmount() { closeLineSendDialog(); closeTips(); offBot?.(); offBot = null; root?.remove(); root = null; activeTpl = null; },
+  unmount() { view = "lobby"; syncHeader(); $("headerLineResetBtn")?.removeEventListener("click", resetDefaults); closeLineSendDialog(); closeTips(); offBot?.(); offBot = null; root?.remove(); root = null; activeTpl = null; },
 };

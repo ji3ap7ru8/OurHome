@@ -40,8 +40,8 @@ export const headerTemplate = `
                 <div id="headerLineTitle" class="hidden items-center gap-3 min-w-0 pr-2">
                     <span class="w-10 h-10 rounded-2xl flex items-center justify-center text-xl shrink-0 text-white shadow-sm" style="background:#06c755"><i class="fa-brands fa-line"></i></span>
                     <div class="flex flex-col min-w-0">
-                        <h2 class="text-xl font-black leading-tight text-slate-800 dark:text-slate-100">LINE推播</h2>
-                        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 leading-tight truncate">製作圖卡，發送 LINE Bot 通知</p>
+                        <h2 id="headerLineName" class="text-xl font-black leading-tight text-slate-800 dark:text-slate-100 truncate">LINE推播</h2>
+                        <p id="headerLineSub" class="text-xs font-semibold text-slate-500 dark:text-slate-400 leading-tight truncate">製作圖卡，發送 LINE Bot 通知</p>
                     </div>
                 </div>
 
@@ -83,6 +83,11 @@ export const headerTemplate = `
                         <input id="liveToggle" type="checkbox" class="sr-only" aria-label="即時翻譯">
                         <div class="oh-switch"></div>
                     </label>
+
+                    <!-- LINE推播編輯頁專用：恢復預設（由 services/linepush 控制顯示；其他頁隱藏） -->
+                    <button id="headerLineResetBtn" data-tip="lp-reset" class="hidden h-10 px-3 rounded-2xl bg-white dark:bg-slate-800 text-rose-500 soft-shadow-sm hover:scale-105 active:scale-95 transition-all items-center gap-1.5 font-black text-xs" title="恢復成範例內容" aria-label="恢復預設">
+                        <i class="fa-solid fa-rotate-left"></i><span>恢復預設</span>
+                    </button>
 
                     <button id="notificationBtn" data-tip="rem-bell" data-action="open-sheet" data-sheet="notification" class="relative w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 soft-shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center">
                         <i id="bellIcon" class="fa-regular fa-bell text-base theme-text-primary"></i>
