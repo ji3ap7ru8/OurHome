@@ -89,10 +89,6 @@ function editorHTML() {
   const authors = [...names.map((n) => `<option value="${esc(n)}" ${n === def ? "selected" : ""}>${esc(n)}</option>`), `<option value="" ${def ? "" : "selected"}>不使用</option>`].join("");
   const card = "rounded-2xl bg-white/85 dark:bg-slate-800/85 border border-white/70 dark:border-slate-700/70 p-3.5 space-y-3 soft-shadow-sm";
   return `
-    <div class="flex items-center gap-2">
-      <button type="button" data-lp="back" class="px-3 py-2 rounded-xl bg-white/85 dark:bg-slate-800/85 border border-slate-200 dark:border-slate-700 text-xs font-black text-slate-600 dark:text-slate-200 active:scale-95 transition"><i class="fa-solid fa-arrow-left mr-1"></i>返回模版</button>
-    </div>
-
     <div class="sticky top-0 z-20 -mx-5 px-5 py-1.5 bg-white/70 dark:bg-slate-900/80 backdrop-blur">
       <div class="rounded-2xl overflow-hidden shadow-md" style="background:#849cb8">
         <div class="flex items-center justify-between px-3 pt-2 text-[11px] font-black text-white/95">
@@ -211,6 +207,8 @@ function configureForm(id) {
 function autoResize(el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; }
 
 // 恢復預設：內容與顏色都回到這款模版的範例
+function backToLobby() { if (view !== "editor") return; view = "lobby"; activeTpl = null; render(); }
+
 function resetDefaults() {
   if (view !== "editor" || !activeTpl) return;
   activeTpl = JSON.parse(JSON.stringify(templates.find((t) => t.id === activeTpl.id)));
@@ -223,11 +221,13 @@ function resetDefaults() {
 
 // 頂部列：編輯頁時，左邊標題換成模版名稱、右邊多一顆「恢復預設」；回到清單就換回原樣
 function syncHeader() {
-  const name = $("headerLineName"), sub = $("headerLineSub"), btn = $("headerLineResetBtn");
+  const name = $("headerLineName"), sub = $("headerLineSub"), btn = $("headerLineResetBtn"), icon = $("headerLineIcon"), back = $("headerLineBackBtn");
   const edit = view === "editor" && !!activeTpl;
   if (name) name.textContent = edit ? activeTpl.name : "LINE推播";
   if (sub) sub.style.display = edit ? "none" : "";
   if (btn) { btn.classList.toggle("hidden", !edit); btn.classList.toggle("flex", edit); }
+  if (icon) icon.style.display = edit ? "none" : "";
+  if (back) { back.classList.toggle("hidden", !edit); back.classList.toggle("flex", edit); }
 }
 
 /* ---------- 讀表單 → 訊息 ---------- */
@@ -278,7 +278,6 @@ function onClick(e) {
   const a = el.dataset.lp;
   if (a === "cat") { category = el.dataset.id; render(); }
   else if (a === "use") { activeTpl = JSON.parse(JSON.stringify(templates.find((t) => t.id === el.dataset.id))); view = "editor"; step = 1; render(); root.closest(".overflow-y-auto")?.scrollTo?.({ top: 0 }); }
-  else if (a === "back") { view = "lobby"; activeTpl = null; render(); }
   else if (a === "palette") { $("primaryColor").value = el.dataset.color; $("btnTextColor").value = "#ffffff"; refreshPreview(); }
   else if (a === "cardbg") { const c = el.dataset.color; $("cardBgColor").value = c; $("textColor").value = c === "#1e293b" ? "#ffffff" : "#111111"; refreshPreview(); }
   else if (a === "next") { step++; showStep(); toTop(); }
@@ -310,8 +309,9 @@ export default {
     root.addEventListener("input", onInput);
     root.addEventListener("change", onInput);
     $("headerLineResetBtn")?.addEventListener("click", resetDefaults);
+    $("headerLineBackBtn")?.addEventListener("click", backToLobby);
     offBot = on("linebotids:change", () => { if (view === "lobby") render(); }); // 設定改了（例如剛登入讀到雲端設定），更新提醒
     render();
   },
-  unmount() { view = "lobby"; syncHeader(); $("headerLineResetBtn")?.removeEventListener("click", resetDefaults); closeLineSendDialog(); closeTips(); offBot?.(); offBot = null; root?.remove(); root = null; activeTpl = null; },
+  unmount() { view = "lobby"; syncHeader(); $("headerLineResetBtn")?.removeEventListener("click", resetDefaults); $("headerLineBackBtn")?.removeEventListener("click", backToLobby); closeLineSendDialog(); closeTips(); offBot?.(); offBot = null; root?.remove(); root = null; activeTpl = null; },
 };

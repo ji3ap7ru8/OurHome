@@ -38,7 +38,9 @@ export const headerTemplate = `
 
                 <!-- LINE推播頁專用：左側標題 + 副標（其他頁隱藏） -->
                 <div id="headerLineTitle" class="hidden items-center gap-3 min-w-0 pr-2">
-                    <span class="w-10 h-10 rounded-2xl flex items-center justify-center text-xl shrink-0 text-white shadow-sm" style="background:#06c755"><i class="fa-brands fa-line"></i></span>
+                    <span id="headerLineIcon" class="w-10 h-10 rounded-2xl flex items-center justify-center text-xl shrink-0 text-white shadow-sm" style="background:#06c755"><i class="fa-brands fa-line"></i></span>
+                    <!-- 編輯頁時取代上面的 LINE 圖示：返回模版（由 services/linepush 控制） -->
+                    <button id="headerLineBackBtn" type="button" data-tip="lp-back" class="hidden w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-200 soft-shadow-sm hover:scale-105 active:scale-95 transition-all items-center justify-center shrink-0" title="返回模版" aria-label="返回模版"><i class="fa-solid fa-arrow-left"></i></button>
                     <div class="flex flex-col min-w-0">
                         <h2 id="headerLineName" class="text-xl font-black leading-tight text-slate-800 dark:text-slate-100 truncate">LINE推播</h2>
                         <p id="headerLineSub" class="text-xs font-semibold text-slate-500 dark:text-slate-400 leading-tight truncate">製作圖卡，發送 LINE Bot 通知</p>
