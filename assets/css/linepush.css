@@ -1,0 +1,101 @@
+/* LINE推播圖卡預覽樣式：所有選擇器都掛在 .line-tpl-root 底下，不會影響其他頁。 */
+.line-tpl-root { --tpl-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif; text-align: left; }
+.line-tpl-root, .line-tpl-root * {
+  box-sizing: border-box;
+  font-family: var(--tpl-font);}
+.line-tpl-root .line-card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  font-size: 14px;
+  line-height: 1.5;
+  color: #111;
+  width: 100%;}
+.line-tpl-root .line-chat-bubble {
+  background: #ffffff;
+  border-radius: 16px;
+  border-top-left-radius: 4px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  font-size: 14px;
+  color: #111;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-width: 85%;}
+.line-tpl-root .line-pure-photo {
+  border-radius: 14px;
+  overflow: hidden;
+  max-width: 85%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);}
+.line-tpl-root .line-pure-photo img {
+  width: 100%;
+  height: auto;
+  display: block;}
+.line-tpl-root .line-sticker-box {
+  width: 130px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;}
+.line-tpl-root .line-sticker-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;}
+.line-tpl-root .card-banner { padding: 12px 16px; color: #fff; font-size: 16px; font-weight: bold; text-align: center;}
+.line-tpl-root .card-body { padding: 16px;}
+.line-tpl-root .card-img { width: 100%; height: 160px; object-fit: cover; display: block;}
+.line-tpl-root .card-title { font-size: 18px; font-weight: bold; margin-bottom: 6px; color: inherit; word-break: break-word;}
+.line-tpl-root .card-subtitle { font-size: 14px; opacity: 0.8; margin-bottom: 10px; word-break: break-word;}
+.line-tpl-root .card-btn {
+  display: block; width: 100%; padding: 10px 0; text-align: center;
+  border-radius: 6px; font-size: 14px; font-weight: bold; margin-top: 10px; text-decoration: none; border: none; word-break: break-word;
+  cursor: pointer;}
+.line-tpl-root .card-btn-outline {
+  display: block; width: 100%; padding: 9px 0; text-align: center;
+  border-radius: 6px; font-size: 13px; font-weight: bold; margin-top: 6px; background: transparent; border: 1px solid #ccc; color: inherit; text-decoration: none; word-break: break-word;}
+.line-tpl-root .divider { height: 1px; background: rgba(0,0,0,0.1); margin: 8px 0;}
+.line-tpl-root .kv-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; color: inherit;}
+.line-tpl-root .cover-card { position: relative; height: 200px; border-radius: 12px; overflow: hidden; background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end;}
+.line-tpl-root .cover-overlay { background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%); padding: 12px; color: #fff;}
+.line-tpl-root .timeline { position: relative; padding-left: 16px; border-left: 2px solid #0867d7; margin: 8px 0 8px 6px;}
+.line-tpl-root .timeline-node { position: relative; margin-bottom: 6px; font-size: 12px; color: inherit; word-break: break-word;}
+.line-tpl-root .timeline-node::before { content: ""; position: absolute; left: -21px; top: 3px; width: 7px; height: 7px; border-radius: 50%; background: #0867d7; border: 2px solid #fff;}
+.line-tpl-root .calendar-box { display: flex; gap: 10px; align-items: center; background: rgba(0,0,0,0.04); padding: 10px; border-radius: 8px; margin-bottom: 8px;}
+.line-tpl-root .calendar-badge { background: #0867d7; color: #fff; border-radius: 6px; padding: 6px 10px; text-align: center; min-width: 50px;}
+.line-tpl-root .calendar-badge .month { font-size: 10px; text-transform: uppercase;}
+.line-tpl-root .calendar-badge .day { font-size: 18px; font-weight: bold;}
+.line-tpl-root .coupon-card { border: 2px dashed #0284c7; background: #f0f9ff; border-radius: 12px; padding: 14px; text-align: center;}
+.line-tpl-root .coupon-wrapper { border: 2px solid #0284c7; border-radius: 12px; padding: 14px; text-align: center; background: inherit;}
+.line-tpl-root .coupon-amount { font-size: 24px; font-weight: 900; color: #0284c7; margin: 4px 0;}
+.line-tpl-root .member-card { background-color: #1e293b; color: #fff; border-radius: 12px; padding: 14px; border: 1px solid #334155;}
+.line-tpl-root .member-points { font-size: 20px; font-weight: bold; color: #38bdf8; word-break: break-word;}
+.line-tpl-root .rating-stars { color: #f59e0b; font-size: 18px; margin: 6px 0; text-align: center; letter-spacing: 2px;}
+.line-tpl-root .qa-box { background: rgba(0,0,0,0.04); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; font-size: 12px; word-break: break-word;}
+.line-tpl-root .qa-q { font-weight: bold; color: #0284c7; margin-bottom: 2px;}
+.line-tpl-root .stat-num { font-size: 26px; font-weight: 800; color: #0867d7; line-height: 1.1;}
+.line-tpl-root .countdown-row { display:flex; gap:6px; justify-content:center; align-items:center; margin:10px 0;}
+.line-tpl-root .countdown-box { background:#111827; color:#fff; border-radius:8px; padding:8px 6px; min-width:46px; text-align:center;}
+.line-tpl-root .countdown-num { font-size:18px; font-weight:800; line-height:1.1;}
+.line-tpl-root .countdown-label { font-size:9px; opacity:0.7; margin-top:2px;}
+.line-tpl-root .countdown-colon { font-weight:800; font-size:16px; color:#94a3b8;}
+.line-tpl-root .weather-card-title { font-size: 24px; font-weight: 800; margin-bottom: 4px; color: inherit; word-break: break-word;}
+.line-tpl-root .weather-icon-big { font-size: 54px; text-align: center; margin: 6px 0 10px; line-height: 1;}
+.line-tpl-root .weather-list-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: inherit; background: rgba(0,0,0,0.05); padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; word-break: break-word; font-weight: 500;}
+.line-tpl-root .progress-track { background:rgba(0,0,0,0.1); border-radius:20px; height:10px; overflow:hidden; margin:10px 0 4px;}
+.line-tpl-root .progress-fill { height:100%; border-radius:20px; transition: width 0.3s ease;}
+.line-tpl-root .progress-status { font-size:12px; font-weight:bold; text-align:right;}
+.line-tpl-root .video-thumb { position:relative; border-radius:10px 10px 0 0; overflow:hidden; background:#000;}
+.line-tpl-root .video-thumb img { width:100%; display:block; height:150px; object-fit:cover; opacity:0.85;}
+.line-tpl-root .video-play-btn { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:46px; height:46px; background:rgba(0,0,0,0.55); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px;}
+.line-tpl-root .video-duration { position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.75); color:#fff; font-size:10px; padding:2px 6px; border-radius:4px; font-weight:600;}
+.line-tpl-root .map-box { background:repeating-linear-gradient(45deg, #e2e8f0, #e2e8f0 10px, #eef2f7 10px, #eef2f7 20px); border-radius:8px; height:110px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; position:relative; overflow:hidden;}
+.line-tpl-root .map-pin { font-size:30px; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.25));}
+.line-tpl-root .birthday-card { border-radius:12px; padding:18px 14px; text-align:center; background:linear-gradient(135deg,#fce7f3 0%,#ede9fe 100%); color: #1e293b;}
+.line-tpl-root .birthday-icon { font-size:34px; margin-bottom:4px;}
+.line-tpl-root .poll-row { margin-bottom:10px;}
+.line-tpl-root .poll-label-row { display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px; color:inherit; word-break:break-word;}
+.line-tpl-root .poll-track { background:rgba(0,0,0,0.08); border-radius:6px; height:9px; overflow:hidden;}
+.line-tpl-root .poll-fill { height:100%; border-radius:6px;}
