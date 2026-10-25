@@ -1000,3 +1000,30 @@ label > input.sr-only { top: 0; left: 0; margin: 0; opacity: 0; pointer-events: 
 /* 大廳「擴充插件」：圖示列置中；插件太多要左右滑動時，用 auto 邊界而不是 justify-center，才不會左邊被切掉 */
 .lob-center > :first-child { margin-left: auto; }
 .lob-center > :last-child { margin-right: auto; }
+
+/* ===== LINE推播頁：LINE 綠（固定色，不跟主題）漸層底 + 斜紋 + 空心對話泡泡 / 紙飛機 ===== */
+#appContainer[data-view="linepush"] #bgShapes { opacity: 0 !important; }
+#appContainer[data-view="linepush"] > .overflow-y-auto {
+    background-color: #f1fbf5 !important;
+    background-image:
+        repeating-linear-gradient(135deg, transparent 0 22px, rgba(6, 199, 85, .045) 22px 24px),
+        linear-gradient(180deg, #dcf7e6 0%, #f1fbf5 38%, #ffffff 100%) !important;
+}
+#appContainer.dark[data-view="linepush"] > .overflow-y-auto {
+    background-color: #0b1712 !important;
+    background-image:
+        repeating-linear-gradient(135deg, transparent 0 22px, rgba(6, 199, 85, .06) 22px 24px),
+        linear-gradient(180deg, #0f2a1c 0%, #0b1712 45%, #0f172a 100%) !important;
+}
+.bg-line-layer {
+    position: sticky; top: 0; height: var(--app-h); margin-bottom: calc(-1 * var(--app-h)); flex: none; overflow: hidden;
+    opacity: 0; transition: opacity .3s ease;
+}
+.bg-line-layer svg { width: 100%; height: 100%; display: block; }
+#appContainer[data-view="linepush"] .bg-line-layer { opacity: 1; }
+.bgl-f { fill: rgba(6, 199, 85, .10); }
+.bgl-s { fill: none; stroke: rgba(6, 199, 85, .38); stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 2 11; }
+.bgl-d { fill: rgba(6, 199, 85, .26); }
+.dark .bgl-f { fill: rgba(6, 199, 85, .12); }
+.dark .bgl-s { stroke: rgba(6, 199, 85, .5); }
+.dark .bgl-d { fill: rgba(6, 199, 85, .36); }

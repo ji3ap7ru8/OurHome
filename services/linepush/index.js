@@ -6,15 +6,8 @@ let root = null;
 
 function render() {
   root.innerHTML = `
-    <div class="px-5 pt-3 pb-6 space-y-4">
-      <div class="flex items-center gap-3">
-        <span class="w-12 h-12 rounded-2xl theme-bg-light theme-text-primary flex items-center justify-center text-xl"><i class="fa-brands fa-line"></i></span>
-        <div class="min-w-0">
-          <h2 class="text-2xl font-black text-slate-800 dark:text-slate-100 leading-tight">LINE推播</h2>
-          <p class="text-sm font-bold text-slate-500 dark:text-slate-400">製作圖卡，發送 LINE Bot 通知</p>
-        </div>
-      </div>
-      <p class="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 text-center text-sm font-bold text-slate-500 dark:text-slate-400 py-3 px-4 leading-relaxed"><i class="fa-solid fa-hammer mr-1"></i>功能開發中</p>
+    <div class="px-5 pt-1 pb-6 space-y-4">
+      <p class="rounded-2xl border-2 border-dashed text-center text-sm font-bold py-3 px-4 leading-relaxed" style="border-color:#06c75566;color:#047a37;background:#ffffffb3"><i class="fa-solid fa-hammer mr-1"></i>功能開發中</p>
     </div>`;
 }
 

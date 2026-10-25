@@ -31,9 +31,10 @@ function renderRoute(id) {
   const sw = id === "碼表"; // 碼表頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「碼表」標題
   const calc = id === "計算機"; // 計算機頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「計算機」標題
   const tm = id === "計時器"; // 計時器頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「計時器」標題
+  const line = id === "LINE推播"; // LINE推播頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「LINE推播」標題
   const ledger = id === "記帳"; // 記帳本頁：不顯示大頭貼 / 名稱 / 信箱與調色盤，左側改放「記帳本」標題
-  document.getElementById("headerUser")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr || sw || tm || calc);
-  document.getElementById("headerPaletteBtn")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr || sw || tm || calc);
+  document.getElementById("headerUser")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr || sw || tm || calc || line);
+  document.getElementById("headerPaletteBtn")?.classList.toggle("hidden", apps || notes || cal || cards || bowl || memo || ledger || menu || tr || sw || tm || calc || line);
   const mn = id === "菜單"; // 菜單頁：左側改放「菜單」標題，右側多一個 ︙ 菜單設定
   const ls = document.getElementById("headerLiveSwitch");
   ls?.classList.toggle("hidden", !tr);
@@ -56,6 +57,9 @@ function renderRoute(id) {
   const swt = document.getElementById("headerStopwatchTitle");
   swt?.classList.toggle("hidden", !sw);
   swt?.classList.toggle("flex", sw);
+  const lnt = document.getElementById("headerLineTitle");
+  lnt?.classList.toggle("hidden", !line);
+  lnt?.classList.toggle("flex", line);
   const lt = document.getElementById("headerLedgerTitle");
   lt?.classList.toggle("hidden", !ledger);
   lt?.classList.toggle("flex", ledger);
