@@ -295,9 +295,9 @@ SECTIONS[QUICK_ID] = {
     const items = quickItems();
     if (!items.length) return msg("還沒有外部選單（所有應用 ︙ 設定 → 擴充插件）");
     // 懸浮視窗的插件：攔截點擊在站內開視窗（見下方 click 監聽）；否則就是一般連結，開新分頁
-    return items.map((p) => `<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" data-lob-quick="${esc(p.id)}" data-tip="lobby-quick" title="${esc(p.url)}" class="shrink-0 snap-start w-20 rounded-2xl px-1.5 py-1.5 flex flex-col items-center gap-1 bg-white/60 dark:bg-slate-800/60 border border-white/70 dark:border-slate-700/70 active:scale-95 transition">
-        <span class="w-10 h-10 rounded-xl theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(p, "text-lg")}</span>
-        <span class="w-full text-center text-[11px] font-black leading-tight text-slate-800 dark:text-slate-100 break-all line-clamp-2">${esc(p.name)}</span>
+    return items.map((p) => `<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" data-lob-quick="${esc(p.id)}" data-tip="lobby-quick" title="${esc(p.url)}" class="shrink-0 snap-start w-[5.5rem] rounded-2xl px-1.5 py-1.5 flex flex-col items-center gap-1 bg-white/60 dark:bg-slate-800/60 border border-white/70 dark:border-slate-700/70 active:scale-95 transition">
+        <span class="w-14 h-14 rounded-2xl theme-bg-light overflow-hidden flex items-center justify-center shrink-0">${appIcon(p, "text-2xl")}</span>
+        <span class="w-full text-center text-xs font-black leading-tight text-slate-800 dark:text-slate-100 break-all line-clamp-2">${esc(p.name)}</span>
       </a>`).join("");
   },
 };
